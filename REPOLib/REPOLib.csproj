@@ -1,0 +1,118 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName><!-- PLUGIN_GUID -->
+    <Product>$(MSBuildProjectName)</Product>          <!-- PLUGIN_NAME -->
+    <Version>1.0.0</Version>                          <!-- PLUGIN_VERSION -->
+    <Authors>Zehs</Authors>
+    <Description>Library for adding content to R.E.P.O.</Description>
+    <PackageTags>unity, bepinex, photon, modding</PackageTags>
+    <Copyright>Copyright © 2025 Zehs</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ZehsTeam/REPOLib</RepositoryUrl>
+    <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
+    
+    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    
+    <IsPackable>true</IsPackable>
+    <PackageId>Zehs.$(AssemblyName)</PackageId>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
+    
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
+    
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.samboy.dev/v3/index.json;
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+  
+  <Target Name="ClearReferenceCopyLocalPaths" AfterTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" />
+    </ItemGroup>
+  </Target>
+  
+  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="$(ProjectDir)../README.md" Pack="true" PackagePath="/" />
+    <None Include="$(ProjectDir)../icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="UnityEngine.Modules" Version="2022.3.21" IncludeAssets="compile" PrivateAssets="all" />
+  </ItemGroup>
+  
+  <!-- EDIT THESE SETTINGS -->
+  <PropertyGroup>
+    <!-- REPO publicized assemblies folder -->
+    <GamePublicizedAssembiesFolder>D:\Documents\REPO Modding\Game</GamePublicizedAssembiesFolder>
+
+    <!-- Steam library folder -->
+    <SteamLibrary>D:\SteamLibrary\steamapps\common</SteamLibrary>
+    
+    <!-- Gale profile name -->
+    <GaleProfile>Mod Development</GaleProfile>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <!-- REPO folder -->
+    <GameFolder>$(SteamLibrary)\REPO</GameFolder>
+    
+    <!-- REPO managed folder -->
+    <GameManagedFolder>$(GameFolder)\REPO_Data\Managed</GameManagedFolder>
+
+    <!-- Gale plugins folder -->
+    <GalePluginsFolder>$(AppData)\com.kesomannen.gale\repo\profiles\$(GaleProfile)\BepInEx\plugins</GalePluginsFolder>
+
+    <!-- Gale plugin folder -->
+    <GalePluginFolder>$(GalePluginsFolder)\Zehs-$(MSBuildProjectName)</GalePluginFolder>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">          <HintPath>$(GamePublicizedAssembiesFolder)\Assembly-CSharp.dll          </HintPath></Reference>
+    <Reference Include="Assembly-CSharp-firstpass"><HintPath>$(GamePublicizedAssembiesFolder)\Assembly-CSharp-firstpass.dll</HintPath></Reference>
+    
+    <Reference Include="Photon3Unity3D">                 <HintPath>$(GameManagedFolder)\Photon3Unity3D.dll                 </HintPath></Reference>
+    <Reference Include="PhotonChat">                     <HintPath>$(GameManagedFolder)\PhotonChat.dll                     </HintPath></Reference>
+    <Reference Include="PhotonRealtime">                 <HintPath>$(GameManagedFolder)\PhotonRealtime.dll                 </HintPath></Reference>
+    <Reference Include="PhotonUnityNetworking">          <HintPath>$(GameManagedFolder)\PhotonUnityNetworking.dll          </HintPath></Reference>
+    <Reference Include="PhotonUnityNetworking.Utilities"><HintPath>$(GameManagedFolder)\PhotonUnityNetworking.Utilities.dll</HintPath></Reference>
+    <Reference Include="PhotonVoice.API">                <HintPath>$(GameManagedFolder)\PhotonVoice.API.dll                </HintPath></Reference>
+    <Reference Include="PhotonVoice">                    <HintPath>$(GameManagedFolder)\PhotonVoice.dll                    </HintPath></Reference>
+    <Reference Include="PhotonVoice.PUN">                <HintPath>$(GameManagedFolder)\PhotonVoice.PUN.dll                </HintPath></Reference>
+    
+    <Reference Include="Sirenix.OdinInspector.Attributes"><HintPath>$(GameManagedFolder)\Sirenix.OdinInspector.Attributes.dll</HintPath></Reference>
+    <Reference Include="Sirenix.Serialization.Config">    <HintPath>$(GameManagedFolder)\Sirenix.Serialization.Config.dll    </HintPath></Reference>
+    <Reference Include="Sirenix.Serialization">           <HintPath>$(GameManagedFolder)\Sirenix.Serialization.dll           </HintPath></Reference>
+    <Reference Include="Sirenix.Utilities">               <HintPath>$(GameManagedFolder)\Sirenix.Utilities.dll               </HintPath></Reference>
+  </ItemGroup>
+  
+  <!-- Copy DLL to Gale Zehs-REPOLib plugin folder -->
+  <Target Name="CopyToGalePluginFolder" AfterTargets="PostBuildEvent">
+    <Copy DestinationFolder="$(GalePluginFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
+  </Target>
+</Project>
