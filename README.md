@@ -12,7 +12,7 @@ Download [REPOLib](https://thunderstore.io/c/repo/p/Zehs/REPOLib/) on Thundersto
 ## Usage
 <details><summary>Click to expand</summary><br>
 
-Reference REPOLib in your project's `.csproj` file.
+Reference [REPOLib](https://www.nuget.org/packages/Zehs.REPOLib) in your project's `.csproj` file.
 ```
 <ItemGroup>
   <PackageReference Include="Zehs.REPOLib" Version="1.*" />

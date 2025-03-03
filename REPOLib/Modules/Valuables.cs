@@ -8,11 +8,15 @@ namespace REPOLib.Modules;
 
 public static class Valuables
 {
+    public static IReadOnlyList<GameObject> RegisteredValuables => _valuablesRegistered;
+
     private static readonly HashSet<LevelValuables> _valuablePresets = new HashSet<LevelValuables>(new LevelValuableComparer());
     private static readonly List<GameObject> _valuablesToRegister = [];
+    private static readonly List<GameObject> _valuablesRegistered = [];
 
-    public static List<GameObject> RegisteredValuables { get; private set; } = [];
+    private static bool _canRegisterValuables = true;
 
+    [Obsolete("", true)]
     private static bool _registeredValuables = false;
 
     private static void CacheValuablePresets()
@@ -34,7 +38,7 @@ public static class Valuables
 
     internal static void RegisterValuables()
     {
-        if (_registeredValuables)
+        if (!_canRegisterValuables)
         {
             return;
         }
@@ -51,7 +55,7 @@ public static class Valuables
 
         foreach (var valuable in _valuablesToRegister)
         {
-            if (RegisteredValuables.Contains(valuable))
+            if (_valuablesRegistered.Contains(valuable))
             {
                 continue;
             }
@@ -60,7 +64,7 @@ public static class Valuables
             {
                 if (preset.AddValuable(valuable))
                 {
-                    RegisteredValuables.Add(valuable);
+                    _valuablesRegistered.Add(valuable);
                     Logger.LogInfo($"Added valuable \"{valuable.name}\" to valuable preset \"{preset.name}\"", extended: true);
                 }
                 else
@@ -71,7 +75,7 @@ public static class Valuables
         }
 
         _valuablesToRegister.Clear();
-        _registeredValuables = true;
+        _canRegisterValuables = false;
     }
 
     public static void RegisterValuable(GameObject prefab)
@@ -91,7 +95,7 @@ public static class Valuables
             throw new ArgumentException("Failed to register valuable. PrefabId is invalid.");
         }
 
-        if (_registeredValuables)
+        if (!_canRegisterValuables)
         {
             Logger.LogError($"Failed to register valuable \"{prefabId}\". You can only register valuables in awake!");
             return;
