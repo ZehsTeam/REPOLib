@@ -1,5 +1,6 @@
 ﻿using REPOLib.Extensions;
 using REPOLib.Objects;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,8 @@ public static class Valuables
 {
     private static readonly HashSet<LevelValuables> _valuablePresets = new HashSet<LevelValuables>(new LevelValuableComparer());
     private static readonly List<GameObject> _valuablesToRegister = [];
+
+    public static List<GameObject> RegisteredValuables { get; private set; } = [];
 
     private static bool _registeredValuables = false;
 
@@ -38,17 +41,32 @@ public static class Valuables
 
         CacheValuablePresets();
 
-        if (_valuablesToRegister.Count == 0)
+        if (_valuablePresets.Count == 0)
         {
             Logger.LogError($"Failed to register valuables. LevelValuables list is empty!");
             return;
         }
 
+        Logger.LogInfo($"Adding valuables to valuable presets.");
+
         foreach (var valuable in _valuablesToRegister)
         {
+            if (RegisteredValuables.Contains(valuable))
+            {
+                continue;
+            }
+
             foreach (var preset in _valuablePresets)
             {
-                preset.AddValuable(valuable);
+                if (preset.AddValuable(valuable))
+                {
+                    RegisteredValuables.Add(valuable);
+                    Logger.LogInfo($"Added valuable \"{valuable.name}\" to valuable preset \"{preset.name}\"", extended: true);
+                }
+                else
+                {
+                    Logger.LogWarning($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{preset.name}\"", extended: true);
+                }
             }
         }
 
@@ -58,11 +76,21 @@ public static class Valuables
 
     public static void RegisterValuable(GameObject prefab)
     {
-        RegisterValuable(prefab.name, prefab);
+        RegisterValuable(prefab?.name, prefab);
     }
 
     public static void RegisterValuable(string prefabId, GameObject prefab)
     {
+        if (prefab == null)
+        {
+            throw new ArgumentException("Failed to register valuable. Prefab is null.");
+        }
+
+        if (string.IsNullOrWhiteSpace(prefabId))
+        {
+            throw new ArgumentException("Failed to register valuable. PrefabId is invalid.");
+        }
+
         if (_registeredValuables)
         {
             Logger.LogError($"Failed to register valuable \"{prefabId}\". You can only register valuables in awake!");
@@ -71,6 +99,7 @@ public static class Valuables
 
         if (_valuablesToRegister.Contains(prefab))
         {
+            Logger.LogWarning($"Failed to register valuable \"{prefabId}\". This valuable is already registered!");
             return;
         }
 

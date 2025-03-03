@@ -23,23 +23,24 @@ public static class NetworkPrefabs
 
     internal static void Initialize()
     {
-        Logger.LogInfo($"Initializing NetworkPrefabs.");
-
-        if (PhotonNetwork.PrefabPool == null)
-        {
-            Logger.LogError("NetworkPrefabs failed to initialize. PhotonNetwork.PrefabPool is null.");
-            return;
-        }
-
         if (PhotonNetwork.PrefabPool is CustomPrefabPool)
         {
             Logger.LogWarning("NetworkPrefabs failed to initialize. PhotonNetwork.PrefabPool is already a CustomPrefabPool.");
             return;
         }
 
+        Logger.LogInfo($"Initializing NetworkPrefabs.");
         Logger.LogInfo($"PhotonNetwork.PrefabPool = {PhotonNetwork.PrefabPool.GetType()}", extended: true);
 
-        CustomPrefabPool.OriginalPool = PhotonNetwork.PrefabPool;
+        if (PhotonNetwork.PrefabPool is DefaultPool defaultPool)
+        {
+            CustomPrefabPool.DefaultPool = defaultPool;
+        }
+        else
+        {
+            CustomPrefabPool.OtherPool = PhotonNetwork.PrefabPool;
+        }
+
         PhotonNetwork.PrefabPool = CustomPrefabPool;
 
         Logger.LogInfo("Replaced PhotonNetwork.PrefabPool with CustomPrefabPool.");
@@ -49,7 +50,7 @@ public static class NetworkPrefabs
 
     public static void RegisterNetworkPrefab(GameObject prefab)
     {
-        RegisterNetworkPrefab(prefab.name, prefab);
+        RegisterNetworkPrefab(prefab?.name, prefab);
     }
 
     public static void RegisterNetworkPrefab(string prefabId, GameObject prefab)

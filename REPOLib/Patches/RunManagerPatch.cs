@@ -10,6 +10,7 @@ internal static class RunManagerPatch
 
     [HarmonyPatch(nameof(RunManager.Awake))]
     [HarmonyPostfix]
+    [HarmonyPriority(Priority.Last)]
     private static void AwakePatch()
     {
         if (_patchedAwake) return;

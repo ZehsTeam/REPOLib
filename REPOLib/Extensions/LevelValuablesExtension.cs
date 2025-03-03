@@ -12,29 +12,38 @@ internal static class LevelValuablesExtension
             return false;
         }
 
-        List<GameObject> gameObjects = GetList(levelValuables, valuableObject.volumeType);
-        return gameObjects.Contains(prefab);
+        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject> list))
+        {
+            return false;
+        }
+
+        return list.Contains(prefab);
     }
 
-    public static void AddValuable(this LevelValuables levelValuables, GameObject prefab)
+    public static bool AddValuable(this LevelValuables levelValuables, GameObject prefab)
     {
         if (levelValuables.HasValuable(prefab))
         {
-            return;
+            return false;
         }
 
         if (!prefab.TryGetComponent(out ValuableObject valuableObject))
         {
-            return;
+            return false;
         }
 
-        List<GameObject> gameObjects = GetList(levelValuables, valuableObject.volumeType);
-        gameObjects.Add(prefab);
-    }
+        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject> list))
+        {
+            return false;
+        }
 
-    public static List<GameObject> GetList(this LevelValuables levelValuables, ValuableVolume.Type volumeType)
+        list.Add(prefab);
+        return true;
+    }
+    
+    public static bool TryGetList(this LevelValuables levelValuables, ValuableVolume.Type volumeType, out List<GameObject> list)
     {
-        List<GameObject> result = volumeType switch
+        list = volumeType switch
         {
             ValuableVolume.Type.Tiny => levelValuables.tiny,
             ValuableVolume.Type.Small => levelValuables.small,
@@ -46,12 +55,6 @@ internal static class LevelValuablesExtension
             _ => null
         };
 
-        if (result == null)
-        {
-            Logger.LogWarning($"LevelValuablesExtension.GetList: Unknown ValuableVolume.Type \"{volumeType}\"");
-            return [];
-        }
-
-        return result;
+        return list != null;
     }
 }
