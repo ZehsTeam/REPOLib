@@ -1,7 +1,7 @@
 # REPOLib
 #### Library for adding content to R.E.P.O.
 
-## <img src="https://i.imgur.com/TpnrFSH.png" width="20px"> Download
+## ![Download](https://i.imgur.com/TpnrFSH.png) Download
 
 Download [REPOLib](https://thunderstore.io/c/repo/p/Zehs/REPOLib/) on Thunderstore.
 
@@ -95,4 +95,4 @@ https://github.com/ZehsTeam/REPOLib
 - **Twitch:** [CritHaxXoG](https://www.twitch.tv/crithaxxog)
 - **YouTube:** [Zehs](https://www.youtube.com/channel/UCb4VEkc-_im0h8DKXlwmIAA)
 
-[<img src="https://i.imgur.com/81tRL6D.png" width="200px">](https://ko-fi.com/zehsteam)
+[![kofi](https://i.imgur.com/jzwECeF.png)](https://ko-fi.com/zehsteam)
