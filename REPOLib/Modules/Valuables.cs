@@ -1,5 +1,6 @@
 ﻿using REPOLib.Extensions;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -94,6 +95,15 @@ public static class Valuables
 
     public static void RegisterValuable(GameObject prefab, List<string> presetNames)
     {
+        RegisterValuable(prefabId, prefab, (from preset in presets select preset.name).ToList());
+    }
+
+    public static void RegisterValuable(string prefabId, GameObject prefab, List<string> presetNames = null)
+    {
+        if (presetNames == null)
+        {
+            presetNames = new List<string>() { "Valuables - Generic" };
+        }
         if (prefab == null)
         {
             Logger.LogError($"Failed to register valuable. Prefab is null.");
