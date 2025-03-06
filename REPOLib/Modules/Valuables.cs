@@ -102,6 +102,7 @@ public static class Valuables
     {
         if (presetNames == null)
         {
+            Logger.LogInfo($"No levels specified for \"{prefabId}\", adding to generic list.", extended: true);
             presetNames = new List<string>() { "Valuables - Generic" };
         }
         if (prefab == null)
