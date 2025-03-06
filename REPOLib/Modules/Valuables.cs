@@ -83,6 +83,8 @@ public static class Valuables
     }
 
     #region Public
+
+    [Obsolete("", true)]
     public static void RegisterValuable(GameObject prefab)
     {
         RegisterValuable(prefab, new List<string>());
