@@ -7,7 +7,7 @@
     
     <AssemblyName>$(MSBuildProjectName)</AssemblyName><!-- PLUGIN_GUID -->
     <Product>$(MSBuildProjectName)</Product>          <!-- PLUGIN_NAME -->
-    <Version>1.0.2</Version>                          <!-- PLUGIN_VERSION -->
+    <Version>1.1.0</Version>                          <!-- PLUGIN_VERSION -->
     <Authors>Zehs</Authors>
     <Description>Library for adding content to R.E.P.O.</Description>
     <PackageTags>unity, bepinex, photon, modding</PackageTags>
