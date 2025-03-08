@@ -7,7 +7,7 @@
     
     <AssemblyName>$(MSBuildProjectName)</AssemblyName><!-- PLUGIN_GUID -->
     <Product>$(MSBuildProjectName)</Product>          <!-- PLUGIN_NAME -->
-    <Version>1.1.0</Version>                          <!-- PLUGIN_VERSION -->
+    <Version>1.0.2</Version>                          <!-- PLUGIN_VERSION -->
     <Authors>Zehs</Authors>
     <Description>Library for adding content to R.E.P.O.</Description>
     <PackageTags>unity, bepinex, photon, modding</PackageTags>
@@ -68,11 +68,14 @@
   
   <!-- EDIT THESE SETTINGS -->
   <PropertyGroup>
+    <!-- REPO publicized assemblies folder -->
+    <GamePublicizedAssembiesFolder>E:\GitHub\RepoMods\Libs</GamePublicizedAssembiesFolder>
+
     <!-- Steam library folder -->
-    <SteamLibrary>D:\SteamLibrary\steamapps\common</SteamLibrary>
+    <SteamLibrary>A:\SteamLibrary\steamapps\common</SteamLibrary>
     
     <!-- Gale profile name -->
-    <GaleProfile>Mod Development</GaleProfile>
+    <GaleProfile>Mod Dev</GaleProfile>
   </PropertyGroup>
   
   <PropertyGroup>
@@ -81,31 +84,31 @@
     
     <!-- REPO managed folder -->
     <GameManagedFolder>$(GameFolder)\REPO_Data\Managed</GameManagedFolder>
-    
+
     <!-- Gale plugins folder -->
     <GalePluginsFolder>$(AppData)\com.kesomannen.gale\repo\profiles\$(GaleProfile)\BepInEx\plugins</GalePluginsFolder>
-    
+
     <!-- Gale plugin folder -->
-    <GalePluginFolder>$(GalePluginsFolder)\Zehs-$(MSBuildProjectName)</GalePluginFolder>
+    <GalePluginFolder>$(GalePluginsFolder)\SolidStone-$(MSBuildProjectName)</GalePluginFolder>
   </PropertyGroup>
   
   <ItemGroup>
-    <Reference Include="Assembly-CSharp"           HintPath="$(GameManagedFolder)\Assembly-CSharp.dll"           Publicize="true" />
-    <Reference Include="Assembly-CSharp-firstpass" HintPath="$(GameManagedFolder)\Assembly-CSharp-firstpass.dll" Publicize="true" />
+    <Reference Include="Assembly-CSharp">          <HintPath>$(GamePublicizedAssembiesFolder)\Assembly-CSharp.dll          </HintPath></Reference>
+    <Reference Include="Assembly-CSharp-firstpass"><HintPath>$(GamePublicizedAssembiesFolder)\Assembly-CSharp-firstpass.dll</HintPath></Reference>
     
-    <Reference Include="Photon3Unity3D"                  HintPath="$(GameManagedFolder)\Photon3Unity3D.dll" />
-    <Reference Include="PhotonChat"                      HintPath="$(GameManagedFolder)\PhotonChat.dll" />
-    <Reference Include="PhotonRealtime"                  HintPath="$(GameManagedFolder)\PhotonRealtime.dll" />
-    <Reference Include="PhotonUnityNetworking"           HintPath="$(GameManagedFolder)\PhotonUnityNetworking.dll" />
-    <Reference Include="PhotonUnityNetworking.Utilities" HintPath="$(GameManagedFolder)\PhotonUnityNetworking.Utilities.dll" />
-    <Reference Include="PhotonVoice.API"                 HintPath="$(GameManagedFolder)\PhotonVoice.API.dll" />
-    <Reference Include="PhotonVoice"                     HintPath="$(GameManagedFolder)\PhotonVoice.dll" /> 
-    <Reference Include="PhotonVoice.PUN"                 HintPath="$(GameManagedFolder)\PhotonVoice.PUN.dll" />
+    <Reference Include="Photon3Unity3D">                 <HintPath>$(GameManagedFolder)\Photon3Unity3D.dll                 </HintPath></Reference>
+    <Reference Include="PhotonChat">                     <HintPath>$(GameManagedFolder)\PhotonChat.dll                     </HintPath></Reference>
+    <Reference Include="PhotonRealtime">                 <HintPath>$(GameManagedFolder)\PhotonRealtime.dll                 </HintPath></Reference>
+    <Reference Include="PhotonUnityNetworking">          <HintPath>$(GameManagedFolder)\PhotonUnityNetworking.dll          </HintPath></Reference>
+    <Reference Include="PhotonUnityNetworking.Utilities"><HintPath>$(GameManagedFolder)\PhotonUnityNetworking.Utilities.dll</HintPath></Reference>
+    <Reference Include="PhotonVoice.API">                <HintPath>$(GameManagedFolder)\PhotonVoice.API.dll                </HintPath></Reference>
+    <Reference Include="PhotonVoice">                    <HintPath>$(GameManagedFolder)\PhotonVoice.dll                    </HintPath></Reference>
+    <Reference Include="PhotonVoice.PUN">                <HintPath>$(GameManagedFolder)\PhotonVoice.PUN.dll                </HintPath></Reference>
     
-    <Reference Include="Sirenix.OdinInspector.Attributes" HintPath="$(GameManagedFolder)\Sirenix.OdinInspector.Attributes.dll" />
-    <Reference Include="Sirenix.Serialization.Config"     HintPath="$(GameManagedFolder)\Sirenix.Serialization.Config.dll" />
-    <Reference Include="Sirenix.Serialization"            HintPath="$(GameManagedFolder)\Sirenix.Serialization.dll" />
-    <Reference Include="Sirenix.Utilities"                HintPath="$(GameManagedFolder)\Sirenix.Utilities.dll"/>
+    <Reference Include="Sirenix.OdinInspector.Attributes"><HintPath>$(GameManagedFolder)\Sirenix.OdinInspector.Attributes.dll</HintPath></Reference>
+    <Reference Include="Sirenix.Serialization.Config">    <HintPath>$(GameManagedFolder)\Sirenix.Serialization.Config.dll    </HintPath></Reference>
+    <Reference Include="Sirenix.Serialization">           <HintPath>$(GameManagedFolder)\Sirenix.Serialization.dll           </HintPath></Reference>
+    <Reference Include="Sirenix.Utilities">               <HintPath>$(GameManagedFolder)\Sirenix.Utilities.dll               </HintPath></Reference>
   </ItemGroup>
   
   <!-- Copy DLL to Gale Zehs-REPOLib plugin folder -->
