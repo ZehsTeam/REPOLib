@@ -44,11 +44,10 @@ public static class Enemies
             {
                 Logger.LogWarning($"Failed to add {enemy.spawnObjects[0].name} to difficulty {enemyParent.difficulty.ToString()}", extended: true);
             }
-            
-            _enemysToRegister.Clear();
-            _canRegisterEnemys = false;
-
         }
+        
+        _enemysToRegister.Clear();
+        _canRegisterEnemys = false;
     }
 
     public static void RegisterEnemy(EnemySetup enemySetup)
@@ -58,7 +57,7 @@ public static class Enemies
             throw new ArgumentException("Failed to register enemy. EnemySetup or spawnObjects list is empty.");
         }
 
-        if (_canRegisterEnemys)
+        if (!_canRegisterEnemys)
         {
             Logger.LogError($"Failed to register enemy {enemySetup.spawnObjects[0].name}. You can only register enemys in awake!");
         }
