@@ -23,5 +23,7 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll(typeof(RunManagerPatch));
 
         ConfigManager.Initialize(Config);
+        
+        BundleLoader.LoadAllBundles(Paths.PluginPath, ".repobundle");
     }
 }
