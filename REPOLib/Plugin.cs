@@ -11,7 +11,9 @@ public class Plugin : BaseUnityPlugin
 
     public static Plugin Instance { get; private set; }
     
+    #pragma warning disable IDE0051 // Remove unused private members
     private void Awake()
+    #pragma warning disable IDE0051 // Remove unused private members
     {
         Instance = this;
 
