@@ -1,8 +1,7 @@
 ﻿using REPOLib.Extensions;
-using REPOLib.Objects;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -11,14 +10,11 @@ public static class Valuables
 {
     public static IReadOnlyList<GameObject> RegisteredValuables => _valuablesRegistered;
 
-    private static readonly Dictionary<string, LevelValuables> _valuablePresets = new Dictionary<string, LevelValuables>();
+    private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
     private static readonly Dictionary<GameObject, List<string>> _valuablesToRegister = [];
     private static readonly List<GameObject> _valuablesRegistered = [];
 
     private static bool _canRegisterValuables = true;
-
-    [Obsolete("", true)]
-    private static bool _registeredValuables = false;
 
     private static void CacheValuablePresets()
     {
@@ -68,6 +64,7 @@ public static class Valuables
                     Logger.LogError($"Failed adding valuable \"{valuable.name}\" to preset \"{presetName}\". The preset does not exist.");
                     continue;
                 }
+
                 if (_valuablePresets[presetName].AddValuable(valuable))
                 {
                     _valuablesRegistered.Add(valuable);
@@ -84,28 +81,42 @@ public static class Valuables
         _canRegisterValuables = false;
     }
 
-    public static void RegisterValuable(GameObject prefab, List<string> presetNames = null)
+    #region Public
+    #region Original
+    public static void RegisterValuable(GameObject prefab)
     {
-        RegisterValuable(prefab?.name, prefab, presetNames);
+        RegisterValuable(prefab?.name, prefab, new List<string>());
     }
+    
+    public static void RegisterValuable(string prefabId, GameObject prefab)
+    {
+        RegisterValuable(prefabId, prefab, new List<string>());
+    }
+    #endregion
 
     public static void RegisterValuable(GameObject prefab, List<LevelValuables> presets)
     {
         RegisterValuable(prefab?.name, prefab, presets);
     }
 
-    public static void RegisterValuable(string prefabId, GameObject prefab, List<LevelValuables> presets = null)
+    public static void RegisterValuable(GameObject prefab, List<string> presetNames)
+    {
+        RegisterValuable(prefab?.name, prefab, presetNames);
+    }
+
+    public static void RegisterValuable(string prefabId, GameObject prefab, List<LevelValuables> presets)
     {
         RegisterValuable(prefabId, prefab, (from preset in presets select preset.name).ToList());
     }
 
-    public static void RegisterValuable(string prefabId, GameObject prefab, List<string> presetNames = null)
+    public static void RegisterValuable(string prefabId, GameObject prefab, List<string> presetNames)
     {
-        if (presetNames == null)
+        if (presetNames == null || presetNames.Count == 0)
         {
             Logger.LogInfo($"No levels specified for \"{prefabId}\", adding to generic list.", extended: true);
-            presetNames = new List<string>() { "Valuables - Generic" };
+            presetNames = ["Valuables - Generic"];
         }
+
         if (prefab == null)
         {
             throw new ArgumentException("Failed to register valuable. Prefab is null.");
@@ -132,4 +143,5 @@ public static class Valuables
 
         _valuablesToRegister.Add(prefab, presetNames);
     }
+    #endregion
 }
