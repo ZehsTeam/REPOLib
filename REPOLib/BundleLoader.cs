@@ -28,15 +28,14 @@ public static class BundleLoader
     public static void LoadBundle(string path)
     {
         var bundle = AssetBundle.LoadFromFile(path);
-        var mods = bundle.LoadAllAssets<Mod>();
+        Mod[] mods = bundle.LoadAllAssets<Mod>();
 
-        if (mods.Length == 0)
+        switch (mods.Length)
         {
-            throw new Exception("Bundle contains no mods.");
-        }
-        if (mods.Length > 1)
-        {
-            throw new Exception("Bundle contains more than one mod.");
+            case 0:
+                throw new Exception("Bundle contains no mods.");
+            case > 1:
+                throw new Exception("Bundle contains more than one mod.");
         }
 
         var mod = mods[0];
@@ -55,8 +54,6 @@ public static class BundleLoader
             {
                 throw new Exception($"Failed to load {content.Name} ({content.GetType().Name}): {e}");
             }
-
-            Logger.LogDebug($"Loaded {content.Name}");
         }
     }
 }

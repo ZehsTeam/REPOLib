@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace REPOLib.Objects.Sdk;
 
@@ -12,19 +13,27 @@ public class Mod : ScriptableObject
     private string _author;
 
     [SerializeField]
-    private string _version;
+    private string _version = "1.0.0";
     
     [SerializeField]
     private string _description;
 
     [SerializeField]
+    private string[] _dependencies;
+
+    [SerializeField]
     private Sprite _icon;
-    
+
+    [SerializeField]
+    private TextAsset _readme;
+
     public string Name => _name;
     public string Author => _author;
     public string Version => _version;
     public string Description => _description;
+    public IReadOnlyList<string> Dependencies => _dependencies;
     public Sprite Icon => _icon;
+    public TextAsset Readme => _readme;
 
     public string FullName => $"{Author}-{Name}";
     // also known as a dependency string
