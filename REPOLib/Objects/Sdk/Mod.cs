@@ -17,6 +17,9 @@ public class Mod : ScriptableObject
     
     [SerializeField]
     private string _description;
+    
+    [SerializeField]
+    private string _websiteUrl;
 
     [SerializeField]
     private string[] _dependencies;
@@ -31,6 +34,7 @@ public class Mod : ScriptableObject
     public string Author => _author;
     public string Version => _version;
     public string Description => _description;
+    public string WebsiteUrl => _websiteUrl;
     public IReadOnlyList<string> Dependencies => _dependencies;
     public Sprite Icon => _icon;
     public TextAsset Readme => _readme;
