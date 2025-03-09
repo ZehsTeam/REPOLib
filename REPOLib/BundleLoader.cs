@@ -16,7 +16,7 @@ public static class BundleLoader
             string relativePath = path.Replace(root, "");
             try
             {
-                LoadBundle(path);
+                LoadBundle(path, relativePath);
             }
             catch (Exception e)
             {
@@ -25,7 +25,7 @@ public static class BundleLoader
         }
     }
 
-    public static void LoadBundle(string path)
+    public static void LoadBundle(string path, string relativePath)
     {
         var bundle = AssetBundle.LoadFromFile(path);
         Mod[] mods = bundle.LoadAllAssets<Mod>();
@@ -40,9 +40,9 @@ public static class BundleLoader
 
         var mod = mods[0];
         
-        Logger.LogInfo($"Loading content from {mod.Identifier}");
+        Logger.LogInfo($"Loading content from bundle at {relativePath} ({mod.Identifier})");
         
-        var contents = bundle.LoadAllAssets<Content>();
+        Content[] contents = bundle.LoadAllAssets<Content>();
         
         foreach (var content in contents)
         {
