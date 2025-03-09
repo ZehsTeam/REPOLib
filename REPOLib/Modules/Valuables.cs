@@ -82,66 +82,101 @@ public static class Valuables
     }
 
     #region Public
-    #region Original
     public static void RegisterValuable(GameObject prefab)
     {
-        RegisterValuable(prefab?.name, prefab, new List<string>());
+        RegisterValuable(prefab, new List<string>());
     }
-    
-    public static void RegisterValuable(string prefabId, GameObject prefab)
-    {
-        RegisterValuable(prefabId, prefab, new List<string>());
-    }
-    #endregion
 
     public static void RegisterValuable(GameObject prefab, List<LevelValuables> presets)
     {
-        RegisterValuable(prefab?.name, prefab, presets);
+        RegisterValuable(prefab, (from preset in presets select preset.name).ToList());
     }
 
     public static void RegisterValuable(GameObject prefab, List<string> presetNames)
     {
-        RegisterValuable(prefab?.name, prefab, presetNames);
-    }
-
-    public static void RegisterValuable(string prefabId, GameObject prefab, List<LevelValuables> presets)
-    {
-        RegisterValuable(prefabId, prefab, (from preset in presets select preset.name).ToList());
-    }
-
-    public static void RegisterValuable(string prefabId, GameObject prefab, List<string> presetNames)
-    {
-        if (presetNames == null || presetNames.Count == 0)
-        {
-            Logger.LogInfo($"No levels specified for \"{prefabId}\", adding to generic list.", extended: true);
-            presetNames = ["Valuables - Generic"];
-        }
-
         if (prefab == null)
         {
-            throw new ArgumentException("Failed to register valuable. Prefab is null.");
+            Logger.LogError($"Failed to register valuable. Prefab is null.");
+            return;
         }
 
-        if (string.IsNullOrWhiteSpace(prefabId))
+        if (!prefab.TryGetComponent(out ValuableObject valuableObject))
         {
-            throw new ArgumentException("Failed to register valuable. PrefabId is invalid.");
+            Logger.LogError($"Failed to register valuable. Prefab does not have a ValuableObject component.");
+            return;
+        }
+
+        RegisterValuable(valuableObject, presetNames);
+    }
+
+    public static void RegisterValuable(ValuableObject valuableObject)
+    {
+        RegisterValuable(valuableObject, new List<string>());
+    }
+
+    public static void RegisterValuable(ValuableObject valuableObject, List<LevelValuables> presets)
+    {
+        RegisterValuable(valuableObject, (from preset in presets select preset.name).ToList());
+    }
+
+    public static void RegisterValuable(ValuableObject valuableObject, List<string> presetNames)
+    {
+        if (valuableObject == null)
+        {
+            Logger.LogError($"Failed to register valuable. ValuableObject is null.");
+            return;
+        }
+
+        GameObject prefab = valuableObject.gameObject;
+
+        if (presetNames == null || presetNames.Count == 0)
+        {
+            Logger.LogInfo($"No valuable presets specified for valuable \"{prefab.name}\". Adding valuable to generic preset.", extended: true);
+            presetNames = ["Valuables - Generic"];
         }
 
         if (!_canRegisterValuables)
         {
-            Logger.LogError($"Failed to register valuable \"{prefabId}\". You can only register valuables in awake!");
+            Logger.LogError($"Failed to register valuable \"{prefab.name}\". You can only register valuables from your plugins awake!");
+            return;
+        }
+
+        if (ResourcesHelper.HasValuablePrefab(valuableObject))
+        {
+            Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable already exists in Resources.");
             return;
         }
 
         if (_valuablesToRegister.ContainsKey(prefab))
         {
-            Logger.LogWarning($"Failed to register valuable \"{prefabId}\". This valuable is already registered!");
+            Logger.LogWarning($"Failed to register valuable \"{prefab.name}\". Valuable is already registered!");
             return;
         }
 
+        string prefabId = ResourcesHelper.GetValuablePrefabPath(valuableObject);
         NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
 
         _valuablesToRegister.Add(prefab, presetNames);
+    }
+    #endregion
+
+    #region Obsolete
+    [Obsolete("prefabId is no longer supported", true)]
+    public static void RegisterValuable(string prefabId, GameObject prefab)
+    {
+        RegisterValuable(prefab);
+    }
+
+    [Obsolete("prefabId is no longer supported", true)]
+    public static void RegisterValuable(string prefabId, GameObject prefab, List<LevelValuables> presets)
+    {
+        RegisterValuable(prefab, presets);
+    }
+
+    [Obsolete("prefabId is no longer supported", true)]
+    public static void RegisterValuable(string prefabId, GameObject prefab, List<string> presetNames)
+    {
+        RegisterValuable(prefab, presetNames);
     }
     #endregion
 }

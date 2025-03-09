@@ -131,7 +131,7 @@ public class YourMod : BaseUnityPlugin
         AssetBundle assetBundle = AssetBundle.LoadFromFile("your_assetbundle_file_path");
         EnemySetup enemy = assetBundle.LoadAsset<EnemySetup>("your_enemy_setup");
 
-        // Register a valuable.
+        // Register an enemy.
         REPOLib.Modules.Enemies.RegisterEnemy(enemy);
     }
 }

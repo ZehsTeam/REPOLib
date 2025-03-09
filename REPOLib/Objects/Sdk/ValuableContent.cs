@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace REPOLib.Objects.Sdk;
 
@@ -25,6 +24,6 @@ public class ValuableContent : Content
     public override void Initialize(Mod mod)
     {
         List<string> presets = AddToAllLevels ? null : _levelNames;
-        Modules.Valuables.RegisterValuable($"{mod.FullName}:{Name}", Prefab.gameObject, presets);
+        Modules.Valuables.RegisterValuable(Prefab.gameObject, presets);
     }
 }

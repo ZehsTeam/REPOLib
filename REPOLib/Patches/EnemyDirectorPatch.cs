@@ -11,7 +11,6 @@ internal static class EnemyDirectorPatch
 
     [HarmonyPatch(nameof(EnemyDirector.Awake))]
     [HarmonyPostfix]
-    [HarmonyPriority(Priority.Last)]
     private static void AwakePatch()
     {
         // We have to refill the enemies to the lists on each game load

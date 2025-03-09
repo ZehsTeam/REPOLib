@@ -13,7 +13,7 @@ public class Plugin : BaseUnityPlugin
     
     #pragma warning disable IDE0051 // Remove unused private members
     private void Awake()
-    #pragma warning disable IDE0051 // Remove unused private members
+    #pragma warning restore IDE0051 // Remove unused private members
     {
         Instance = this;
 
@@ -22,6 +22,7 @@ public class Plugin : BaseUnityPlugin
 
         _harmony.PatchAll(typeof(RunManagerPatch));
         _harmony.PatchAll(typeof(EnemyDirectorPatch));
+        _harmony.PatchAll(typeof(StatsManagerPatch));
 
         ConfigManager.Initialize(Config);
         
