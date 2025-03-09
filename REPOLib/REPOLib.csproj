@@ -87,5 +87,6 @@
   <!-- Copy DLL to Gale Zehs-REPOLib plugin folder -->
   <Target Name="CopyToGalePluginFolder" AfterTargets="PostBuildEvent">
     <Copy DestinationFolder="$(GalePluginFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
+    <Copy DestinationFolder="../../REPOAssetBundleBuilder/Assets/Plugins" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
   </Target>
 </Project>
