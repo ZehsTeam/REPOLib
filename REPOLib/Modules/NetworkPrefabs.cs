@@ -55,11 +55,6 @@ public static class NetworkPrefabs
 
     public static void RegisterNetworkPrefab(string prefabId, GameObject prefab)
     {
-        if (CustomPrefabPool.Contains(prefabId))
-        {
-            return;
-        }
-        
         CustomPrefabPool.RegisterPrefab(prefabId, prefab);
     }
 }

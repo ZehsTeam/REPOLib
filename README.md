@@ -9,7 +9,7 @@
 ## Features
 - Registering network prefabs.
 - Registering valuables.
-- Registering enemys.
+- Registering enemies.
 
 ## Usage
 <details><summary>Click to expand</summary><br>
@@ -35,6 +35,8 @@ public class YourMod : BaseUnityPlugin
 }
 ```
 
+<details><summary>Network prefabs</summary><br>
+
 Registering a network prefab.
 ```cs
 [BepInPlugin("You.YourMod", "YourMod", "1.0.0")]
@@ -55,6 +57,10 @@ public class YourMod : BaseUnityPlugin
     }
 }
 ```
+
+</details>
+
+<details><summary>Valuables</summary><br>
 
 Registering a valuable.
 ```cs
@@ -106,8 +112,11 @@ public class YourMod : BaseUnityPlugin
 }
 ```
 
+</details>
 
-Registering a enemy.
+<details><summary>Enemies</summary><br>
+
+Registering an enemy.
 ```cs
 [BepInPlugin("You.YourMod", "YourMod", "1.0.0")]
 [BepInDependency(REPOLib.MyPluginInfo.PLUGIN_GUID, BepInDependency.DependencyFlags.HardDependency)]
@@ -127,6 +136,7 @@ public class YourMod : BaseUnityPlugin
     }
 }
 ```
+</details>
 </details>
 
 > [!NOTE]

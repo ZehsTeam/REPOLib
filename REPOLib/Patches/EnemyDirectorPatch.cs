@@ -14,18 +14,17 @@ internal static class EnemyDirectorPatch
     [HarmonyPriority(Priority.Last)]
     private static void AwakePatch()
     {
-        
-        //we have to refill the enemys to the lists on each game load
+        // We have to refill the enemies to the lists on each game load
         if (_alreadyRegistered)
         {
-            foreach (var enemy in Enemies.RegisteredEnemys)
+            foreach (var enemy in Enemies.RegisteredEnemies)
             {
                 EnemyDirector.instance.AddEnemy(enemy);
             }
             return;
         }
-        _alreadyRegistered = true;
         
         Enemies.RegisterEnemies();
+        _alreadyRegistered = true;
     }
 }

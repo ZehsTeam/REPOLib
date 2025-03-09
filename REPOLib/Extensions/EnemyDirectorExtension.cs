@@ -1,48 +1,62 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace REPOLib.Extensions;
 
 public static class EnemyDirectorExtension
 {
-    
+    public static bool HasEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
+    {
+        if (enemySetup == null || enemySetup.spawnObjects.Count == 0)
+        {
+            return false;
+        }
+
+        foreach (var spawnObject in enemySetup.spawnObjects)
+        {
+            if (!spawnObject.TryGetComponent(out EnemyParent enemyParent))
+            {
+                continue;
+            }
+
+            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup> list))
+            {
+                continue;
+            }
+
+            return list.Contains(enemySetup);
+        }
+
+        return false;
+    }
 
     public static bool AddEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
     {
         if (enemySetup == null)
+        {
             return false;
+        }
 
         foreach (var spawnObject in enemySetup.spawnObjects)
         {
-            if (spawnObject.TryGetComponent(out EnemyParent enemyParent))
+            if (!spawnObject.TryGetComponent(out EnemyParent enemyParent))
             {
-                if (TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup> list))
-                {
-                    list.Add(enemySetup);
-                    return true;
-                }
+                continue;
             }
+
+            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup> list))
+            {
+                continue;
+            }
+
+            if (list.Contains(enemySetup))
+            {
+                continue;
+            }
+
+            list.Add(enemySetup);
+            return true;
         }
         
-        return false;
-    }
-
-    public static bool HasEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
-    {
-        if (enemySetup == null || enemySetup.spawnObjects.Count == 0)
-            return false;
-
-        foreach (var spawnObject in enemySetup.spawnObjects)
-        {
-            if (spawnObject.TryGetComponent(out EnemyParent enemyParent))
-            {
-                if (TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup> list))
-                {
-                    return list.Contains(enemySetup);
-                }
-            }
-        }
-
         return false;
     }
     

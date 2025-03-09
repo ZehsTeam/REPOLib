@@ -76,12 +76,7 @@ public class CustomPrefabPool : IPunPrefabPool
 
     public bool Contains(string prefabId)
     {
-        if (Prefabs.TryGetValue(prefabId, out GameObject value))
-        {
-            return true;
-        }
-
-        return false;
+        return Prefabs.ContainsKey(prefabId);
     }
 
     public GameObject Instantiate(string prefabId, Vector3 position, Quaternion rotation)

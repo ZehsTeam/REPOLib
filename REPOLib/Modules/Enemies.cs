@@ -1,31 +1,28 @@
+using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
-using REPOLib.Extensions;
-using REPOLib.Objects;
-using UnityEngine;
 
 namespace REPOLib.Modules;
 
 public static class Enemies 
 {
-    public static IReadOnlyList<EnemySetup> RegisteredEnemys => _enemysRegistered;
+    public static IReadOnlyList<EnemySetup> RegisteredEnemies => _enemiesRegistered;
 
-    private static readonly List<EnemySetup> _enemysToRegister = [];
-    private static readonly List<EnemySetup> _enemysRegistered = [];
+    private static readonly List<EnemySetup> _enemiesToRegister = [];
+    private static readonly List<EnemySetup> _enemiesRegistered = [];
     
-    private static bool _canRegisterEnemys = true;
+    private static bool _canRegisterEnemies = true;
 
     internal static void RegisterEnemies()
     {
-
-        if (!_canRegisterEnemys)
+        if (!_canRegisterEnemies)
         {
             return;
         }
         
-        foreach (var enemy in _enemysToRegister)
+        foreach (var enemy in _enemiesToRegister)
         {
-            if (_enemysRegistered.Contains(enemy))
+            if (_enemiesRegistered.Contains(enemy))
             {
                 continue;
             }
@@ -37,43 +34,43 @@ public static class Enemies
 
             if (EnemyDirector.instance.AddEnemy(enemy))
             {
-                _enemysRegistered.Add(enemy);
-                Logger.LogInfo($"Added {enemy.spawnObjects[0].name} to difficulty {enemyParent.difficulty.ToString()}", extended: true);
+                _enemiesRegistered.Add(enemy);
+                Logger.LogInfo($"Added enemy \"{enemy.spawnObjects[0].name}\" to difficulty {enemyParent.difficulty.ToString()}", extended: true);
             }
             else
             {
-                Logger.LogWarning($"Failed to add {enemy.spawnObjects[0].name} to difficulty {enemyParent.difficulty.ToString()}", extended: true);
+                Logger.LogWarning($"Failed to add enemy \"{enemy.spawnObjects[0].name}\" to difficulty {enemyParent.difficulty.ToString()}", extended: true);
             }
         }
         
-        _enemysToRegister.Clear();
-        _canRegisterEnemys = false;
+        _enemiesToRegister.Clear();
+        _canRegisterEnemies = false;
     }
 
     public static void RegisterEnemy(EnemySetup enemySetup)
     {
-        if (enemySetup == null || enemySetup.spawnObjects[0] == null || enemySetup.spawnObjects.Count == 0)
+        if (enemySetup == null || enemySetup.spawnObjects.Count == 0 || enemySetup.spawnObjects[0] == null)
         {
             throw new ArgumentException("Failed to register enemy. EnemySetup or spawnObjects list is empty.");
         }
 
-        if (!_canRegisterEnemys)
+        if (!_canRegisterEnemies)
         {
-            Logger.LogError($"Failed to register enemy {enemySetup.spawnObjects[0].name}. You can only register enemys in awake!");
+            Logger.LogError($"Failed to register enemy \"{enemySetup.spawnObjects[0].name}\". You can only register enemies in awake!");
         }
 
-        if (_enemysToRegister.Contains(enemySetup))
+        if (_enemiesToRegister.Contains(enemySetup))
         {
-            Logger.LogError($"Failed to register enemy. Enemy {enemySetup.spawnObjects[0].name} is already registered!");
+            Logger.LogError($"Failed to register enemy \"{enemySetup.spawnObjects[0].name}\". Enemy is already registered!");
             return;
         }
 
-        //register all spawn prefabs to the network
+        // Register all spawn prefabs to the network
         foreach (var spawnObject in enemySetup.spawnObjects)
         {
             NetworkPrefabs.RegisterNetworkPrefab(spawnObject.name, spawnObject);
         }
         
-        _enemysToRegister.Add(enemySetup);
+        _enemiesToRegister.Add(enemySetup);
     }
 }
