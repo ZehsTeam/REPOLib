@@ -22,17 +22,17 @@ internal static class LevelValuablesExtension
 
     public static bool AddValuable(this LevelValuables levelValuables, GameObject prefab)
     {
-        if (levelValuables.HasValuable(prefab))
-        {
-            return false;
-        }
-
         if (!prefab.TryGetComponent(out ValuableObject valuableObject))
         {
             return false;
         }
 
         if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject> list))
+        {
+            return false;
+        }
+
+        if (list.Contains(prefab))
         {
             return false;
         }
