@@ -6,14 +6,14 @@ namespace REPOLib.Objects.Sdk;
 public class EnemyContent : Content
 {
     [SerializeField]
-    private EnemySetup _prefab;
+    private EnemySetup _setup;
     
-    public EnemySetup Prefab => _prefab;
+    public EnemySetup Setup => _setup;
 
-    public override string Name => Prefab.name;
+    public override string Name => Setup.name;
 
     public override void Initialize(Mod mod)
     {
-        Modules.Enemies.RegisterEnemy(Prefab);
+        Modules.Enemies.RegisterEnemy(Setup);
     }
 }
