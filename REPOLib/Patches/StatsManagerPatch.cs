@@ -6,12 +6,10 @@ namespace REPOLib.Patches;
 [HarmonyPatch(typeof(StatsManager))]
 internal static class StatsManagerPatch
 {
-    [HarmonyPatch(nameof(StatsManager.Start))]
+    [HarmonyPatch(nameof(StatsManager.RunStartStats))]
     [HarmonyPostfix]
-    private static void StartPatch()
+    private static void RunStartStatsPatch()
     {
-        Logger.LogInfo("\n\n\n\nStatsManager.Start();\n\n\n");
-
         Items.RegisterItems();
     }
 }

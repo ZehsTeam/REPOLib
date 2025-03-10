@@ -4,12 +4,14 @@
 [![Thunderstore Downloads](https://img.shields.io/thunderstore/dt/Zehs/REPOLib?style=for-the-badge&logo=thunderstore&logoColor=white)](https://thunderstore.io/c/repo/p/Zehs/REPOLib/)
 [![NuGet Version](https://img.shields.io/nuget/v/zehs.repolib?style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/Zehs.REPOLib)
 
-#### Library for adding content to R.E.P.O.
+**Library for adding content to R.E.P.O.**
 
 ## Features
 - Registering network prefabs.
 - Registering valuables.
+- Registering items.
 - Registering enemies.
+- Registering features without code using the [REPOLib-Sdk](https://github.com/ZehsTeam/REPOLib-Sdk).
 
 ## Usage
 <details><summary>Click to expand</summary><br>
@@ -114,6 +116,30 @@ public class YourMod : BaseUnityPlugin
 
 </details>
 
+<details><summary>Items</summary><br>
+
+Registering an item.
+```cs
+[BepInPlugin("You.YourMod", "YourMod", "1.0.0")]
+[BepInDependency(REPOLib.MyPluginInfo.PLUGIN_GUID, BepInDependency.DependencyFlags.HardDependency)]
+public class YourMod : BaseUnityPlugin
+{
+    // ...
+
+    private void Awake()
+    {
+        // ...
+
+        AssetBundle assetBundle = AssetBundle.LoadFromFile("your_assetbundle_file_path");
+        Item item = assetBundle.LoadAsset<Item>("your_item");
+
+        // Register an item.
+        REPOLib.Modules.Items.RegisterItem(item);
+    }
+}
+```
+</details>
+
 <details><summary>Enemies</summary><br>
 
 Registering an enemy.
@@ -140,11 +166,10 @@ public class YourMod : BaseUnityPlugin
 </details>
 
 > [!NOTE]
-> Registering valuables automatically registers them as a network prefab. 
-> (Same for enemy spawn objects)
+> Registering valuables, items, and enemies automatically registers their prefabs as a network prefab. 
 
 > [!IMPORTANT]
-> You should only register network prefabs and features from your plugins awake function.
+> You should only register network prefabs and features from your plugin's awake function.
 
 > [!TIP]
 > You can enable extended logging in the config settings to get more info about features being registered, custom network prefabs being spawned, and more.
@@ -155,7 +180,7 @@ Anyone is free to contribute.
 https://github.com/ZehsTeam/REPOLib
 
 ## Developer Contact
-#### Report bugs, suggest features, or provide feedback:  
+**Report bugs, suggest features, or provide feedback:**
 - **GitHub Issues Page:** [REPOLib](https://github.com/ZehsTeam/REPOLib/issues)
 - **Email:** crithaxxog@gmail.com
 - **Twitch:** [CritHaxXoG](https://www.twitch.tv/crithaxxog)

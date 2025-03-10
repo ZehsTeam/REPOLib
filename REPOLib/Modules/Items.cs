@@ -1,4 +1,5 @@
-﻿using System;
+﻿using REPOLib.Extensions;
+using System;
 using System.Collections.Generic;
 
 namespace REPOLib.Modules;
@@ -12,12 +13,13 @@ public static class Items
 
     private static bool _canRegisterItems = true;
 
+    // This will run multiple times because of how the vanilla game registers items.
     internal static void RegisterItems()
     {
-        if (!_canRegisterItems)
-        {
-            return;
-        }
+        //if (!_canRegisterItems)
+        //{
+        //    return;
+        //}
 
         if (StatsManager.instance == null)
         {
@@ -25,21 +27,26 @@ public static class Items
             return;
         }
 
+        Logger.LogInfo($"Adding items.");
+
         foreach (var item in _itemsToRegister)
         {
-            if (StatsManager.instance.itemDictionary.ContainsKey(item.itemAssetName))
+            if (StatsManager.instance.AddItem(item))
             {
-                continue;
+                if (!_itemsRegistered.Contains(item))
+                {
+                    _itemsRegistered.Add(item);
+                }
+
+                Logger.LogInfo($"Added item \"{item.itemName}\"", extended: true);
             }
-
-            StatsManager.instance.itemDictionary.Add(item.itemAssetName, item);
-
-            foreach (Dictionary<string, int> dictionary in StatsManager.instance.AllDictionariesWithPrefix("item"))
+            else
             {
-                dictionary.Add(item.itemAssetName, 0);
+                Logger.LogWarning($"Failed to add item \"{item.itemName}\"", extended: true);
             }
         }
-        
+
+        //_itemsToRegister.Clear();
         _canRegisterItems = false;
     }
 
@@ -68,13 +75,20 @@ public static class Items
             return;
         }
 
+        if (ResourcesHelper.HasItemPrefab(item))
+        {
+            Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab already exists in Resources with the same name.");
+            return;
+        }
+
         if (_itemsToRegister.Contains(item))
         {
             Logger.LogError($"Failed to register item \"{item.itemName}\". Item is already registered!");
             return;
         }
 
-        NetworkPrefabs.RegisterNetworkPrefab(item.prefab);
+        string prefabId = ResourcesHelper.GetItemPrefabPath(item);
+        NetworkPrefabs.RegisterNetworkPrefab(prefabId, item.prefab);
 
         _itemsToRegister.Add(item);
     }

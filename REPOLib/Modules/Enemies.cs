@@ -49,26 +49,55 @@ public static class Enemies
 
     public static void RegisterEnemy(EnemySetup enemySetup)
     {
-        if (enemySetup == null || enemySetup.spawnObjects.Count == 0 || enemySetup.spawnObjects[0] == null)
+        if (enemySetup == null || enemySetup.spawnObjects == null || enemySetup.spawnObjects.Count == 0)
         {
             throw new ArgumentException("Failed to register enemy. EnemySetup or spawnObjects list is empty.");
         }
 
+        EnemyParent enemyParent = null;
+
+        foreach (var spawnObject in enemySetup.spawnObjects)
+        {
+            if (spawnObject.TryGetComponent(out enemyParent))
+            {
+                break;
+            }
+        }
+
+        if (enemyParent == null)
+        {
+            Logger.LogError($"Failed to register enemy \"{enemySetup.name}\". No enemy prefab found in spawnObjects list.");
+            return;
+        }
+
         if (!_canRegisterEnemies)
         {
-            Logger.LogError($"Failed to register enemy \"{enemySetup.spawnObjects[0].name}\". You can only register enemies in awake!");
+            Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". You can only register enemies in awake!");
+        }
+
+        if (ResourcesHelper.HasEnemyPrefab(enemySetup))
+        {
+            Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". Enemy prefab already exists in Resources with the same name.");
+            return;
         }
 
         if (_enemiesToRegister.Contains(enemySetup))
         {
-            Logger.LogError($"Failed to register enemy \"{enemySetup.spawnObjects[0].name}\". Enemy is already registered!");
+            Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". Enemy is already registered!");
             return;
         }
 
         // Register all spawn prefabs to the network
         foreach (var spawnObject in enemySetup.spawnObjects)
         {
-            NetworkPrefabs.RegisterNetworkPrefab(spawnObject.name, spawnObject);
+            if (spawnObject == null)
+            {
+                Logger.LogWarning($"Enemy \"{enemyParent.enemyName}\" has a null entry in the spawnObjects list.");
+                continue;
+            }
+
+            string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
+            NetworkPrefabs.RegisterNetworkPrefab(prefabId, spawnObject);
         }
         
         _enemiesToRegister.Add(enemySetup);

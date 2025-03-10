@@ -10,27 +10,27 @@ public static class ResourcesHelper
     {
         string folder = volumeType switch
         {
-            ValuableVolume.Type.Tiny =>     "01 tiny/",
-            ValuableVolume.Type.Small =>    "02 small/",
-            ValuableVolume.Type.Medium =>   "03 medium/",
-            ValuableVolume.Type.Big =>      "04 big/",
-            ValuableVolume.Type.Wide =>     "05 wide/",
-            ValuableVolume.Type.Tall =>     "06 tall/",
-            ValuableVolume.Type.VeryTall => "07 very tall/",
+            ValuableVolume.Type.Tiny =>     "01 Tiny/",
+            ValuableVolume.Type.Small =>    "02 Small/",
+            ValuableVolume.Type.Medium =>   "03 Medium/",
+            ValuableVolume.Type.Big =>      "04 Big/",
+            ValuableVolume.Type.Wide =>     "05 Wide/",
+            ValuableVolume.Type.Tall =>     "06 Tall/",
+            ValuableVolume.Type.VeryTall => "07 Very Tall/",
             _ => string.Empty
         };
 
-        return Path.Combine("valuables/", folder);
+        return Path.Combine("Valuables/", folder);
     }
 
     public static string GetItemsFolderPath()
     {
-        return "items/";
+        return "Items/";
     }
 
     public static string GetEnemiesFolderPath()
     {
-        return "enemies/";
+        return "Enemies/";
     }
     #endregion
 
@@ -80,6 +80,18 @@ public static class ResourcesHelper
         
         return string.Empty;
     }
+
+    public static string GetEnemyPrefabPath(GameObject prefab)
+    {
+        if (prefab == null)
+        {
+            return string.Empty;
+        }
+
+        string folderPath = GetEnemiesFolderPath();
+
+        return Path.Combine(folderPath, prefab.name);
+    }
     #endregion
 
     public static bool HasValuablePrefab(ValuableObject valuableObject)
@@ -113,13 +125,11 @@ public static class ResourcesHelper
             return false;
         }
 
-        string folderPath = GetEnemiesFolderPath();
-
         foreach (var spawnObject in enemySetup.spawnObjects)
         {
             if (spawnObject == null) continue;
 
-            string prefabPath = Path.Combine(folderPath, spawnObject.name);
+            string prefabPath = GetEnemyPrefabPath(spawnObject);
 
             if (Resources.Load<GameObject>(prefabPath) != null)
             {
@@ -133,5 +143,10 @@ public static class ResourcesHelper
     public static bool HasPrefab(GameObject prefab)
     {
         return Resources.Load<GameObject>(prefab?.name) != null;
+    }
+
+    public static bool HasPrefab(string prefabId)
+    {
+        return Resources.Load<GameObject>(prefabId) != null;
     }
 }

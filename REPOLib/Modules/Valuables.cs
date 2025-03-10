@@ -131,7 +131,7 @@ public static class Valuables
 
         if (presetNames == null || presetNames.Count == 0)
         {
-            Logger.LogInfo($"No valuable presets specified for valuable \"{prefab.name}\". Adding valuable to generic preset.", extended: true);
+            //Logger.LogInfo($"No valuable presets specified for valuable \"{prefab.name}\". Adding valuable to generic preset.", extended: true);
             presetNames = ["Valuables - Generic"];
         }
 
@@ -143,7 +143,7 @@ public static class Valuables
 
         if (ResourcesHelper.HasValuablePrefab(valuableObject))
         {
-            Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable already exists in Resources.");
+            Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable prefab already exists in Resources with the same name.");
             return;
         }
 
@@ -160,7 +160,7 @@ public static class Valuables
     }
     #endregion
 
-    #region Obsolete
+    #region Deprecated
     [Obsolete("prefabId is no longer supported", true)]
     public static void RegisterValuable(string prefabId, GameObject prefab)
     {

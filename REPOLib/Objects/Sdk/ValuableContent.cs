@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace REPOLib.Objects.Sdk;
@@ -10,20 +11,15 @@ public class ValuableContent : Content
     private ValuableObject _prefab;
 
     [SerializeField]
-    private bool _addToAllLevels = true;
-    
-    [SerializeField]
-    private List<string> _levelNames;
-    
+    private List<string> _valuablePresets = ["Valuables - Generic"];
+
     public ValuableObject Prefab => _prefab;
-    public bool AddToAllLevels => _addToAllLevels;
-    public IReadOnlyList<string> LevelNames => _levelNames;
+    public IReadOnlyList<string> ValuablePresets => _valuablePresets;
 
     public override string Name => Prefab.name;
 
     public override void Initialize(Mod mod)
     {
-        List<string> presets = AddToAllLevels ? null : _levelNames;
-        Modules.Valuables.RegisterValuable(Prefab.gameObject, presets);
+        Modules.Valuables.RegisterValuable(Prefab.gameObject, ValuablePresets.ToList());
     }
 }

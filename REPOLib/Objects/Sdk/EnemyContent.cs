@@ -2,7 +2,7 @@
 
 namespace REPOLib.Objects.Sdk;
 
-[CreateAssetMenu(menuName = "REPOLib/Enemy", order = 2, fileName = "New Enemy")]
+[CreateAssetMenu(menuName = "REPOLib/Enemy", order = 3, fileName = "New Enemy")]
 public class EnemyContent : Content
 {
     [SerializeField]
