@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using HarmonyLib;
+using REPOLib.Commands;
 using REPOLib.Patches;
 
 namespace REPOLib;
@@ -23,6 +24,8 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll(typeof(RunManagerPatch));
         _harmony.PatchAll(typeof(EnemyDirectorPatch));
         _harmony.PatchAll(typeof(StatsManagerPatch));
+        _harmony.PatchAll(typeof(SteamManagerPatch));
+        _harmony.PatchAll(typeof(SemiFuncPatch));
 
         ConfigManager.Initialize(Config);
 
