@@ -13,8 +13,6 @@ namespace REPOLib.Commands
 
         public static void Initialize()
         {
-            FindAllCommandMethods();
-
             foreach (var command in CommandInitializerMethods)
             {
                 try
@@ -23,6 +21,7 @@ namespace REPOLib.Commands
                     {
                         Logger.LogWarning($"Command initializer {command.Name} is not static!");
                     }
+                    Logger.LogInfo($"Initializing command {command.Name}", extended: true);
                     command.Invoke(null, null);
                 }
                 catch (Exception e)
@@ -30,6 +29,8 @@ namespace REPOLib.Commands
                     Logger.LogError($"Failed to initialize command: {e}");
                 }
             }
+
+            FindAllCommandMethods();
             foreach (var command in CommandExecutionMethods)
             {
                 if (!command.Value.IsStatic)
@@ -45,12 +46,13 @@ namespace REPOLib.Commands
             var executionMethods = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
                 .SelectMany(type => type.GetMethods())
-                .Where(method => method.GetCustomAttribute<CommandExecutionAttribute>() != null)
+                .Where(method => method.GetCustomAttribute<REPOLibCommandExecutionAttribute>() != null)
                 .ToList();
 
             foreach (var method in executionMethods)
             {
-                var aliasAttributes = method.GetCustomAttributes<CommandAliasAttribute>();
+                var aliasAttributes = method.GetCustomAttributes<REPOLibCommandAliasAttribute>();
+                bool added = false;
                 if (aliasAttributes == null || aliasAttributes.Count() == 0)
                 {
                     Logger.LogWarning($"Command {method.Name} has no alias attributes!");
@@ -58,15 +60,18 @@ namespace REPOLib.Commands
                 }
                 foreach (var aliasAttribute in aliasAttributes)
                 {
-                    CommandExecutionMethods.Add(aliasAttribute.Alias, method);
+                    if (CommandExecutionMethods.TryAdd(aliasAttribute.Alias, method))
+                    {
+                        Logger.LogWarning($"Skipped duplicate command alias \"{aliasAttribute.Alias}\" on method \"{method.Name}\".");
+                    }
+                    else
+                        added = true;
+                }
+                if (!added)
+                {
+                    Logger.LogWarning($"Failed to add any command aliases for method \"{method.Name}\".");
                 }
             }
-
-            CommandInitializerMethods = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes())
-                .SelectMany(type => type.GetMethods())
-                .Where(method => method.GetCustomAttribute<CommandInitializerAttribute>() != null)
-                .ToList();
         }
     }
 }

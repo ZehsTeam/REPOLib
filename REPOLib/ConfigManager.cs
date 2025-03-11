@@ -18,6 +18,6 @@ internal static class ConfigManager
     private static void BindConfigs()
     {
         ExtendedLogging = ConfigFile.Bind("General", "ExtendedLogging", defaultValue: false, "Enable extended logging.");
-        DeveloperMode = ConfigFile.Bind("General", "DeveloperMode", defaultValue: false, "Enable developer mode cheats.");
+        DeveloperMode = ConfigFile.Bind("General", "DeveloperMode", defaultValue: false, "Enable developer mode cheats for testing.");
     }
 }

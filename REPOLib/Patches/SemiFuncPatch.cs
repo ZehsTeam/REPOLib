@@ -35,7 +35,7 @@ namespace REPOLib.Patches
             CommandManager.CommandExecutionMethods.TryGetValue(command, out commandMethod);
             if (commandMethod != null)
             {
-                if (commandMethod.GetCustomAttribute<CommandExecutionAttribute>()?.RequiresDeveloperMode == true && !SteamManager.instance.developerMode)
+                if (commandMethod.GetCustomAttribute<REPOLibCommandExecutionAttribute>()?.RequiresDeveloperMode == true && !SteamManager.instance.developerMode)
                 {
                     Logger.LogWarning($"Command {command} requires developer mode to be enabled. Enable it in REPOLib.cfg");
                     return false;

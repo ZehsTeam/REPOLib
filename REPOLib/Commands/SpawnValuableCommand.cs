@@ -9,13 +9,13 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace REPOLib.Commands
 {
-    public static class SpawnValuable
+    public static class SpawnValuableCommand
     {
         static bool initialized = false;
 
         private static readonly Dictionary<string, GameObject> valuablePrefabs = [];
 
-        [CommandInitializer]
+        [REPOLibCommandInitializer]
         public static void Initialize()
         {
             Logger.LogInfo("Initializing spawn command");
@@ -48,10 +48,10 @@ namespace REPOLib.Commands
             }
         }
 
-        [CommandExecution(requiresDeveloperMode:true)]
-        [CommandAlias("spawn")]
-        [CommandAlias("spawnvaluable")]
-        [CommandAlias("sv")]
+        [REPOLibCommandExecution(requiresDeveloperMode:true)]
+        [REPOLibCommandAlias("spawnvaluable")]
+        [REPOLibCommandAlias("spawnval")]
+        [REPOLibCommandAlias("sv")]
         public static void Execute(string args)
         {
             Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
