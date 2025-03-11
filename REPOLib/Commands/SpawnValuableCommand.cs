@@ -41,7 +41,6 @@ namespace REPOLib.Commands
                     {
                         foreach (var valuable in valuables)
                         {
-                            Logger.LogInfo($"SpawnValuable caching \"{valuable.name}\".");
                             valuablePrefabs.TryAdd(valuable.name.ToLower().Substring(valuable.name.LastIndexOf('/')+1), valuable);
                         }
                     }
