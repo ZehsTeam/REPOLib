@@ -66,16 +66,19 @@
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.21" IncludeAssets="compile" PrivateAssets="all" />
     <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.1.2-ngd.0" />
   </ItemGroup>
-  
-  <!-- EDIT THESE SETTINGS -->
+
+  <!-- Import settings from .csproj.user file -->
+  <Import Project="$(MSBuildProjectFile).user" Condition="Exists('$(MSBuildProjectFile).user')" />
+
+  <!-- Default values in case the .csproj.user file doesn't exist -->
   <PropertyGroup>
-    <!-- Gale profile name -->
-    <GaleProfile>Mod Development</GaleProfile>
+    <GaleProfile Condition="'$(GaleProfile)' == ''">Mod Development</GaleProfile>
+    <GaleDataFolder Condition="'$(GaleDataFolder)' == ''">$(AppData)\com.kesomannen.gale/</GaleDataFolder>
   </PropertyGroup>
   
   <PropertyGroup>
     <!-- Gale plugins folder -->
-    <GalePluginsFolder>$(AppData)\com.kesomannen.gale\repo\profiles\$(GaleProfile)\BepInEx\plugins</GalePluginsFolder>
+    <GalePluginsFolder>$(GaleDataFolder)\repo\profiles\$(GaleProfile)\BepInEx\plugins</GalePluginsFolder>
     
     <!-- Gale plugin folder -->
     <GalePluginFolder>$(GalePluginsFolder)\Zehs-$(MSBuildProjectName)</GalePluginFolder>

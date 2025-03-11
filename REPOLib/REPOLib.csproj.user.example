@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <!-- COPY THIS FILE AND EDIT THESE SETTINGS -->
+    <PropertyGroup>
+        <!-- Gale profile name -->
+        <GaleProfile>Mod Development</GaleProfile>
+        
+        <!-- Gale data folder -->
+        <GaleDataFolder>$(AppData)\com.kesomannen.gale</GaleDataFolder>
+    </PropertyGroup>
+</Project>
