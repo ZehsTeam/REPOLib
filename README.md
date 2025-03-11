@@ -12,6 +12,7 @@
 - Registering items.
 - Registering enemies.
 - Registering custom chat /commands
+    - Built-in dev mode commands: Spawn Valuable, Spawn Item
 - Registering features without code using the [REPOLib-Sdk](https://github.com/ZehsTeam/REPOLib-Sdk).
 
 ## Usage
