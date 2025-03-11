@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace REPOLib.Extensions;
@@ -54,6 +55,26 @@ internal static class LevelValuablesExtension
             ValuableVolume.Type.VeryTall => levelValuables.veryTall,
             _ => null
         };
+
+        return list != null;
+    }
+
+    public static bool TryGetCombinedList(this LevelValuables levelValuables, out List<GameObject> list)
+    {
+        var volumeTypes = new List<List<GameObject>>()
+        {
+            levelValuables.tiny,
+            levelValuables.small,
+            levelValuables.medium,
+            levelValuables.big,
+            levelValuables.wide,
+            levelValuables.tall,
+            levelValuables.veryTall,
+        };
+        list = volumeTypes.SelectMany(volumeType => volumeType)
+            .Where(x => x != null)
+            .Distinct()
+            .ToList();
 
         return list != null;
     }
