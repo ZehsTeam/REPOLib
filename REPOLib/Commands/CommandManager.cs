@@ -21,7 +21,7 @@ namespace REPOLib.Commands
             CommandInitializerMethods = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
                 .SelectMany(type => type.GetMethods())
-                .Where(method => method.GetCustomAttribute<REPOLibCommandInitializerAttribute>() != null)
+                .Where(method => method.GetCustomAttribute<CommandInitializerAttribute>() != null)
                 .ToList();
             foreach (var command in CommandInitializerMethods)
             {
@@ -59,12 +59,12 @@ namespace REPOLib.Commands
             commandExecutionMethodCache = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(assembly => assembly.GetTypes())
                 .SelectMany(type => type.GetMethods())
-                .Where(method => method.GetCustomAttribute<REPOLibCommandExecutionAttribute>() != null)
+                .Where(method => method.GetCustomAttribute<CommandExecutionAttribute>() != null)
                 .ToList();
 
             foreach (var method in commandExecutionMethodCache)
             {
-                var aliasAttributes = method.GetCustomAttributes<REPOLibCommandAliasAttribute>();
+                var aliasAttributes = method.GetCustomAttributes<CommandAliasAttribute>();
                 bool added = false;
                 if (aliasAttributes == null || aliasAttributes.Count() == 0)
                 {
@@ -90,7 +90,7 @@ namespace REPOLib.Commands
         {
             foreach (var method in commandExecutionMethodCache)
             {
-                var execAttribute = method.GetCustomAttribute<REPOLibCommandExecutionAttribute>();
+                var execAttribute = method.GetCustomAttribute<CommandExecutionAttribute>();
 
                 var bepinPluginClass = method.Module.Assembly.GetTypes()
                     .Where(type => type.GetCustomAttribute<BepInPlugin>() != null)
@@ -99,7 +99,7 @@ namespace REPOLib.Commands
                 string sourceClass = method.DeclaringType.ToString() ?? "Unknown";
 
                 List<string> aliases = [];
-                foreach (var aliasAttribute in method.GetCustomAttributes<REPOLibCommandAliasAttribute>())
+                foreach (var aliasAttribute in method.GetCustomAttributes<CommandAliasAttribute>())
                 {
                     aliases.Add(aliasAttribute.Alias);
                 }

@@ -3,14 +3,14 @@
 namespace REPOLib.Commands
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-    public class REPOLibCommandExecutionAttribute : Attribute
+    public class CommandExecutionAttribute : Attribute
     {
         public bool RequiresDeveloperMode { get; private set; }
         public bool EnabledByDefault { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
 
-        public REPOLibCommandExecutionAttribute(string name=null, string description=null, bool enabledByDefault=true, bool requiresDeveloperMode=false)
+        public CommandExecutionAttribute(string name=null, string description=null, bool enabledByDefault=true, bool requiresDeveloperMode=false)
         {
             RequiresDeveloperMode = requiresDeveloperMode;
             EnabledByDefault = enabledByDefault;
@@ -20,17 +20,17 @@ namespace REPOLib.Commands
     }
 
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-    public class REPOLibCommandInitializerAttribute : Attribute
+    public class CommandInitializerAttribute : Attribute
     {
 
     }
 
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-    public class  REPOLibCommandAliasAttribute : Attribute
+    public class  CommandAliasAttribute : Attribute
     {
         public string Alias { get; private set; }
 
-        public REPOLibCommandAliasAttribute(string alias)
+        public CommandAliasAttribute(string alias)
         {
             this.Alias = alias;
         }

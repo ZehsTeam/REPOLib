@@ -12,13 +12,13 @@ namespace REPOLib.Commands
     {
         private static readonly Dictionary<string, GameObject> itemPrefabs = [];
 
-        [REPOLibCommandExecution(
+        [CommandExecution(
             "Spawn Item",
             "Spawn an instance of an item with the specified (case-insensitive) name. You can optionally leave out \"Item \" from the prefab name.",
             requiresDeveloperMode: true
             )]
-        [REPOLibCommandAlias("spawnitem")]
-        [REPOLibCommandAlias("si")]
+        [CommandAlias("spawnitem")]
+        [CommandAlias("si")]
         public static void Execute(string args)
         {
             Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);

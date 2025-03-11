@@ -36,7 +36,7 @@ namespace REPOLib.Patches
             CommandManager.CommandExecutionMethods.TryGetValue(command, out commandMethod);
             if (commandMethod != null)
             {
-                var execAttribute = commandMethod.GetCustomAttribute<REPOLibCommandExecutionAttribute>();
+                var execAttribute = commandMethod.GetCustomAttribute<CommandExecutionAttribute>();
                 if (CommandManager.CommandsEnabled.TryGetValue(execAttribute.Name, out bool enabled))
                 {
                     if (!enabled)

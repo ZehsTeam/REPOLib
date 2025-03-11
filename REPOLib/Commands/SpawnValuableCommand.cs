@@ -15,7 +15,7 @@ namespace REPOLib.Commands
 
         private static readonly Dictionary<string, GameObject> valuablePrefabs = [];
 
-        [REPOLibCommandInitializer]
+        [CommandInitializer]
         public static void Initialize()
         {
             Logger.LogInfo("Initializing spawn valuable command");
@@ -49,14 +49,14 @@ namespace REPOLib.Commands
             }
         }
 
-        [REPOLibCommandExecution(
+        [CommandExecution(
             "Spawn Valuable",
             "Spawn an instance of a valuable with the specified (case-insensitive) name. You can optionally leave out \"Valuable \" from the prefab name.",
             requiresDeveloperMode:true
             )]
-        [REPOLibCommandAlias("spawnvaluable")]
-        [REPOLibCommandAlias("spawnval")]
-        [REPOLibCommandAlias("sv")]
+        [CommandAlias("spawnvaluable")]
+        [CommandAlias("spawnval")]
+        [CommandAlias("sv")]
         public static void Execute(string args)
         {
             Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
