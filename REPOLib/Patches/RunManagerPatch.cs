@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using REPOLib.Commands;
 using REPOLib.Modules;
 
 namespace REPOLib.Patches;
@@ -18,5 +19,7 @@ internal static class RunManagerPatch
 
         NetworkPrefabs.Initialize();
         Valuables.RegisterValuables();
+
+        CommandManager.Initialize();
     }
 }

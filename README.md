@@ -11,6 +11,8 @@
 - Registering valuables.
 - Registering items.
 - Registering enemies.
+- Registering custom chat /commands
+    - Built-in dev mode commands: Spawn Valuable, Spawn Item
 - Registering features without code using the [REPOLib-Sdk](https://github.com/ZehsTeam/REPOLib-Sdk).
 
 ## Usage
@@ -159,6 +161,36 @@ public class YourMod : BaseUnityPlugin
 
         // Register an enemy.
         REPOLib.Modules.Enemies.RegisterEnemy(enemy);
+    }
+}
+```
+</details>
+
+<details><summary>Chat commands</summary><br>
+
+Registering a chat /command.
+```cs
+public static class YourCommand
+{
+    // ...
+
+    [REPOLibCommandInitializer]
+    public static void Initialize()
+    {
+        // Perform any setup or caching
+    }
+
+    [REPOLibCommandExecution(
+        "Your Command Name",
+        "Description of what the command does and how to use it.",
+        enabledByDefault: true,
+        requiresDeveloperMode: false,
+        )]
+    [REPOLibCommandAlias("yourcommand")]
+    [REPOLibCommandAlias("yourcmd")]
+    public static void Execute(string args)
+    {
+        // ...
     }
 }
 ```
