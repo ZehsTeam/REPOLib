@@ -10,6 +10,7 @@ namespace REPOLib.Modules;
 public static class Valuables
 {
     public static IReadOnlyList<GameObject> RegisteredValuables => _valuablesRegistered;
+    public static IReadOnlyList<LevelValuables> ValuablePresets => _valuablePresets.Values.ToList();
 
     private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
     private static readonly Dictionary<GameObject, List<string>> _valuablesToRegister = [];
