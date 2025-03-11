@@ -51,7 +51,15 @@ namespace REPOLib.Patches
                 }
                 try
                 {
-                    commandMethod.Invoke(null, [args]);
+                    var methodParams = commandMethod.GetParameters();
+                    if (methodParams.Length == 0)
+                    {
+                        commandMethod.Invoke(null, null);
+                    }
+                    else
+                    {
+                        commandMethod.Invoke(null, [args]);
+                    }
                 }
                 catch (Exception e)
                 {

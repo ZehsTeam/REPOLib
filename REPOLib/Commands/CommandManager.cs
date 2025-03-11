@@ -64,6 +64,17 @@ namespace REPOLib.Commands
 
             foreach (var method in commandExecutionMethodCache)
             {
+                var methodParams = method.GetParameters();
+                if (methodParams.Length > 1)
+                {
+                    Logger.LogError($"Command \"{method.GetCustomAttribute<CommandExecutionAttribute>().Name}\" execution method \"{method.Name}\" has too many parameters! Should only have 1 string parameter or none.");
+                    return;
+                }
+                if (methodParams.Length == 1 && methodParams[0].ParameterType != typeof(string))
+                {
+                    Logger.LogError($"Command \"{method.GetCustomAttribute<CommandExecutionAttribute>().Name}\" execution method \"{method.Name}\" has parameter of the wrong type! Should be string.");
+                    return;
+                }
                 var aliasAttributes = method.GetCustomAttributes<CommandAliasAttribute>();
                 bool added = false;
                 if (aliasAttributes == null || aliasAttributes.Count() == 0)
