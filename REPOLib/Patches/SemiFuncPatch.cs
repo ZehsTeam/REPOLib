@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using HarmonyLib;
 using REPOLib.Commands;
 using REPOLib.Extensions;
@@ -35,12 +36,27 @@ namespace REPOLib.Patches
             CommandManager.CommandExecutionMethods.TryGetValue(command, out commandMethod);
             if (commandMethod != null)
             {
-                if (commandMethod.GetCustomAttribute<REPOLibCommandExecutionAttribute>()?.RequiresDeveloperMode == true && !SteamManager.instance.developerMode)
+                var execAttribute = commandMethod.GetCustomAttribute<REPOLibCommandExecutionAttribute>();
+                if (CommandManager.CommandsEnabled.TryGetValue(execAttribute.Name, out bool enabled))
+                {
+                    if (!enabled)
+                    {
+                        return false;
+                    }
+                }
+                if (execAttribute != null &&  execAttribute.RequiresDeveloperMode == true && !SteamManager.instance.developerMode)
                 {
                     Logger.LogWarning($"Command {command} requires developer mode to be enabled. Enable it in REPOLib.cfg");
                     return false;
                 }
-                commandMethod.Invoke(null, [args]);
+                try
+                {
+                    commandMethod.Invoke(null, [args]);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError($"Error executing command: {e}");
+                }
 
                 return false;
             }

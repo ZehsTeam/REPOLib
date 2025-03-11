@@ -6,10 +6,16 @@ namespace REPOLib.Commands
     public class REPOLibCommandExecutionAttribute : Attribute
     {
         public bool RequiresDeveloperMode { get; private set; }
+        public bool EnabledByDefault { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
 
-        public REPOLibCommandExecutionAttribute(bool requiresDeveloperMode=false)
+        public REPOLibCommandExecutionAttribute(string name=null, string description=null, bool enabledByDefault=true, bool requiresDeveloperMode=false)
         {
             RequiresDeveloperMode = requiresDeveloperMode;
+            EnabledByDefault = enabledByDefault;
+            Name = name ?? "";
+            Description = description ?? "";
         }
     }
 

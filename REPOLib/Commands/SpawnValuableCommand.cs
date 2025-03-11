@@ -18,15 +18,16 @@ namespace REPOLib.Commands
         [REPOLibCommandInitializer]
         public static void Initialize()
         {
-            Logger.LogInfo("Initializing spawn command");
+            Logger.LogInfo("Initializing spawn valuable command");
 
             CacheValuables();
 
             initialized = true;
         }
 
-        private static void CacheValuables()
+        public static void CacheValuables()
         {
+            valuablePrefabs.Clear();
             if (RunManager.instance == null)
             {
                 Logger.LogError($"Failed to cache LevelValuables. RunManager instance is null.");
@@ -48,13 +49,22 @@ namespace REPOLib.Commands
             }
         }
 
-        [REPOLibCommandExecution(requiresDeveloperMode:true)]
+        [REPOLibCommandExecution(
+            "Spawn Valuable",
+            "Spawn an instance of a valuable with the specified (case-insensitive) name. You can optionally leave out \"Valuable \" from the prefab name.",
+            requiresDeveloperMode:true
+            )]
         [REPOLibCommandAlias("spawnvaluable")]
         [REPOLibCommandAlias("spawnval")]
         [REPOLibCommandAlias("sv")]
         public static void Execute(string args)
         {
             Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
+            if (args == null || args.Length == 0)
+            {
+                Logger.LogWarning("No args provided to spawn command.");
+                return;
+            }
             if (!initialized)
             {
                 Logger.LogError("Spawn command not initialized!");

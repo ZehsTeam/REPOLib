@@ -24,10 +24,14 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll(typeof(RunManagerPatch));
         _harmony.PatchAll(typeof(EnemyDirectorPatch));
         _harmony.PatchAll(typeof(StatsManagerPatch));
-        _harmony.PatchAll(typeof(SteamManagerPatch));
         _harmony.PatchAll(typeof(SemiFuncPatch));
 
         ConfigManager.Initialize(Config);
+
+        if (ConfigManager.DeveloperMode.Value)
+        {
+            _harmony.PatchAll(typeof(SteamManagerPatch));
+        }
 
         BundleLoader.LoadAllBundles(Paths.PluginPath, ".repobundle");
     }
