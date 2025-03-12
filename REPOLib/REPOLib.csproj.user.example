@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project>
     <!-- COPY THIS FILE AND EDIT THESE SETTINGS -->
     <PropertyGroup>
         <!-- Gale profile name -->
