@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using REPOLib.Extensions;
+using System.IO;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -91,19 +92,16 @@ public static class ResourcesHelper
             return string.Empty;
         }
 
+        GameObject mainSpawnObject = enemySetup.GetMainSpawnObject();
+
+        if (mainSpawnObject == null)
+        {
+            return string.Empty;
+        }
+
         string folderPath = GetEnemiesFolderPath();
 
-        foreach (var spawnObject in enemySetup.spawnObjects)
-        {
-            if (spawnObject == null) continue;
-
-            if (spawnObject.TryGetComponent(out EnemyParent enemyParent))
-            {
-                return Path.Combine(folderPath, spawnObject.name);
-            }
-        }
-        
-        return string.Empty;
+        return Path.Combine(folderPath, mainSpawnObject.name);
     }
 
     public static string GetEnemyPrefabPath(GameObject prefab)
@@ -150,10 +148,8 @@ public static class ResourcesHelper
             return false;
         }
 
-        foreach (var spawnObject in enemySetup.spawnObjects)
+        foreach (var spawnObject in enemySetup.GetDistinctSpawnObjects())
         {
-            if (spawnObject == null) continue;
-
             string prefabPath = GetEnemyPrefabPath(spawnObject);
 
             if (Resources.Load<GameObject>(prefabPath) != null)

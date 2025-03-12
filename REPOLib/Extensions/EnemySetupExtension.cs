@@ -27,9 +27,7 @@ internal static class EnemySetupExtension
 
     public static EnemyParent GetEnemyParent(this EnemySetup enemySetup)
     {
-        List<GameObject> spawnObjects = GetDistinctSpawnObjects(enemySetup);
-
-        foreach (var spawnObject in spawnObjects)
+        foreach (var spawnObject in GetDistinctSpawnObjects(enemySetup))
         {
             if (spawnObject.TryGetComponent(out EnemyParent enemyParent))
             {
