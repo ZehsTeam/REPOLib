@@ -1,6 +1,7 @@
 ﻿using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace REPOLib.Modules;
 
@@ -78,6 +79,12 @@ public static class Items
         if (ResourcesHelper.HasItemPrefab(item))
         {
             Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab already exists in Resources with the same name.");
+            return;
+        }
+
+        if (_itemsToRegister.Any(x => x.itemAssetName == item.itemAssetName))
+        {
+            Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab already exists with the same name.");
             return;
         }
 

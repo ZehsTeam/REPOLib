@@ -71,6 +71,7 @@ internal static class LevelValuablesExtension
             levelValuables.tall,
             levelValuables.veryTall,
         };
+
         list = volumeTypes.SelectMany(volumeType => volumeType)
             .Where(x => x != null)
             .Distinct()

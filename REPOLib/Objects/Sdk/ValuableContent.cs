@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using REPOLib.Modules;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -11,8 +12,8 @@ public class ValuableContent : Content
     private ValuableObject _prefab;
 
     [SerializeField]
-    private List<string> _valuablePresets = ["Valuables - Generic"];
-
+    private string[] _valuablePresets = [Valuables.GenericValuablePresetName];
+    
     public ValuableObject Prefab => _prefab;
     public IReadOnlyList<string> ValuablePresets => _valuablePresets;
 
@@ -20,6 +21,6 @@ public class ValuableContent : Content
 
     public override void Initialize(Mod mod)
     {
-        Modules.Valuables.RegisterValuable(Prefab.gameObject, ValuablePresets.ToList());
+        Valuables.RegisterValuable(Prefab.gameObject, ValuablePresets.ToList());
     }
 }

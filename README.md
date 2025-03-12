@@ -174,20 +174,20 @@ public static class YourCommand
 {
     // ...
 
-    [REPOLibCommandInitializer]
+    [CommandInitializer]
     public static void Initialize()
     {
         // Perform any setup or caching
     }
 
-    [REPOLibCommandExecution(
+    [CommandExecution(
         "Your Command Name",
         "Description of what the command does and how to use it.",
         enabledByDefault: true,
         requiresDeveloperMode: false,
         )]
-    [REPOLibCommandAlias("yourcommand")]
-    [REPOLibCommandAlias("yourcmd")]
+    [CommandAlias("yourcommand")]
+    [CommandAlias("yourcmd")]
     public static void Execute(string args)
     {
         // ...
@@ -205,6 +205,9 @@ public static class YourCommand
 
 > [!TIP]
 > You can enable extended logging in the config settings to get more info about features being registered, custom network prefabs being spawned, and more.
+
+> [!TIP]
+> You can enable developer mode in the config settings to get access to the `/spawnvaluable <name>` and `/spawnitem <name>` chat commands (`/sv` and `/si` for short). HOST ONLY!
 
 ## Contribute
 Anyone is free to contribute.

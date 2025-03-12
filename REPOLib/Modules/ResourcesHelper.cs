@@ -47,16 +47,41 @@ public static class ResourcesHelper
         return Path.Combine(folderPath, valuableObject.gameObject.name);
     }
 
+    public static string GetValuablePrefabPath(GameObject prefab)
+    {
+        if (prefab == null)
+        {
+            return string.Empty;
+        }
+
+        if (prefab.TryGetComponent(out ValuableObject valuableObject))
+        {
+            return GetValuablePrefabPath(valuableObject);
+        }
+
+        return string.Empty;
+    }
+
     public static string GetItemPrefabPath(Item item)
     {
-        if (item == null || item.prefab == null)
+        if (item == null)
+        {
+            return string.Empty;
+        }
+
+        return GetItemPrefabPath(item.prefab);
+    }
+
+    public static string GetItemPrefabPath(GameObject prefab)
+    {
+        if (prefab == null)
         {
             return string.Empty;
         }
 
         string folderPath = GetItemsFolderPath();
 
-        return Path.Combine(folderPath, item.prefab.name);
+        return Path.Combine(folderPath, prefab.name);
     }
 
     public static string GetEnemyPrefabPath(EnemySetup enemySetup)
