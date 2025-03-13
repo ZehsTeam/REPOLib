@@ -30,6 +30,9 @@ public class Mod : ScriptableObject
     [SerializeField]
     private TextAsset _readme;
 
+    [SerializeField]
+    private TextAsset _changelog;
+
     public string Name => _name;
     public string Author => _author;
     public string Version => _version;
@@ -38,6 +41,7 @@ public class Mod : ScriptableObject
     public IReadOnlyList<string> Dependencies => _dependencies;
     public Sprite Icon => _icon;
     public TextAsset Readme => _readme;
+    public TextAsset Changelog => _changelog;
 
     public string FullName => $"{Author}-{Name}";
     // also known as a dependency string

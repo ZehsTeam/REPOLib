@@ -54,15 +54,7 @@ public static class Enemies
             throw new ArgumentException("Failed to register enemy. EnemySetup or spawnObjects list is empty.");
         }
 
-        EnemyParent enemyParent = null;
-
-        foreach (var spawnObject in enemySetup.spawnObjects)
-        {
-            if (spawnObject.TryGetComponent(out enemyParent))
-            {
-                break;
-            }
-        }
+        EnemyParent enemyParent = enemySetup.GetEnemyParent();
 
         if (enemyParent == null)
         {
@@ -87,15 +79,21 @@ public static class Enemies
             return;
         }
 
-        // Register all spawn prefabs to the network
-        foreach (var spawnObject in enemySetup.spawnObjects)
+        foreach (var spawnObject in enemySetup.GetDistinctSpawnObjects())
         {
-            if (spawnObject == null)
+            foreach (var previousEnemy in _enemiesToRegister)
             {
-                Logger.LogWarning($"Enemy \"{enemyParent.enemyName}\" has a null entry in the spawnObjects list.");
-                continue;
+                if (previousEnemy.AnySpawnObjectsNameEquals(spawnObject.name))
+                {
+                    Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". Enemy \"{previousEnemy.name}\" already has a spawn object called \"{spawnObject.name}\"");
+                    return;
+                }
             }
-
+        }
+        
+        // Register all spawn prefabs to the network
+        foreach (var spawnObject in enemySetup.GetDistinctSpawnObjects())
+        {
             string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
             NetworkPrefabs.RegisterNetworkPrefab(prefabId, spawnObject);
         }

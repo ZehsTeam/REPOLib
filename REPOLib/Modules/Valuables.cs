@@ -9,7 +9,10 @@ namespace REPOLib.Modules;
 public static class Valuables
 {
     public static IReadOnlyList<GameObject> RegisteredValuables => _valuablesRegistered;
+    public static IReadOnlyList<LevelValuables> ValuablePresets => _valuablePresets.Values.ToList();
 
+    public static string GenericValuablePresetName => "Valuables - Generic";
+    
     private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
     private static readonly Dictionary<GameObject, List<string>> _valuablesToRegister = [];
     private static readonly List<GameObject> _valuablesRegistered = [];
@@ -57,11 +60,19 @@ public static class Valuables
                 continue;
             }
 
-            foreach (var presetName in _valuablesToRegister[valuable])
+            List<string> presetNames = _valuablesToRegister[valuable];
+
+            if (!presetNames.Any(x => _valuablePresets.Keys.Any(y => x == y)))
+            {
+                Logger.LogError($"Valuable \"{valuable.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
+                presetNames.Add(GenericValuablePresetName);
+            }
+
+            foreach (var presetName in presetNames)
             {
                 if (presetName == null || !_valuablePresets.ContainsKey(presetName))
                 {
-                    Logger.LogError($"Failed adding valuable \"{valuable.name}\" to preset \"{presetName}\". The preset does not exist.");
+                    Logger.LogError($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\". The valuable preset does not exist.");
                     continue;
                 }
 
@@ -132,7 +143,7 @@ public static class Valuables
         if (presetNames == null || presetNames.Count == 0)
         {
             //Logger.LogInfo($"No valuable presets specified for valuable \"{prefab.name}\". Adding valuable to generic preset.", extended: true);
-            presetNames = ["Valuables - Generic"];
+            presetNames = [GenericValuablePresetName];
         }
 
         if (!_canRegisterValuables)
@@ -144,6 +155,12 @@ public static class Valuables
         if (ResourcesHelper.HasValuablePrefab(valuableObject))
         {
             Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable prefab already exists in Resources with the same name.");
+            return;
+        }
+
+        if (_valuablesToRegister.Keys.Any(x => x.name.Equals(prefab.name, StringComparison.OrdinalIgnoreCase)))
+        {
+            Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable prefab already exists with the same name.");
             return;
         }
 
