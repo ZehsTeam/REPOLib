@@ -22,7 +22,7 @@ public class Mod : ScriptableObject
     private string _websiteUrl;
 
     [SerializeField]
-    private string[] _dependencies;
+    private string[] _dependencies = [$"Zehs-REPOLib-{MyPluginInfo.PLUGIN_VERSION}"];
 
     [SerializeField]
     private Sprite _icon;
