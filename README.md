@@ -206,8 +206,36 @@ public static class YourCommand
 > [!TIP]
 > You can enable extended logging in the config settings to get more info about features being registered, custom network prefabs being spawned, and more.
 
+## Chat Commands
+> [!IMPORTANT]
+> You must enable `DeveloperMode` in the config settings to use developer mode commands.
+
+Chat commands currently only work in multiplayer since you need access to the in-game chat to use commands.
+
+This mod comes with a few built-in chat commands:
+
+### 1. Spawn Valuable `/spawnvaluable <name>`
+This command will spawn a valuable in front of you.\
+Replace `<name>` with the name of the valuable prefab.\
+Names are not case-sensitive.\
+Example usage: `/spawnvaluable diamond`\
+This command has multiple aliases: `/spawnval`, `/sv`\
+<ins>**This command requires developer mode to be enabled.**</ins>\
+<ins>**This command is host-only!**</ins>
+
+### 2. Spawn Item `/spawnitem <name>`
+This command will spawn an item in front of you.\
+Replace `<name>` with the name of the item or item prefab.\
+Names are not case-sensitive.\
+Example usage: `/spawnitem gun`\
+This command has one alias: `/si`\
+<ins>**This command requires developer mode to be enabled.**</ins>\
+<ins>**This command is host-only!**</ins>
+
 > [!TIP]
-> You can enable developer mode in the config settings to get access to the `/spawnvaluable <name>` and `/spawnitem <name>` chat commands (`/sv` and `/si` for short). HOST ONLY!
+> Commands can be enabled/disabled in the config settings.
+
+If you are a mod developer and want to add your own custom chat commands to your mod, check the `Usage > Chat commands` section.
 
 ## Contribute
 Anyone is free to contribute.
