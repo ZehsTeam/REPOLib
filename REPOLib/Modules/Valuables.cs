@@ -173,6 +173,8 @@ public static class Valuables
         string prefabId = ResourcesHelper.GetValuablePrefabPath(valuableObject);
         NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
 
+        Utilities.FixAudioMixerGroups(prefab);
+
         _valuablesToRegister.Add(prefab, presetNames);
     }
     #endregion

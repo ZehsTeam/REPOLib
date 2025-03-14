@@ -96,6 +96,8 @@ public static class Enemies
         {
             string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
             NetworkPrefabs.RegisterNetworkPrefab(prefabId, spawnObject);
+
+            Utilities.FixAudioMixerGroups(spawnObject);
         }
         
         _enemiesToRegister.Add(enemySetup);
