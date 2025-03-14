@@ -10,7 +10,7 @@ public class Utilities
     /// <summary>
     /// Fixes the mixer groups of all audio sources in the game object and its children.
     /// Assigns the audio mixer group based on the audio group found assigned in the prefab.
-    /// Best to call this method in the Awake, Start, or OnEnable method of the game object.
+    /// Best to call this method in the Start, or OnEnable method of the game object.
     /// - Vyrus
     /// </summary>
     public static void FixMixerGroups(GameObject gameObject)
