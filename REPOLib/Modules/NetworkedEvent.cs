@@ -61,7 +61,7 @@ namespace REPOLib.Modules
 
         private static byte GetUniqueID()
         {
-            byte id = 1;
+            byte id = 0;
             do
             {
                 id++;
