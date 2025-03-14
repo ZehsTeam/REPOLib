@@ -1,91 +1,94 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>latest</LangVersion>
-    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-    
-    <AssemblyName>$(MSBuildProjectName)</AssemblyName> <!-- PLUGIN_GUID -->
-    <Product>$(MSBuildProjectName)</Product>           <!-- PLUGIN_NAME -->
-    <Version>1.3.1</Version>                           <!-- PLUGIN_VERSION -->
-    <Authors>Zehs</Authors>
-    <Description>Library for adding content to R.E.P.O.</Description>
-    <PackageTags>R.E.P.O., unity, bepinex, photon-pun, modding</PackageTags>
-    <Copyright>Copyright © 2025 Zehs</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/ZehsTeam/REPOLib</RepositoryUrl>
-    <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
-    <RepositoryType>git</RepositoryType>
-    <RequireLicenseAcceptance>false</RequireLicenseAcceptance>
-    
-    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
-    
-    <IsPackable>true</IsPackable>
-    <PackageId>Zehs.$(AssemblyName)</PackageId>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
-    
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>embedded</DebugType>
-    
-    <RestoreAdditionalProjectSources>
-      https://api.nuget.org/v3/index.json;
-      https://nuget.bepinex.dev/v3/index.json;
-      https://nuget.samboy.dev/v3/index.json;
-    </RestoreAdditionalProjectSources>
-  </PropertyGroup>
-  
-  <Target Name="ClearReferenceCopyLocalPaths" AfterTargets="ResolveAssemblyReferences">
-    <ItemGroup>
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" />
-    </ItemGroup>
-  </Target>
-  
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="$(ProjectDir)../README.md" Pack="true" PackagePath="/" />
-    <None Include="$(ProjectDir)../icon.png" Pack="true" PackagePath="/" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
-    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
-    <PackageReference Include="BepInEx.Core" Version="5.*" />
-    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="UnityEngine.Modules" Version="2022.3.21" IncludeAssets="compile" PrivateAssets="all" />
-    <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.1.2-ngd.0" />
-  </ItemGroup>
-  
-  <!-- Import settings from .csproj.user file -->
-  <Import Project="$(MSBuildProjectFile).user" Condition="Exists('$(MSBuildProjectFile).user')" />
-  
-  <!-- Default values in case the .csproj.user file doesn't exist -->
-  <PropertyGroup>
-    <GaleProfile Condition="'$(GaleProfile)' == ''">Mod Development</GaleProfile>
-    <GaleDataFolder Condition="'$(GaleDataFolder)' == ''">$(AppData)\com.kesomannen.gale/</GaleDataFolder>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <!-- Gale plugins folder -->
-    <GalePluginsFolder>$(GaleDataFolder)\repo\profiles\$(GaleProfile)\BepInEx\plugins</GalePluginsFolder>
-    
-    <!-- Gale plugin folder -->
-    <GalePluginFolder>$(GalePluginsFolder)\Zehs-$(MSBuildProjectName)</GalePluginFolder>
-  </PropertyGroup>
-  
-  <!-- Copy DLL to Gale Zehs-REPOLib plugin folder -->
-  <Target Name="CopyToGalePluginFolder" AfterTargets="PostBuildEvent">
-    <Copy DestinationFolder="$(GalePluginFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
-  </Target>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latest</LangVersion>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+
+		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
+		<!-- PLUGIN_GUID -->
+		<Product>$(MSBuildProjectName)</Product>
+		<!-- PLUGIN_NAME -->
+		<Version>1.3.1</Version>
+		<!-- PLUGIN_VERSION -->
+		<Authors>Zehs</Authors>
+		<Description>Library for adding content to R.E.P.O.</Description>
+		<PackageTags>R.E.P.O., unity, bepinex, photon-pun, modding</PackageTags>
+		<Copyright>Copyright © 2025 Zehs</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/ZehsTeam/REPOLib</RepositoryUrl>
+		<PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+		<RepositoryType>git</RepositoryType>
+		<RequireLicenseAcceptance>false</RequireLicenseAcceptance>
+
+		<RootNamespace>$(MSBuildProjectName)</RootNamespace>
+
+		<IsPackable>true</IsPackable>
+		<PackageId>Zehs.$(AssemblyName)</PackageId>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageOutputPath>$(OutputPath)</PackageOutputPath>
+
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>embedded</DebugType>
+
+		<RestoreAdditionalProjectSources>
+			https://api.nuget.org/v3/index.json;
+			https://nuget.bepinex.dev/v3/index.json;
+			https://nuget.samboy.dev/v3/index.json;
+		</RestoreAdditionalProjectSources>
+	</PropertyGroup>
+
+	<Target Name="ClearReferenceCopyLocalPaths" AfterTargets="ResolveAssemblyReferences">
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" />
+		</ItemGroup>
+	</Target>
+
+	<ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="$(ProjectDir)../README.md" Pack="true" PackagePath="/" />
+		<None Include="$(ProjectDir)../icon.png" Pack="true" PackagePath="/" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
+		<PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+		<PackageReference Include="BepInEx.Core" Version="5.*" />
+		<PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="UnityEngine.Modules" Version="2022.3.21" IncludeAssets="compile" PrivateAssets="all" />
+		<PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.1.2-ngd.0" />
+	</ItemGroup>
+
+	<!-- Import settings from .csproj.user file -->
+	<Import Project="$(MSBuildProjectFile).user" Condition="Exists('$(MSBuildProjectFile).user')" />
+
+	<!-- Default values in case the .csproj.user file doesn't exist -->
+	<PropertyGroup>
+		<GaleProfile Condition="'$(GaleProfile)' == ''">Mod Development</GaleProfile>
+		<GaleDataFolder Condition="'$(GaleDataFolder)' == ''">$(AppData)\com.kesomannen.gale/</GaleDataFolder>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!-- Gale plugins folder -->
+		<GalePluginsFolder>$(GaleDataFolder)\repo\profiles\$(GaleProfile)\BepInEx\plugins</GalePluginsFolder>
+
+		<!-- Gale plugin folder -->
+		<GalePluginFolder>$(GalePluginsFolder)\Zehs-$(MSBuildProjectName)</GalePluginFolder>
+	</PropertyGroup>
+
+	<!-- Copy DLL to Gale Zehs-REPOLib plugin folder -->
+	<Target Name="CopyToGalePluginFolder" AfterTargets="PostBuildEvent">
+		<Copy DestinationFolder="$(GalePluginFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
+	</Target>
 </Project>
