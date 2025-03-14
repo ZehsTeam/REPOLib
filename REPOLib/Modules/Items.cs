@@ -97,6 +97,8 @@ public static class Items
         string prefabId = ResourcesHelper.GetItemPrefabPath(item);
         NetworkPrefabs.RegisterNetworkPrefab(prefabId, item.prefab);
 
+        Utilities.FixAudioMixerGroups(item.prefab);
+
         _itemsToRegister.Add(item);
     }
 }

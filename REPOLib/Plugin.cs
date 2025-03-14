@@ -24,6 +24,7 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll(typeof(EnemyDirectorPatch));
         _harmony.PatchAll(typeof(StatsManagerPatch));
         _harmony.PatchAll(typeof(SemiFuncPatch));
+        _harmony.PatchAll(typeof(AudioManagerPatch));
         _harmony.PatchAll(typeof(RoomVolumeExample));
 
         ConfigManager.Initialize(Config);
