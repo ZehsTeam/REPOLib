@@ -11,13 +11,15 @@ public static class Valuables
     public static IReadOnlyList<GameObject> RegisteredValuables => _valuablesRegistered;
     public static IReadOnlyList<LevelValuables> ValuablePresets => _valuablePresets.Values.ToList();
 
+    private static IEnumerable<GameObject> PendingAndRegisteredValuables => _valuablesToRegister.Keys.Concat(_valuablesRegistered);
+
     public static string GenericValuablePresetName => "Valuables - Generic";
     
     private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
     private static readonly Dictionary<GameObject, List<string>> _valuablesToRegister = [];
     private static readonly List<GameObject> _valuablesRegistered = [];
 
-    private static bool _canRegisterValuables = true;
+    private static bool _initialValuablesRegistered;
 
     private static void CacheValuablePresets()
     {
@@ -36,9 +38,9 @@ public static class Valuables
         }
     }
 
-    internal static void RegisterValuables()
+    internal static void RegisterInitialValuables()
     {
-        if (!_canRegisterValuables)
+        if (_initialValuablesRegistered)
         {
             return;
         }
@@ -55,41 +57,46 @@ public static class Valuables
 
         foreach (var valuable in _valuablesToRegister.Keys)
         {
-            if (_valuablesRegistered.Contains(valuable))
-            {
-                continue;
-            }
-
-            List<string> presetNames = _valuablesToRegister[valuable];
-
-            if (!presetNames.Any(x => _valuablePresets.Keys.Any(y => x == y)))
-            {
-                Logger.LogError($"Valuable \"{valuable.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
-                presetNames.Add(GenericValuablePresetName);
-            }
-
-            foreach (var presetName in presetNames)
-            {
-                if (presetName == null || !_valuablePresets.ContainsKey(presetName))
-                {
-                    Logger.LogError($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\". The valuable preset does not exist.");
-                    continue;
-                }
-
-                if (_valuablePresets[presetName].AddValuable(valuable))
-                {
-                    _valuablesRegistered.Add(valuable);
-                    Logger.LogInfo($"Added valuable \"{valuable.name}\" to valuable preset \"{presetName}\"", extended: true);
-                }
-                else
-                {
-                    Logger.LogWarning($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\"", extended: true);
-                }
-            }
+            RegisterValuableInternal(valuable);
         }
 
         _valuablesToRegister.Clear();
-        _canRegisterValuables = false;
+        _initialValuablesRegistered = true;
+    }
+
+    private static void RegisterValuableInternal(GameObject valuable)
+    {
+        if (_valuablesRegistered.Contains(valuable))
+        {
+            return;
+        }
+
+        List<string> presetNames = _valuablesToRegister[valuable];
+
+        if (!presetNames.Any(x => _valuablePresets.Keys.Any(y => x == y)))
+        {
+            Logger.LogError($"Valuable \"{valuable.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
+            presetNames.Add(GenericValuablePresetName);
+        }
+
+        foreach (var presetName in presetNames)
+        {
+            if (presetName == null || !_valuablePresets.ContainsKey(presetName))
+            {
+                Logger.LogError($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\". The valuable preset does not exist.");
+                continue;
+            }
+
+            if (_valuablePresets[presetName].AddValuable(valuable))
+            {
+                _valuablesRegistered.Add(valuable);
+                Logger.LogDebug($"Added valuable \"{valuable.name}\" to valuable preset \"{presetName}\"", extended: true);
+            }
+            else
+            {
+                Logger.LogWarning($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\"", extended: true);
+            }
+        }
     }
 
     #region Public
@@ -146,25 +153,19 @@ public static class Valuables
             presetNames = [GenericValuablePresetName];
         }
 
-        if (!_canRegisterValuables)
-        {
-            Logger.LogError($"Failed to register valuable \"{prefab.name}\". You can only register valuables from your plugins awake!");
-            return;
-        }
-
         if (ResourcesHelper.HasValuablePrefab(valuableObject))
         {
             Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable prefab already exists in Resources with the same name.");
             return;
         }
 
-        if (_valuablesToRegister.Keys.Any(x => x.name.Equals(prefab.name, StringComparison.OrdinalIgnoreCase)))
+        if (PendingAndRegisteredValuables.Any(x => x.name.Equals(prefab.name, StringComparison.OrdinalIgnoreCase)))
         {
             Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable prefab already exists with the same name.");
             return;
         }
 
-        if (_valuablesToRegister.ContainsKey(prefab))
+        if (PendingAndRegisteredValuables.Contains(prefab))
         {
             Logger.LogWarning($"Failed to register valuable \"{prefab.name}\". Valuable is already registered!");
             return;
@@ -174,6 +175,10 @@ public static class Valuables
         NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
 
         _valuablesToRegister.Add(prefab, presetNames);
+        if (_initialValuablesRegistered)
+        {
+            RegisterValuableInternal(valuableObject.gameObject);
+        }
     }
     #endregion
 

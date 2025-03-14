@@ -11,5 +11,7 @@ public static class SteamManagerPatch
     {
         Logger.LogInfo("Enabling developer mode in SteamManager");
         __instance.developerMode = true;
+        
+        BundleLoader.FinishLoadOperations(__instance);
     }
 }

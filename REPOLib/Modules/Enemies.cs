@@ -11,40 +11,45 @@ public static class Enemies
     private static readonly List<EnemySetup> _enemiesToRegister = [];
     private static readonly List<EnemySetup> _enemiesRegistered = [];
     
-    private static bool _canRegisterEnemies = true;
+    private static bool _initialEnemiesRegistered = true;
 
     internal static void RegisterEnemies()
     {
-        if (!_canRegisterEnemies)
+        if (!_initialEnemiesRegistered)
         {
             return;
         }
         
         foreach (var enemy in _enemiesToRegister)
         {
-            if (_enemiesRegistered.Contains(enemy))
-            {
-                continue;
-            }
-
-            if (!enemy.spawnObjects[0].TryGetComponent(out EnemyParent enemyParent))
-            {
-                continue;
-            }
-
-            if (EnemyDirector.instance.AddEnemy(enemy))
-            {
-                _enemiesRegistered.Add(enemy);
-                Logger.LogInfo($"Added enemy \"{enemy.spawnObjects[0].name}\" to difficulty {enemyParent.difficulty.ToString()}", extended: true);
-            }
-            else
-            {
-                Logger.LogWarning($"Failed to add enemy \"{enemy.spawnObjects[0].name}\" to difficulty {enemyParent.difficulty.ToString()}", extended: true);
-            }
+            RegisterEnemyInternal(enemy);
         }
         
         _enemiesToRegister.Clear();
-        _canRegisterEnemies = false;
+        _initialEnemiesRegistered = true;
+    }
+
+    private static void RegisterEnemyInternal(EnemySetup enemy)
+    {
+        if (_enemiesRegistered.Contains(enemy))
+        {
+            return;
+        }
+
+        if (!enemy.spawnObjects[0].TryGetComponent(out EnemyParent enemyParent))
+        {
+            return;
+        }
+
+        if (EnemyDirector.instance.AddEnemy(enemy))
+        {
+            _enemiesRegistered.Add(enemy);
+            Logger.LogDebug($"Added enemy \"{enemy.spawnObjects[0].name}\" to difficulty {enemyParent.difficulty.ToString()}", extended: true);
+        }
+        else
+        {
+            Logger.LogWarning($"Failed to add enemy \"{enemy.spawnObjects[0].name}\" to difficulty {enemyParent.difficulty.ToString()}", extended: true);
+        }
     }
 
     public static void RegisterEnemy(EnemySetup enemySetup)
@@ -62,7 +67,7 @@ public static class Enemies
             return;
         }
 
-        if (!_canRegisterEnemies)
+        if (!_initialEnemiesRegistered)
         {
             Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". You can only register enemies in awake!");
         }
@@ -97,7 +102,14 @@ public static class Enemies
             string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
             NetworkPrefabs.RegisterNetworkPrefab(prefabId, spawnObject);
         }
-        
-        _enemiesToRegister.Add(enemySetup);
+
+        if (_initialEnemiesRegistered)
+        {
+            RegisterEnemyInternal(enemySetup);
+        }
+        else
+        {
+            _enemiesToRegister.Add(enemySetup);
+        }
     }
 }
