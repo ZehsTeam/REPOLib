@@ -1,7 +1,6 @@
 ﻿using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using REPOLib.Patches;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,9 +37,6 @@ public class NetworkingEvents
         {
             PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
         };
-
-        // Just for testing
-        InitExample();
     }
 
     internal static void AddCustomEvent(NetworkedEvent networkedEvent)
@@ -60,7 +56,7 @@ public class NetworkingEvents
             return;
         }
 
-        thisEvent.EventAction?.Invoke(photonEvent.CustomData);
+        thisEvent.EventAction?.Invoke(photonEvent);
     }
 
     internal static bool TryGetUniqueEventCode(out byte eventCode)
@@ -95,25 +91,15 @@ public class NetworkingEvents
 
         return false;
     }
-
-
-
-    // Just for testing
-    internal static NetworkedEvent ExampleEvent = null;
-    
-    private static void InitExample()
-    {
-        ExampleEvent ??= new("REPOLib Example", RoomVolumeExample.NetworkAnnouncement);
-    }
 }
 
 public class NetworkedEvent
 {
     public string Name { get; private set; }
     public byte EventCode { get; private set; }
-    public Action<object> EventAction { get; private set; }
+    public Action<EventData> EventAction { get; private set; }
 
-    public NetworkedEvent(string name, Action<object> eventAction)
+    public NetworkedEvent(string name, Action<EventData> eventAction)
     {
         Name = name;
         EventAction = eventAction;
