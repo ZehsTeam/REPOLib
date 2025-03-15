@@ -9,7 +9,7 @@ public static class Items
 {
     public static IReadOnlyList<Item> RegisteredItems => _itemsRegistered;
 
-    private static readonly List<Item> _itemsToAdd = [];
+    private static readonly List<Item> _itemsToRegister = [];
     private static readonly List<Item> _itemsRegistered = [];
 
     private static bool _initialItemsRegistered;
@@ -25,7 +25,7 @@ public static class Items
 
         Logger.LogInfo($"Adding items.");
 
-        foreach (var item in _itemsToAdd)
+        foreach (var item in _itemsToRegister)
         {
             RegisterItemInternal(item);
         }
@@ -35,6 +35,8 @@ public static class Items
 
     private static void RegisterItemInternal(Item item)
     {
+        Utilities.FixAudioMixerGroups(item.prefab);
+        
         if (StatsManager.instance.AddItem(item))
         {
             if (!_itemsRegistered.Contains(item))
@@ -75,13 +77,13 @@ public static class Items
             return;
         }
 
-        if (_itemsToAdd.Any(x => x.itemAssetName == item.itemAssetName))
+        if (_itemsToRegister.Any(x => x.itemAssetName == item.itemAssetName))
         {
             Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab already exists with the same name.");
             return;
         }
 
-        if (_itemsToAdd.Contains(item))
+        if (_itemsToRegister.Contains(item))
         {
             Logger.LogError($"Failed to register item \"{item.itemName}\". Item is already registered!");
             return;
@@ -90,7 +92,7 @@ public static class Items
         string prefabId = ResourcesHelper.GetItemPrefabPath(item);
         NetworkPrefabs.RegisterNetworkPrefab(prefabId, item.prefab);
 
-        _itemsToAdd.Add(item);
+        _itemsToRegister.Add(item);
         
         if (_initialItemsRegistered)
         { 

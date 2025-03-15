@@ -13,6 +13,8 @@
 - Registering enemies.
 - Registering custom chat /commands
     - Built-in dev mode commands: Spawn Valuable, Spawn Item
+- Fixing audio mixer groups.
+- Making networked events.
 - Registering features without code using the [REPOLib-Sdk](https://github.com/ZehsTeam/REPOLib-Sdk).
 
 ## Usage
@@ -170,6 +172,8 @@ public class YourMod : BaseUnityPlugin
 
 Registering a chat /command.
 ```cs
+using REPOLib.Commands;
+
 public static class YourCommand
 {
     // ...
@@ -195,13 +199,89 @@ public static class YourCommand
 }
 ```
 </details>
+
+<details><summary>Fixing audio mixer groups</summary><br>
+
+Fixing audio mixer groups on a prefab and their children.
+```cs
+[BepInPlugin("You.YourMod", "YourMod", "1.0.0")]
+[BepInDependency(REPOLib.MyPluginInfo.PLUGIN_GUID, BepInDependency.DependencyFlags.HardDependency)]
+public class YourMod : BaseUnityPlugin
+{
+    // ...
+
+    private void Awake()
+    {
+        // ...
+
+        AssetBundle assetBundle = AssetBundle.LoadFromFile("your_assetbundle_file_path");
+        GameObject prefab = assetBundle.LoadAsset<GameObject>("your_prefab");
+
+        // Fix the audio mixer groups on a prefab and their children.
+        REPOLib.Modules.Utilities.FixAudioMixerGroups(prefab);
+    }
+}
+```
+Registering any features will automatically fix their prefabs audio mixer groups.
+</details>
+
+
+<details><summary>Networked events</summary><br>
+
+Creating a networked event.
+```cs
+using ExitGames.Client.Photon;
+using REPOLib.Modules;
+
+[BepInPlugin("You.YourMod", "YourMod", "1.0.0")]
+[BepInDependency(REPOLib.MyPluginInfo.PLUGIN_GUID, BepInDependency.DependencyFlags.HardDependency)]
+public class YourMod : BaseUnityPlugin
+{
+    // ...
+
+    public static NetworkedEvent ExampleEvent;
+
+    private void Awake()
+    {
+        // ...
+
+        ExampleEvent = new NetworkedEvent("My Example Event", HandleExampleEvent);
+    }
+
+    // EventData is from ExitGames.Client.Photon
+    private static void HandleExampleEvent(EventData eventData)
+    {
+        string message = (string)eventData.CustomData;
+        Debug.Log($"Received message from example event: {message}");
+    }
+}
+```
+
+Calling a networked event.
+```cs
+// The data you are sending through your networked event.
+string message = "Hello World!";
+
+// Call networked event on everyone. (This works in singleplayer)
+ExampleEvent.RaiseEvent(message, REPOLib.Modules.NetworkingEvents.RaiseAll, SendOptions.SendReliable);
+
+// Call networked event on everyone but yourself. (This works in singleplayer)
+ExampleEvent.RaiseEvent(message, REPOLib.Modules.NetworkingEvents.RaiseOthers, SendOptions.SendReliable);
+
+// Call networked event on the master client. (This works in singleplayer)
+ExampleEvent.RaiseEvent(message, REPOLib.Modules.NetworkingEvents.RaiseMasterClient, SendOptions.SendReliable);
+```
+</details>
 </details>
 
 > [!NOTE]
-> Registering valuables, items, and enemies automatically registers their prefabs as a network prefab. 
+> Registering features (Valuables, Items, Enemies, etc...) automatically registers their prefabs as a network prefab. 
+
+> [!NOTE]
+> Registering features (Valuables, Items, Enemies, etc...) automatically fixes their prefabs audio mixer groups. 
 
 > [!IMPORTANT]
-> You should only register network prefabs and features from your plugin's awake function.
+> You should only register network prefabs and features (Valuables, Items, Enemies, etc...) from your plugin's awake function.
 
 > [!TIP]
 > You can enable extended logging in the config settings to get more info about features being registered, custom network prefabs being spawned, and more.

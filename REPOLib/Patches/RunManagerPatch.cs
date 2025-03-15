@@ -20,6 +20,7 @@ internal static class RunManagerPatch
         _patchedAwake = true;
 
         NetworkPrefabs.Initialize();
+        NetworkingEvents.Initialize();
         Valuables.RegisterInitialValuables();
 
         CommandManager.Initialize();
