@@ -29,6 +29,11 @@ public static class NetworkingEvents
         Receivers = ReceiverGroup.Others
     };
 
+    public static readonly RaiseEventOptions RaiseMasterClient = new()
+    {
+        Receivers = ReceiverGroup.MasterClient
+    };
+
     internal static void Initialize()
     {
         PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
@@ -115,5 +120,38 @@ public class NetworkedEvent
         {
             Logger.LogError($"Failed to register NetworkedEvent \"{Name}\". Could not get unique event code.");
         }
+    }
+
+    /// <summary>
+    /// This method works in multiplayer and singleplayer.
+    /// </summary>
+    public void RaiseEvent(object eventContent, RaiseEventOptions raiseEventOptions, SendOptions sendOptions)
+    {
+        if (SemiFunc.IsMultiplayer())
+        {
+            PhotonNetwork.RaiseEvent(EventCode, eventContent, raiseEventOptions, sendOptions);
+        }
+        else if (raiseEventOptions.Receivers != ReceiverGroup.Others)
+        {
+            RaiseEventSingleplayer(eventContent);
+        }
+    }
+
+    private void RaiseEventSingleplayer(object eventContent)
+    {
+        if (SemiFunc.IsMultiplayer())
+        {
+            return;
+        }
+
+        EventData eventData = new EventData
+        {
+            Code = EventCode
+        };
+
+        eventData.Parameters[eventData.CustomDataKey] = eventContent;
+        eventData.Parameters[eventData.SenderKey] = 1;
+
+        EventAction?.Invoke(eventData);
     }
 }

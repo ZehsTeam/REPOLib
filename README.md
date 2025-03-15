@@ -14,7 +14,7 @@
 - Registering custom chat /commands
     - Built-in dev mode commands: Spawn Valuable, Spawn Item
 - Fixing audio mixer groups.
-- Managing Photon RaiseEvent event codes.
+- Making networked events.
 - Registering features without code using the [REPOLib-Sdk](https://github.com/ZehsTeam/REPOLib-Sdk).
 
 ## Usage
@@ -226,7 +226,7 @@ Registering any features will automatically fix their prefabs audio mixer groups
 </details>
 
 
-<details><summary>Networked event</summary><br>
+<details><summary>Networked events</summary><br>
 
 Creating a networked event.
 ```cs
@@ -262,11 +262,14 @@ Calling a networked event.
 // The data you are sending through your networked event.
 string message = "Hello World!";
 
-// Call networked event on everyone.
-PhotonNetwork.RaiseEvent(YourMod.ExampleEvent.EventCode, message, REPOLib.Modules.NetworkingEvents.RaiseAll, SendOptions.SendReliable);
+// Call networked event on everyone. (This works in singleplayer)
+ExampleEvent.RaiseEvent(message, REPOLib.Modules.NetworkingEvents.RaiseAll, SendOptions.SendReliable);
 
-// Call networked event on everyone but yourself.
-PhotonNetwork.RaiseEvent(YourMod.ExampleEvent.EventCode, message, REPOLib.Modules.NetworkingEvents.RaiseOthers, SendOptions.SendReliable);
+// Call networked event on everyone but yourself. (This works in singleplayer)
+ExampleEvent.RaiseEvent(message, REPOLib.Modules.NetworkingEvents.RaiseOthers, SendOptions.SendReliable);
+
+// Call networked event on the master client. (This works in singleplayer)
+ExampleEvent.RaiseEvent(message, REPOLib.Modules.NetworkingEvents.RaiseMasterClient, SendOptions.SendReliable);
 ```
 </details>
 </details>
