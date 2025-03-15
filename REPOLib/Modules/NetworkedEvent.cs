@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace REPOLib.Modules;
 
-public class NetworkingEvents
+public static class NetworkingEvents
 {
     public static IReadOnlyList<NetworkedEvent> CustomEvents => _customEvents;
 
