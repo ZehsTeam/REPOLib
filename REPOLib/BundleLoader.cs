@@ -30,7 +30,7 @@ public static class BundleLoader
 
     public static void LoadBundle(string path, string relativePath)
     {
-        Logger.LogDebug($"Loading bundle at {relativePath}...", extended: true);
+        Logger.LogInfo($"Loading bundle at {relativePath}...", extended: true);
 
         var start = DateTime.Now;
         var request = AssetBundle.LoadFromFileAsync(path);
@@ -51,9 +51,6 @@ public static class BundleLoader
     {
         while (!operation.CreateRequest.isDone)
         {
-            double millis = (DateTime.Now - operation.StartTime).TotalMilliseconds;
-            float progress = operation.CreateRequest.progress;
-            Logger.LogDebug($"Bundle {operation.RelativePath}: progress {progress:P0}, elapsed {millis:N0} ms", extended: true);
             yield return null;
         }
 

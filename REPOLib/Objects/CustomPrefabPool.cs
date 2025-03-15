@@ -77,7 +77,7 @@ public class CustomPrefabPool : IPunPrefabPool
 
         Prefabs[prefabId.ToLower()] = prefab;
 
-        Logger.LogDebug($"CustomPrefabPool: registered network prefab \"{prefabId}\"", extended: true);
+        Logger.LogInfo($"CustomPrefabPool: registered network prefab \"{prefabId}\"", extended: true);
         return true;
     }
 

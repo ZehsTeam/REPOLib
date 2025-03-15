@@ -13,7 +13,7 @@ public static class Enemies
     
     private static bool _initialEnemiesRegistered = true;
 
-    internal static void RegisterEnemies()
+    internal static void RegisterInitialEnemies()
     {
         if (!_initialEnemiesRegistered)
         {
@@ -44,7 +44,7 @@ public static class Enemies
         if (EnemyDirector.instance.AddEnemy(enemy))
         {
             _enemiesRegistered.Add(enemy);
-            Logger.LogDebug($"Added enemy \"{enemy.spawnObjects[0].name}\" to difficulty {enemyParent.difficulty.ToString()}", extended: true);
+            Logger.LogInfo($"Added enemy \"{enemy.spawnObjects[0].name}\" to difficulty {enemyParent.difficulty.ToString()}", extended: true);
         }
         else
         {

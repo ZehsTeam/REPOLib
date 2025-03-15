@@ -11,11 +11,6 @@ internal static class Logger
         ManualLogSource = manualLogSource;
     }
 
-    public static void LogDebug(object data, bool extended = true)
-    {
-        Log(LogLevel.Debug, data, extended);
-    }
-
     public static void LogInfo(object data, bool extended = false)
     {
         Log(LogLevel.Info, data, extended);
