@@ -15,6 +15,8 @@ public static class BundleLoader
     
     public static void LoadAllBundles(string root, string withExtension)
     {
+        Logger.LogInfo($"Loading all bundles with extension {withExtension} from root {root}", extended: true);
+        
         string[] files = Directory.GetFiles(root, "*" + withExtension, SearchOption.AllDirectories);
 
         foreach (string path in files)
@@ -49,12 +51,17 @@ public static class BundleLoader
 
     private static IEnumerator FinishLoadOperation(LoadOperation operation)
     {
-        while (!operation.CreateRequest.isDone)
+        yield return operation.Request;
+
+        var bundle = operation.Request.assetBundle;
+        
+        if (bundle == null)
         {
-            yield return null;
+            Logger.LogError($"Failed to load bundle at {operation.RelativePath}!");
+            _operations.Remove(operation);
+            yield break;
         }
 
-        var bundle = operation.CreateRequest.assetBundle;
         Mod[] mods = bundle.LoadAllAssets<Mod>();
 
         switch (mods.Length)
@@ -90,10 +97,18 @@ public static class BundleLoader
         _operations.Remove(operation);
     }
 
+    public static IEnumerator WaitForLoadOperations()
+    {
+        while (_operations.Count > 0)
+        {
+            yield return null;
+        }
+    }
+
     private class LoadOperation(DateTime startTime, AssetBundleCreateRequest request, string relativePath)
     {
         public string RelativePath { get; } = relativePath;
         public DateTime StartTime { get; } = startTime;
-        public AssetBundleCreateRequest CreateRequest { get; } = request;
+        public AssetBundleCreateRequest Request { get; } = request;
     }
 }
