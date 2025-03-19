@@ -4,6 +4,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -41,46 +45,119 @@ public static class BundleLoader
         _operations.Add(operation);
     }
 
-    internal static void FinishLoadOperations(MonoBehaviour routineRunner)
+    internal static void FinishLoadOperations(MonoBehaviour behaviour, Action onFinished)
     {
+        behaviour.StartCoroutine(FinishLoadOperationsRoutine(behaviour, onFinished));
+    }
+
+    private static IEnumerator FinishLoadOperationsRoutine(MonoBehaviour behaviour, Action onFinished)
+    {
+        yield return null;
+        
         foreach (var loadOperation in _operations.ToArray()) // collection might change
         {
-            routineRunner.StartCoroutine(FinishLoadOperation(loadOperation));
+            behaviour.StartCoroutine(FinishLoadOperation(loadOperation));
         }
+        
+        var (text, disableLoadingUI) = SetupLoadingUI();
+
+        float lastUpdate = Time.time;
+        while (_operations.Count > 0)
+        {
+            if (Time.time - lastUpdate > 1)
+            {
+                lastUpdate = Time.time;
+
+                //text.text = $"REPOLib: Waiting for {_operations.Count} bundle(s) to load...";
+
+                if (!ConfigManager.ExtendedLogging.Value) continue;
+                    
+                foreach (var operation in _operations)
+                {
+                    string msg = $"{operation.RelativePath}: {operation.CurrentState}";
+                    if (operation.CurrentState == LoadOperation.State.LoadingBundle)
+                    {
+                        msg += $" {operation.Request.progress:P0}";
+                    }
+                        
+                    Logger.LogInfo(msg, extended: true);
+                }
+            }
+            
+            yield return null;
+        }
+
+        onFinished();
+        disableLoadingUI();
+    }
+
+    private static (TMP_Text, Action) SetupLoadingUI()
+    {
+        var hudCanvas = GameObject.Find("HUD Canvas");
+        var hud = hudCanvas.transform.Find("HUD");
+        hud.gameObject.SetActive(false);
+
+        var buttonText = Object.FindObjectOfType<TMP_Text>();
+        var text = Object.Instantiate(buttonText, hudCanvas.transform);
+        text.gameObject.name = "REPOLibText";
+        text.gameObject.SetActive(true);
+        text.text = $"REPOLib is loading bundles...";
+        text.color = Color.white;
+        text.alignment = TextAlignmentOptions.Center;
+        
+        var rectTransform = text.GetComponent<RectTransform>();
+        rectTransform.anchoredPosition = Vector2.zero;
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.sizeDelta = Vector2.zero;
+
+        return (text, () =>
+        {
+            text.gameObject.SetActive(false);
+            hud.gameObject.SetActive(true);
+        });
     }
 
     private static IEnumerator FinishLoadOperation(LoadOperation operation)
     {
         yield return operation.Request;
-
         var bundle = operation.Request.assetBundle;
         
         if (bundle == null)
         {
             Logger.LogError($"Failed to load bundle at {operation.RelativePath}!");
-            _operations.Remove(operation);
+            Finish();
             yield break;
         }
 
-        Mod[] mods = bundle.LoadAllAssets<Mod>();
+        operation.CurrentState = LoadOperation.State.LoadingContent;
 
+        var modsRequest = bundle.LoadAllAssetsAsync<Mod>();
+        yield return modsRequest;
+        Object[] mods = modsRequest.allAssets;
+        
         switch (mods.Length)
         {
             case 0:
                 Logger.LogError($"Bundle at {operation.RelativePath} contains no mods.");
-                _operations.Remove(operation);
+                Finish();
                 yield break;
             case > 1:
                 Logger.LogError($"Bundle at {operation.RelativePath} contains more than one mod.");
-                _operations.Remove(operation);
+                Finish();
                 yield break;
         }
+        
+        var mod = (Mod)mods[0];
+        
+        var contentRequest = bundle.LoadAllAssetsAsync<Content>();
+        yield return contentRequest;
 
-        var mod = mods[0];
-        Content[] contents = bundle.LoadAllAssets<Content>();
+        operation.CurrentState = LoadOperation.State.RegisteringContent;
 
-        foreach (var content in contents)
+        foreach (var obj in contentRequest.allAssets)
         {
+            var content = (Content)obj;
             try
             {
                 content.Initialize(mod);
@@ -90,25 +167,32 @@ public static class BundleLoader
                 Logger.LogError($"Failed to load {content.Name} ({content.GetType().Name}) from {mod.Identifier} (at {operation.RelativePath}): {e}");
             }
         }
-
-        double loadTime = (DateTime.Now - operation.StartTime).TotalSeconds;
-        Logger.LogInfo($"Loaded bundled mod {mod.Identifier} (at {operation.RelativePath}) in {loadTime:N1}s");
         
-        _operations.Remove(operation);
-    }
+        Logger.LogInfo($"Loaded bundled mod {mod.Identifier} (at {operation.RelativePath}) in {operation.ElapsedTime.TotalSeconds:N1}s");
 
-    public static IEnumerator WaitForLoadOperations()
-    {
-        while (_operations.Count > 0)
+        Finish();
+        yield break;
+        
+        void Finish()
         {
-            yield return null;
+            _operations.Remove(operation);
         }
     }
-
+    
     private class LoadOperation(DateTime startTime, AssetBundleCreateRequest request, string relativePath)
     {
         public string RelativePath { get; } = relativePath;
         public DateTime StartTime { get; } = startTime;
         public AssetBundleCreateRequest Request { get; } = request;
+        public State CurrentState { get; set; } = State.LoadingBundle;
+        
+        public TimeSpan ElapsedTime => DateTime.Now - StartTime;
+
+        public enum State
+        {
+            LoadingBundle,
+            LoadingContent,
+            RegisteringContent
+        }
     }
 }
