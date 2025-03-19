@@ -3,6 +3,7 @@ using REPOLib.Extensions;
 using REPOLib.Modules;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace REPOLib.Commands;
@@ -136,14 +137,16 @@ public static class SpawnValuableCommand
 
     private static bool TryGetValuableByName(string name, out GameObject prefab)
     {
-        if (valuablePrefabs.TryGetValue(name.ToLower(), out prefab))
-        {
-            return true;
-        }
+        prefab = null;
+        string lowerName = name.ToLower();
 
-        if (valuablePrefabs.TryGetValue("valuable " + name.ToLower(), out prefab))
+        foreach (var key in valuablePrefabs.Keys)
         {
-            return true;
+            if (key.ToLower().Contains(lowerName))
+            {
+                prefab = valuablePrefabs[key];
+                return true;
+            }
         }
 
         return false;
