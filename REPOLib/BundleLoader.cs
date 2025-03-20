@@ -1,12 +1,10 @@
 ﻿using BepInEx;
+using REPOLib.Modules;
 using REPOLib.Objects.Sdk;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -15,6 +13,8 @@ namespace REPOLib;
 
 public static class BundleLoader
 {
+    public static event Action OnAllBundlesLoaded;
+    
     private static readonly List<LoadOperation> _operations = [];
     
     public static void LoadAllBundles(string root, string withExtension)
@@ -45,12 +45,12 @@ public static class BundleLoader
         _operations.Add(operation);
     }
 
-    internal static void FinishLoadOperations(MonoBehaviour behaviour, Action onFinished)
+    internal static void FinishLoadOperations(MonoBehaviour behaviour)
     {
-        behaviour.StartCoroutine(FinishLoadOperationsRoutine(behaviour, onFinished));
+        behaviour.StartCoroutine(FinishLoadOperationsRoutine(behaviour));
     }
 
-    private static IEnumerator FinishLoadOperationsRoutine(MonoBehaviour behaviour, Action onFinished)
+    private static IEnumerator FinishLoadOperationsRoutine(MonoBehaviour behaviour)
     {
         yield return null;
         
@@ -87,8 +87,8 @@ public static class BundleLoader
             yield return null;
         }
 
-        onFinished();
         disableLoadingUI();
+        Utilities.SafeInvokeEvent(OnAllBundlesLoaded);
     }
 
     private static (TMP_Text, Action) SetupLoadingUI()

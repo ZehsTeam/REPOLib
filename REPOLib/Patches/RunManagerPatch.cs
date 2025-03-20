@@ -22,7 +22,8 @@ internal static class RunManagerPatch
         NetworkPrefabs.Initialize();
         NetworkingEvents.Initialize();
         Valuables.RegisterInitialValuables();
-        
-        BundleLoader.FinishLoadOperations(__instance, CommandManager.Initialize);
+
+        BundleLoader.OnAllBundlesLoaded += CommandManager.Initialize;
+        BundleLoader.FinishLoadOperations(__instance);
     }
 }

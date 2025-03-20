@@ -1,4 +1,5 @@
 using REPOLib.Extensions;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,5 +46,17 @@ public static class Utilities
 
         prefab.FixAudioMixerGroups();
         _fixedPrefabs.Add(prefab);
+    }
+
+    internal static void SafeInvokeEvent(Action action)
+    {
+        try
+        {
+            action?.Invoke();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Exception occured while invoking event: {e}");
+        }
     }
 }
