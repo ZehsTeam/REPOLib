@@ -13,7 +13,7 @@ internal static class Logger
 
     public static void LogInfo(object data, bool extended = false)
     {
-        Log(extended ? LogLevel.Debug : LogLevel.Info, data, extended);
+        Log(LogLevel.Info, data, extended);
     }
 
     public static void LogWarning(object data, bool extended = false)
