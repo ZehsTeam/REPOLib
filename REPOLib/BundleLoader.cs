@@ -68,7 +68,7 @@ public static class BundleLoader
             {
                 lastUpdate = Time.time;
 
-                //text.text = $"REPOLib: Waiting for {_operations.Count} bundle(s) to load...";
+                text.text = $"REPOLib: Waiting for {_operations.Count} bundle(s) to load...";
 
                 if (!ConfigManager.ExtendedLogging.Value) continue;
                     
@@ -79,7 +79,7 @@ public static class BundleLoader
                     {
                         msg += $" {operation.Request.progress:P0}";
                     }
-                        
+                    
                     Logger.LogInfo(msg, extended: true);
                 }
             }
