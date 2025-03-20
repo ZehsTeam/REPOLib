@@ -325,9 +325,9 @@ To set up the project, copy the `REPOLib.csproj.user.example` file to `REPOLib.c
 
 REPOLib loads any bundles under the `plugins` folder with the `.repobundle` extension. These bundles are then scanned for `Mod` and `Content` assets, which allows codeless registration of features in tandem with [REPOLib-Sdk](https://github.com/Zehs/REPOLib-Sdk).
 
-REPOLib loads bundles asynchronously, which enables other mods to do their initialization while bundles are being read from disk, which in turn leads to shorter startup times. Hence, using the `.repobundle` system is the preferred way to use this library, even if you're already writing your own plugin code.
+Bundles are loaded asynchronously, which enables other mods to do their initialization while files are being read from disk, which in turn leads to shorter startup times. Hence, using the `.repobundle` system is the preferred way to use this library, even if you're already writing your own plugin code.
 
-> [!NOTE]
+> [!WARNING]
 > If you're writing a mod that interacts with modded content, remember that all REPOLib content may not be registered by game start because of async bundle loading.
 >
 > To work around this, either do your initialization at a later stage (for example when joining a lobby) or subscribe to the `REPOLib.BundleLoader.OnAllBundlesLoaded` event (however this requires a dependency on REPOLib).
