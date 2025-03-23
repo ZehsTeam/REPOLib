@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using REPOLib.Commands;
+using REPOLib.Modules;
 using System;
 using System.Reflection;
 
@@ -65,6 +66,20 @@ internal static class SemiFuncPatch
                 Logger.LogError($"Error executing command: {e}");
             }
 
+            return false;
+        }
+
+        return true;
+    }
+
+    [HarmonyPatch(nameof(SemiFunc.EnemySpawn))]
+    [HarmonyPrefix]
+    private static bool EnemySpawnPatch(ref bool __result)
+    {
+        if (Enemies.SpawnNextEnemyNotDespawned)
+        {
+            __result = true;
+            Enemies.SpawnNextEnemyNotDespawned = false;
             return false;
         }
 

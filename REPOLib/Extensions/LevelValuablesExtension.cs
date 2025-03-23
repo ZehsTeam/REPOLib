@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace REPOLib.Extensions;
 
-internal static class LevelValuablesExtension
+public static class LevelValuablesExtension
 {
     public static bool HasValuable(this LevelValuables levelValuables, GameObject prefab)
     {
@@ -21,7 +21,7 @@ internal static class LevelValuablesExtension
         return list.Contains(prefab);
     }
 
-    public static bool AddValuable(this LevelValuables levelValuables, GameObject prefab)
+    internal static bool AddValuable(this LevelValuables levelValuables, GameObject prefab)
     {
         if (!prefab.TryGetComponent(out ValuableObject valuableObject))
         {

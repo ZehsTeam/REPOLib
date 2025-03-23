@@ -3,16 +3,15 @@ using REPOLib.Extensions;
 using REPOLib.Modules;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace REPOLib.Commands;
 
-public static class SpawnValuableCommand
+internal static class SpawnValuableCommand
 {
-    static bool initialized = false;
+    private static readonly Dictionary<string, GameObject> _valuablePrefabs = [];
 
-    private static readonly Dictionary<string, GameObject> valuablePrefabs = [];
+    private static bool _initialized = false;
 
     [CommandInitializer]
     public static void Initialize()
@@ -21,12 +20,12 @@ public static class SpawnValuableCommand
 
         CacheValuables();
 
-        initialized = true;
+        _initialized = true;
     }
 
     public static void CacheValuables()
     {
-        valuablePrefabs.Clear();
+        _valuablePrefabs.Clear();
 
         if (RunManager.instance == null)
         {
@@ -42,7 +41,7 @@ public static class SpawnValuableCommand
                 {
                     foreach (var valuable in valuables)
                     {
-                        valuablePrefabs.TryAdd(valuable.name.ToLower(), valuable);
+                        _valuablePrefabs.TryAdd(valuable.name.ToLower(), valuable);
                     }
                 }
             }
@@ -52,8 +51,8 @@ public static class SpawnValuableCommand
     [CommandExecution(
         "Spawn Valuable",
         "Spawn an instance of a valuable with the specified (case-insensitive) name. You can optionally leave out \"Valuable \" from the prefab name.",
-        requiresDeveloperMode:true
-        )]
+        requiresDeveloperMode: true
+    )]
     [CommandAlias("spawnvaluable")]
     [CommandAlias("spawnval")]
     [CommandAlias("sv")]
@@ -61,13 +60,13 @@ public static class SpawnValuableCommand
     {
         Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
 
-        if (args == null || args.Length == 0)
+        if (string.IsNullOrWhiteSpace(args))
         {
             Logger.LogWarning("No args provided to spawn command.");
             return;
         }
 
-        if (!initialized)
+        if (!_initialized)
         {
             Logger.LogError("Spawn command not initialized!");
             return;
@@ -138,13 +137,12 @@ public static class SpawnValuableCommand
     private static bool TryGetValuableByName(string name, out GameObject prefab)
     {
         prefab = null;
-        string lowerName = name.ToLower();
 
-        foreach (var key in valuablePrefabs.Keys)
+        foreach (var key in _valuablePrefabs.Keys)
         {
-            if (key.ToLower().Contains(lowerName))
+            if (key.Contains(name, StringComparison.OrdinalIgnoreCase))
             {
-                prefab = valuablePrefabs[key];
+                prefab = _valuablePrefabs[key];
                 return true;
             }
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace REPOLib.Extensions;
@@ -29,7 +30,7 @@ public static class EnemyDirectorExtension
         return false;
     }
 
-    public static bool AddEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
+    internal static bool AddEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
     {
         if (enemySetup == null)
         {
@@ -71,5 +72,48 @@ public static class EnemyDirectorExtension
         };
 
         return list != null;
+    }
+
+    public static List<EnemySetup> GetEnemies(this EnemyDirector enemyDirector)
+    {
+        return [
+            .. enemyDirector.enemiesDifficulty1,
+            .. enemyDirector.enemiesDifficulty2,
+            .. enemyDirector.enemiesDifficulty3,
+        ];
+    }
+
+    public static EnemySetup GetEnemyByName(this EnemyDirector enemyDirector, string name)
+    {
+        foreach (var enemySetup in GetEnemies(enemyDirector))
+        {
+            if (enemySetup.name.Contains(name, StringComparison.OrdinalIgnoreCase))
+            {
+                return enemySetup;
+            }
+
+            if (!enemySetup.TryGetEnemyParent(out EnemyParent enemyParent))
+            {
+                continue;
+            }
+
+            if (enemyParent.gameObject.name.Contains(name, StringComparison.OrdinalIgnoreCase))
+            {
+                return enemySetup;
+            }
+
+            if (enemyParent.enemyName.Contains(name, StringComparison.OrdinalIgnoreCase))
+            {
+                return enemySetup;
+            }
+        }
+
+        return null;
+    }
+
+    public static bool TryGetEnemyByName(this EnemyDirector enemyDirector, string name, out EnemySetup enemySetup)
+    {
+        enemySetup = enemyDirector.GetEnemyByName(name);
+        return enemySetup != null;
     }
 }
