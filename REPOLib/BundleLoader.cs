@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -74,11 +75,14 @@ public static class BundleLoader
                     
                 foreach (var operation in _operations)
                 {
-                    string msg = $"{operation.RelativePath}: {operation.CurrentState}";
-                    if (operation.CurrentState == LoadOperation.State.LoadingBundle)
+                    string msg = $"Loading {operation.FileName}: {operation.CurrentState}";
+                    float? progress = operation.CurrentState switch
                     {
-                        msg += $" {operation.Request.progress:P0}";
-                    }
+                        LoadOperation.State.LoadingBundle => operation.BundleRequest.progress,
+                        _ => null
+                    };
+                    
+                    if (progress.HasValue) msg += $" {progress.Value:P0}";
                     
                     Logger.LogInfo(msg, extended: true);
                 }
@@ -101,7 +105,7 @@ public static class BundleLoader
         var text = Object.Instantiate(buttonText, hudCanvas.transform);
         text.gameObject.name = "REPOLibText";
         text.gameObject.SetActive(true);
-        text.text = $"REPOLib is loading bundles...";
+        text.text = "REPOLib is loading bundles...  Hang tight!";
         text.color = Color.white;
         text.alignment = TextAlignmentOptions.Center;
         
@@ -120,55 +124,50 @@ public static class BundleLoader
 
     private static IEnumerator FinishLoadOperation(LoadOperation operation)
     {
-        yield return operation.Request;
-        var bundle = operation.Request.assetBundle;
+        yield return operation.BundleRequest;
+        var bundle = operation.BundleRequest.assetBundle;
         
         if (bundle == null)
         {
-            Logger.LogError($"Failed to load bundle at {operation.RelativePath}!");
+            Logger.LogError($"Failed to load bundle {operation.FileName}!");
             Finish();
             yield break;
         }
 
-        operation.CurrentState = LoadOperation.State.LoadingContent;
-
-        var modsRequest = bundle.LoadAllAssetsAsync<Mod>();
-        yield return modsRequest;
-        Object[] mods = modsRequest.allAssets;
+        operation.CurrentState = LoadOperation.State.LoadingAssets;
+        operation.AssetRequest = bundle.LoadAllAssetsAsync<ScriptableObject>();
+        yield return operation.AssetRequest;
+        
+        Object[] assets = operation.AssetRequest.allAssets;
+        Mod[] mods = assets.OfType<Mod>().ToArray();
         
         switch (mods.Length)
         {
             case 0:
-                Logger.LogError($"Bundle at {operation.RelativePath} contains no mods.");
+                Logger.LogError($"Bundle {operation.FileName} contains no mods!");
                 Finish();
                 yield break;
             case > 1:
-                Logger.LogError($"Bundle at {operation.RelativePath} contains more than one mod.");
+                Logger.LogError($"Bundle {operation.FileName} contains more than one mod!");
                 Finish();
                 yield break;
         }
-        
-        var mod = (Mod)mods[0];
-        
-        var contentRequest = bundle.LoadAllAssetsAsync<Content>();
-        yield return contentRequest;
 
-        operation.CurrentState = LoadOperation.State.RegisteringContent;
-
-        foreach (var obj in contentRequest.allAssets)
+        var mod = mods[0];
+        
+        foreach (var content in assets.OfType<Content>())
         {
-            var content = (Content)obj;
             try
             {
                 content.Initialize(mod);
             }
             catch (Exception e)
             {
-                Logger.LogError($"Failed to load {content.Name} ({content.GetType().Name}) from {mod.Identifier} (at {operation.RelativePath}): {e}");
+                Logger.LogError($"Failed to load {content.Name} ({content.GetType().Name}) from bundle {operation.FileName} ({mod.Identifier}): {e}");
             }
         }
         
-        Logger.LogInfo($"Loaded bundled mod {mod.Identifier} (at {operation.RelativePath}) in {operation.ElapsedTime.TotalSeconds:N1}s");
+        Logger.LogInfo($"Loaded bundled {operation.FileName} ({mod.Identifier}) in {operation.ElapsedTime.TotalSeconds:N1}s");
 
         Finish();
         yield break;
@@ -176,23 +175,29 @@ public static class BundleLoader
         void Finish()
         {
             _operations.Remove(operation);
+            
+            Logger.LogInfo($"Unloading bundle {operation.FileName}...", extended: true);
+            bundle.UnloadAsync(unloadAllLoadedObjects: false);
         }
     }
     
-    private class LoadOperation(DateTime startTime, AssetBundleCreateRequest request, string relativePath)
+    private class LoadOperation(DateTime startTime, AssetBundleCreateRequest bundleRequest, string relativePath)
     {
         public string RelativePath { get; } = relativePath;
         public DateTime StartTime { get; } = startTime;
-        public AssetBundleCreateRequest Request { get; } = request;
         public State CurrentState { get; set; } = State.LoadingBundle;
+        
+        public AssetBundleCreateRequest BundleRequest { get; } = bundleRequest;
+        public AssetBundleRequest AssetRequest { get; set; }
         
         public TimeSpan ElapsedTime => DateTime.Now - StartTime;
 
+        public string FileName => Path.GetFileName(RelativePath);
+        
         public enum State
         {
             LoadingBundle,
-            LoadingContent,
-            RegisteringContent
+            LoadingAssets,
         }
     }
 }
