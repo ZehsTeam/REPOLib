@@ -97,8 +97,8 @@ public static class SpawnItemCommand
         Item[] items = StatsManager.instance.itemDictionary.Values.ToArray();
 
         item = items.FirstOrDefault(x => 
-            x.itemAssetName.Equals(name, StringComparison.OrdinalIgnoreCase) ||
-            x.itemName.Equals(name, StringComparison.OrdinalIgnoreCase));
+            x.itemAssetName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+            x.itemName.Contains(name, StringComparison.OrdinalIgnoreCase));
 
         return item != null;
     }
