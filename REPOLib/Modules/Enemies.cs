@@ -14,25 +14,25 @@ public static class Enemies
     private static readonly List<EnemySetup> _enemiesToRegister = [];
     private static readonly List<EnemySetup> _enemiesRegistered = [];
     
-    private static bool _initialEnemiesRegistered = true;
+    private static bool _initialEnemiesRegistered;
 
     internal static void RegisterInitialEnemies()
     {
-        if (!_initialEnemiesRegistered)
+        if (_initialEnemiesRegistered)
         {
             return;
         }
         
         foreach (var enemy in _enemiesToRegister)
         {
-            RegisterEnemyInternal(enemy);
+            RegisterEnemyWithGame(enemy);
         }
         
         _enemiesToRegister.Clear();
         _initialEnemiesRegistered = true;
     }
 
-    private static void RegisterEnemyInternal(EnemySetup enemy)
+    private static void RegisterEnemyWithGame(EnemySetup enemy)
     {
         if (_enemiesRegistered.Contains(enemy))
         {
@@ -110,7 +110,7 @@ public static class Enemies
 
         if (_initialEnemiesRegistered)
         {
-            RegisterEnemyInternal(enemySetup);
+            RegisterEnemyWithGame(enemySetup);
         }
         else
         {

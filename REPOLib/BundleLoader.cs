@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using REPOLib.Modules;
 using REPOLib.Objects.Sdk;
+using SingularityGroup.HotReload;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ public static class BundleLoader
 
     public static void LoadBundle(string path, string relativePath)
     {
-        Logger.LogInfo($"Loading bundle at {relativePath}...", extended: true);
+        Logger.LogInfo($"Loading bundle at {relativePath}...");
 
         var start = DateTime.Now;
         var request = AssetBundle.LoadFromFileAsync(path);
@@ -69,7 +70,8 @@ public static class BundleLoader
             {
                 lastUpdate = Time.time;
 
-                text.text = $"REPOLib: Waiting for {_operations.Count} bundle(s) to load...";
+                string bundlesWord = _operations.Count == 1 ? "bundle": "bundles" ;
+                text.text = $"REPOLib: Waiting for {_operations.Count} {bundlesWord} to load...";
 
                 if (!ConfigManager.ExtendedLogging.Value) continue;
                     
@@ -91,6 +93,8 @@ public static class BundleLoader
             yield return null;
         }
 
+        Logger.LogInfo("Finished loading bundles.");
+        
         disableLoadingUI();
         Utilities.SafeInvokeEvent(OnAllBundlesLoaded);
     }
@@ -105,7 +109,7 @@ public static class BundleLoader
         var text = Object.Instantiate(buttonText, hudCanvas.transform);
         text.gameObject.name = "REPOLibText";
         text.gameObject.SetActive(true);
-        text.text = "REPOLib is loading bundles...  Hang tight!";
+        text.text = "REPOLib is loading bundles... Hang tight!";
         text.color = Color.white;
         text.alignment = TextAlignmentOptions.Center;
         
@@ -166,9 +170,12 @@ public static class BundleLoader
                 Logger.LogError($"Failed to load {content.Name} ({content.GetType().Name}) from bundle {operation.FileName} ({mod.Identifier}): {e}");
             }
         }
-        
-        Logger.LogInfo($"Loaded bundled {operation.FileName} ({mod.Identifier}) in {operation.ElapsedTime.TotalSeconds:N1}s");
 
+        if (ConfigManager.ExtendedLogging.Value)
+        {
+            Logger.LogInfo($"Loaded bundle {operation.FileName} ({mod.Identifier}) in {operation.ElapsedTime.TotalSeconds:N1}s");
+        }
+        
         Finish();
         yield break;
         
@@ -192,7 +199,7 @@ public static class BundleLoader
         
         public TimeSpan ElapsedTime => DateTime.Now - StartTime;
 
-        public string FileName => Path.GetFileName(RelativePath);
+        public string FileName => Path.GetFileNameWithoutExtension(RelativePath);
         
         public enum State
         {

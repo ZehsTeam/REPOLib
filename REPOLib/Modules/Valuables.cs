@@ -57,14 +57,14 @@ public static class Valuables
 
         foreach (var valuable in _valuablesToRegister.Keys)
         {
-            RegisterValuableInternal(valuable);
+            RegisterValuableWithGame(valuable);
         }
 
         _valuablesToRegister.Clear();
         _initialValuablesRegistered = true;
     }
 
-    private static void RegisterValuableInternal(GameObject valuable)
+    private static void RegisterValuableWithGame(GameObject valuable)
     {
         if (_valuablesRegistered.Contains(valuable))
         {
@@ -179,7 +179,7 @@ public static class Valuables
         _valuablesToRegister.Add(prefab, presetNames);
         if (_initialValuablesRegistered)
         {
-            RegisterValuableInternal(valuableObject.gameObject);
+            RegisterValuableWithGame(valuableObject.gameObject);
         }
     }
 

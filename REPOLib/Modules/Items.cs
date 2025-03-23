@@ -27,13 +27,13 @@ public static class Items
 
         foreach (var item in _itemsToRegister)
         {
-            RegisterItemInternal(item);
+            RegisterItemWithGame(item);
         }
         
         _initialItemsRegistered = true;
     }
 
-    private static void RegisterItemInternal(Item item)
+    private static void RegisterItemWithGame(Item item)
     {
         Utilities.FixAudioMixerGroups(item.prefab);
         
@@ -96,7 +96,7 @@ public static class Items
         
         if (_initialItemsRegistered)
         { 
-            RegisterItemInternal(item);   
+            RegisterItemWithGame(item);   
         }
     }
 }
