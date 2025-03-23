@@ -182,6 +182,27 @@ public static class Valuables
             RegisterValuableInternal(valuableObject.gameObject);
         }
     }
+
+    public static ValuableObject SpawnValuable(ValuableObject valuableObject, Vector3 position, Quaternion rotation)
+    {
+        if (valuableObject == null)
+        {
+            Logger.LogError("Failed to spawn valuable. ValuableObject is null.");
+            return null;
+        }
+
+        if (!SemiFunc.IsMasterClientOrSingleplayer())
+        {
+            Logger.LogError($"Failed to spawn valuable \"{valuableObject.gameObject.name}\". You are not the host.");
+            return null;
+        }
+
+        GameObject gameObject = NetworkPrefabs.SpawnNetworkPrefab(valuableObject.gameObject, position, rotation);
+
+        Logger.LogInfo($"Spawned valuable \"{gameObject.name}\" at position {position}, rotation: {rotation.eulerAngles}", extended: true);
+
+        return gameObject.GetComponent<ValuableObject>();
+    }
     #endregion
 
     #region Deprecated

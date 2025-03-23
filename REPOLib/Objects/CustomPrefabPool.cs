@@ -81,6 +81,60 @@ public class CustomPrefabPool : IPunPrefabPool
         return true;
     }
 
+    public bool HasPrefab(GameObject prefab)
+    {
+        if (Prefabs.ContainsValue(prefab))
+        {
+            return true;
+        }
+
+        if (ResourcesHelper.HasPrefab(prefab))
+        {
+            return true;
+        }
+
+        return true;
+    }
+
+    public bool HasPrefab(string prefabId)
+    {
+        if (Prefabs.ContainsKey(prefabId.ToLower()))
+        {
+            return true;
+        }
+
+        if (ResourcesHelper.HasPrefab(prefabId))
+        {
+            return true;
+        }
+
+        return true;
+    }
+
+    public string GetPrefabId(GameObject prefab)
+    {
+        if (prefab == null)
+        {
+            Logger.LogError("Failed to get prefab id. GameObject is null.");
+            return string.Empty;
+        }
+
+        foreach (var key in Prefabs.Keys)
+        {
+            if (Prefabs[key] == prefab)
+            {
+                return key;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    public GameObject GetPrefab(string prefabId)
+    {
+        return Prefabs.GetValueOrDefault(prefabId.ToLower());
+    }
+
     public GameObject Instantiate(string prefabId, Vector3 position, Quaternion rotation)
     {
         GameObject result;

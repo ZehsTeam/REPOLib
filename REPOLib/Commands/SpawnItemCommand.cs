@@ -7,20 +7,20 @@ using Object = UnityEngine.Object;
 
 namespace REPOLib.Commands;
 
-public static class SpawnItemCommand
+internal static class SpawnItemCommand
 {
     [CommandExecution(
         "Spawn Item",
         "Spawn an instance of an item with the specified (case-insensitive) name. You can optionally leave out \"Item \" from the prefab name.",
         requiresDeveloperMode: true
-        )]
+    )]
     [CommandAlias("spawnitem")]
     [CommandAlias("si")]
     public static void Execute(string args)
     {
         Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
 
-        if (args == null ||  args.Length == 0 )
+        if (string.IsNullOrWhiteSpace(args))
         {
             Logger.LogWarning("No args provided to spawn command.");
             return;
@@ -97,8 +97,8 @@ public static class SpawnItemCommand
         Item[] items = StatsManager.instance.itemDictionary.Values.ToArray();
 
         item = items.FirstOrDefault(x => 
-            x.itemAssetName.Equals(name, StringComparison.OrdinalIgnoreCase) ||
-            x.itemName.Equals(name, StringComparison.OrdinalIgnoreCase));
+            x.itemAssetName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
+            x.itemName.Contains(name, StringComparison.OrdinalIgnoreCase));
 
         return item != null;
     }

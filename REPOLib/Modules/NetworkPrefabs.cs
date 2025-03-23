@@ -57,4 +57,72 @@ public static class NetworkPrefabs
     {
         CustomPrefabPool.RegisterPrefab(prefabId, prefab);
     }
+
+    public static bool HasNetworkPrefab(GameObject prefab)
+    {
+        return CustomPrefabPool.HasPrefab(prefab);
+    }
+
+    public static bool HasNetworkPrefab(string prefabId)
+    {
+        return CustomPrefabPool.HasPrefab(prefabId);
+    }
+
+    public static string GetNetworkPrefabId(GameObject prefab)
+    {
+        return CustomPrefabPool.GetPrefabId(prefab);
+    }
+
+    public static bool TryNetworkGetPrefabId(GameObject prefab, out string prefabId)
+    {
+        prefabId = CustomPrefabPool.GetPrefabId(prefab);
+        return !string.IsNullOrEmpty(prefabId);
+    }
+
+    public static GameObject SpawnNetworkPrefab(GameObject prefab, Vector3 position, Quaternion rotation, byte group = 0, object[] data = null)
+    {
+        if (prefab == null)
+        {
+            Logger.LogError("Failed to spawn network prefab. GameObject is null.");
+            return null;
+        }
+
+        if (!TryNetworkGetPrefabId(prefab, out string prefabId))
+        {
+            Logger.LogError($"Failed to spawn network prefab \"{prefab.name}\". GameObject is not registered as a network prefab.");
+            return null;
+        }
+
+        return SpawnNetworkPrefab(prefabId, position, rotation, group, data);
+    }
+
+    public static GameObject SpawnNetworkPrefab(string prefabId, Vector3 position, Quaternion rotation, byte group = 0, object[] data = null)
+    {
+        if (string.IsNullOrWhiteSpace(prefabId))
+        {
+            Logger.LogError("Failed to spawn network prefab. PrefabId is null.");
+            return null;
+        }
+
+        if (!HasNetworkPrefab(prefabId))
+        {
+            Logger.LogError($"Failed to spawn network prefab \"{prefabId}\". PrefabId is not registered as a network prefab.");
+            return null;
+        }
+
+        if (!SemiFunc.IsMasterClientOrSingleplayer())
+        {
+            Logger.LogError($"Failed to spawn network prefab \"{prefabId}\". You are not the host.");
+            return null;
+        }
+
+        if (SemiFunc.IsMultiplayer())
+        {
+            return PhotonNetwork.InstantiateRoomObject(prefabId, position, rotation, group, data);
+        }
+        else
+        {
+            return Object.Instantiate(CustomPrefabPool.GetPrefab(prefabId), position, rotation);
+        }
+    }
 }

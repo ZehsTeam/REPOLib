@@ -6,12 +6,13 @@ using System.Reflection;
 
 namespace REPOLib.Commands;
 
-public static class CommandManager
+internal static class CommandManager
 {
     public static Dictionary<string, MethodInfo> CommandExecutionMethods { get; private set; } = [];
-    private static List<MethodInfo> commandExecutionMethodCache = [];
     public static List<MethodInfo> CommandInitializerMethods { get; private set; } = [];
     public static Dictionary<string, bool> CommandsEnabled { get; private set; } = [];
+
+    private static List<MethodInfo> _commandExecutionMethodCache = [];
 
     public static void Initialize()
     {
@@ -27,7 +28,7 @@ public static class CommandManager
         {
             try
             {
-                Logger.LogInfo($"Initializing command initializer on method {command.DeclaringType}.{command.Name}", extended:true);
+                Logger.LogInfo($"Initializing command initializer on method {command.DeclaringType}.{command.Name}", extended: true);
                 if (!command.IsStatic)
                 {
                     Logger.LogWarning($"Command initializer {command.DeclaringType}.{command.Name} is not static!");
@@ -57,13 +58,13 @@ public static class CommandManager
 
     public static void FindAllCommandMethods()
     {
-        commandExecutionMethodCache = AppDomain.CurrentDomain.GetAssemblies()
+        _commandExecutionMethodCache = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(assembly => assembly.GetTypes())
             .SelectMany(type => type.GetMethods())
             .Where(method => method.GetCustomAttribute<CommandExecutionAttribute>() != null)
             .ToList();
 
-        foreach (var method in commandExecutionMethodCache)
+        foreach (var method in _commandExecutionMethodCache)
         {
             var methodParams = method.GetParameters();
             if (methodParams.Length > 1)
@@ -87,7 +88,7 @@ public static class CommandManager
             {
                 if (CommandExecutionMethods.TryAdd(aliasAttribute.Alias, method))
                 {
-                    Logger.LogInfo($"Registered command alias \"{aliasAttribute.Alias}\" for method \"{method.DeclaringType}.{method.Name}\".", extended:true);
+                    Logger.LogInfo($"Registered command alias \"{aliasAttribute.Alias}\" for method \"{method.DeclaringType}.{method.Name}\".", extended: true);
                     added = true;
                 }
             }
@@ -100,7 +101,7 @@ public static class CommandManager
 
     public static void BindConfigs()
     {
-        foreach (var method in commandExecutionMethodCache)
+        foreach (var method in _commandExecutionMethodCache)
         {
             var execAttribute = method.GetCustomAttribute<CommandExecutionAttribute>();
 

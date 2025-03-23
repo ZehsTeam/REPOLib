@@ -1,12 +1,15 @@
 using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace REPOLib.Modules;
 
 public static class Enemies 
 {
     public static IReadOnlyList<EnemySetup> RegisteredEnemies => _enemiesRegistered;
+
+    internal static bool SpawnNextEnemyNotDespawned = false;
 
     private static readonly List<EnemySetup> _enemiesToRegister = [];
     private static readonly List<EnemySetup> _enemiesRegistered = [];
@@ -113,5 +116,39 @@ public static class Enemies
         {
             _enemiesToRegister.Add(enemySetup);
         }
+    }
+
+    public static void SpawnEnemy(EnemySetup enemySetup, Vector3 position, bool spawnDespawned = true)
+    {
+        if (enemySetup == null)
+        {
+            Logger.LogError("Failed to spawn enemy. EnemySetup is null.");
+            return;
+        }
+
+        if (!enemySetup.TryGetEnemyParent(out EnemyParent enemyParent))
+        {
+            Logger.LogError("Failed to spawn enemy. EnemyParent is null.");
+            return;
+        }
+
+        if (LevelGenerator.Instance == null)
+        {
+            Logger.LogError($"Failed to spawn enemy \"{enemyParent.enemyName}\". EnemySetup instance is null.");
+            return;
+        }
+
+        if (RunManager.instance == null)
+        {
+            Logger.LogError($"Failed to spawn enemy \"{enemyParent.enemyName}\". RunManager instance is null.");
+            return;
+        }
+
+        SpawnNextEnemyNotDespawned = !spawnDespawned;
+
+        LevelGenerator.Instance.EnemySpawn(enemySetup, position);
+        RunManager.instance.EnemiesSpawnedRemoveEnd();
+
+        Logger.LogInfo($"Spawned enemy \"{enemyParent.enemyName}\" at position {position}", extended: true);
     }
 }
