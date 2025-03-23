@@ -181,9 +181,6 @@ public static class BundleLoader
         void Finish()
         {
             _operations.Remove(operation);
-            
-            Logger.LogInfo($"Unloading bundle {operation.FileName}...", extended: true);
-            bundle.UnloadAsync(unloadAllLoadedObjects: false);
         }
     }
     
