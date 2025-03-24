@@ -20,6 +20,19 @@ public static class EnemySetupExtension
             .Distinct(new UnityObjectNameComparer<GameObject>()).ToList();
     }
 
+    public static List<GameObject> GetSortedSpawnObjects(this EnemySetup enemySetup)
+    {
+        if (enemySetup == null || enemySetup.spawnObjects == null)
+        {
+            return [];
+        }
+
+        return enemySetup.spawnObjects
+            .Where(x => x != null)
+            .OrderByDescending(x => x.TryGetComponent<EnemyParent>(out _))
+            .ToList();
+    }
+
     public static GameObject GetMainSpawnObject(this EnemySetup enemySetup)
     {
         return GetEnemyParent(enemySetup)?.gameObject;

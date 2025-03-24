@@ -107,7 +107,7 @@ public static class Enemies
         _enemiesToRegister.Add(enemySetup);
     }
 
-    public static List<GameObject> SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
+    public static List<EnemyParent> SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
     {
         if (enemySetup == null)
         {
@@ -139,9 +139,9 @@ public static class Enemies
             return null;
         }
 
-        List<GameObject> gameObjects = [];
+        List<EnemyParent> enemyParents = [];
 
-        foreach (GameObject spawnObject in enemySetup.spawnObjects)
+        foreach (GameObject spawnObject in enemySetup.GetSortedSpawnObjects())
         {
             if (spawnObject == null)
             {
@@ -160,9 +160,10 @@ public static class Enemies
 
             if (!gameObject.TryGetComponent(out EnemyParent enemyParent))
             {
-                gameObjects.Add(gameObject);
                 continue;
             }
+
+            enemyParents.Add(enemyParent);
 
             SpawnNextEnemiesNotDespawned++;
 
@@ -181,21 +182,19 @@ public static class Enemies
 
             LevelGenerator.Instance.EnemiesSpawnTarget++;
             EnemyDirector.instance.FirstSpawnPointAdd(enemyParent);
-
-            gameObjects.Add(gameObject);
         }
 
-        if (gameObjects.Count == 0)
+        if (enemyParents.Count == 0)
         {
             Logger.LogInfo($"Failed to spawn enemy \"{prefabEnemyParent.enemyName}\". No spawn objects where spawned.", extended: true);
-            return gameObjects;
+            return enemyParents;
         }
 
         Logger.LogInfo($"Spawned enemy \"{prefabEnemyParent.enemyName}\" at position {position}", extended: true);
 
         RunManager.instance.EnemiesSpawnedRemoveEnd();
 
-        return gameObjects;
+        return enemyParents;
     }
 
     public static IReadOnlyList<EnemySetup> GetEnemies()
