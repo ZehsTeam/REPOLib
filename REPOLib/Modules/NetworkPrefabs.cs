@@ -58,43 +58,45 @@ public static class NetworkPrefabs
         CustomPrefabPool.RegisterPrefab(prefabId, prefab);
     }
 
-    public static bool HasNetworkPrefab(GameObject prefab)
-    {
-        return CustomPrefabPool.HasPrefab(prefab);
-    }
-
     public static bool HasNetworkPrefab(string prefabId)
     {
         return CustomPrefabPool.HasPrefab(prefabId);
     }
 
-    public static string GetNetworkPrefabId(GameObject prefab)
-    {
-        return CustomPrefabPool.GetPrefabId(prefab);
-    }
+    #region Disabled
+    //public static bool HasNetworkPrefab(GameObject prefab)
+    //{
+    //    return CustomPrefabPool.HasPrefab(prefab);
+    //}
 
-    public static bool TryNetworkGetPrefabId(GameObject prefab, out string prefabId)
-    {
-        prefabId = CustomPrefabPool.GetPrefabId(prefab);
-        return !string.IsNullOrEmpty(prefabId);
-    }
+    //public static string GetNetworkPrefabId(GameObject prefab)
+    //{
+    //    return CustomPrefabPool.GetPrefabId(prefab);
+    //}
 
-    public static GameObject SpawnNetworkPrefab(GameObject prefab, Vector3 position, Quaternion rotation, byte group = 0, object[] data = null)
-    {
-        if (prefab == null)
-        {
-            Logger.LogError("Failed to spawn network prefab. GameObject is null.");
-            return null;
-        }
+    //public static bool TryGetNetworkPrefabId(GameObject prefab, out string prefabId)
+    //{
+    //    prefabId = GetNetworkPrefabId(prefab);
+    //    return !string.IsNullOrEmpty(prefabId);
+    //}
 
-        if (!TryNetworkGetPrefabId(prefab, out string prefabId))
-        {
-            Logger.LogError($"Failed to spawn network prefab \"{prefab.name}\". GameObject is not registered as a network prefab.");
-            return null;
-        }
+    //public static GameObject SpawnNetworkPrefab(GameObject prefab, Vector3 position, Quaternion rotation, byte group = 0, object[] data = null)
+    //{
+    //    if (prefab == null)
+    //    {
+    //        Logger.LogError("Failed to spawn network prefab. GameObject is null.");
+    //        return null;
+    //    }
 
-        return SpawnNetworkPrefab(prefabId, position, rotation, group, data);
-    }
+    //    if (!TryGetNetworkPrefabId(prefab, out string prefabId))
+    //    {
+    //        Logger.LogError($"Failed to spawn network prefab \"{prefab.name}\". GameObject is not registered as a network prefab.");
+    //        return null;
+    //    }
+
+    //    return SpawnNetworkPrefab(prefabId, position, rotation, group, data);
+    //}
+    #endregion
 
     public static GameObject SpawnNetworkPrefab(string prefabId, Vector3 position, Quaternion rotation, byte group = 0, object[] data = null)
     {

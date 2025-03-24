@@ -53,4 +53,60 @@ public static class EnemySetupExtension
 
         return enemySetup.GetDistinctSpawnObjects().Any(x => x.name.Equals(name, comparisonType));
     }
+
+    public static bool NameEquals(this EnemySetup enemySetup, string name)
+    {
+        if (enemySetup == null)
+        {
+            return false;
+        }
+
+        if (enemySetup.name.EqualsAny([name, $"Enemy - {name}"], StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (enemySetup.TryGetEnemyParent(out EnemyParent enemyParent))
+        {
+            if (enemyParent.enemyName.Equals(name, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        if (enemyParent.gameObject.name.EqualsAny([name, $"Enemy - {name}"], StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static bool NameContains(this EnemySetup enemySetup, string name)
+    {
+        if (enemySetup == null)
+        {
+            return false;
+        }
+
+        if (enemySetup.name.Contains(name, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        if (enemySetup.TryGetEnemyParent(out EnemyParent enemyParent))
+        {
+            if (enemyParent.enemyName.Contains(name, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        if (enemyParent.gameObject.name.Contains(name, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

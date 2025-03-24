@@ -61,7 +61,7 @@ public static class LevelValuablesExtension
 
     public static bool TryGetCombinedList(this LevelValuables levelValuables, out List<GameObject> list)
     {
-        var volumeTypes = new List<List<GameObject>>()
+        var allValuables = new List<List<GameObject>>()
         {
             levelValuables.tiny,
             levelValuables.small,
@@ -72,11 +72,21 @@ public static class LevelValuablesExtension
             levelValuables.veryTall,
         };
 
-        list = volumeTypes.SelectMany(volumeType => volumeType)
+        list = allValuables.SelectMany(valuables => valuables)
             .Where(x => x != null)
             .Distinct()
             .ToList();
 
         return list != null;
+    }
+
+    public static List<GameObject> GetCombinedList(this LevelValuables levelValuables)
+    {
+        if (levelValuables.TryGetCombinedList(out List<GameObject> list))
+        {
+            return list;
+        }
+
+        return [];
     }
 }

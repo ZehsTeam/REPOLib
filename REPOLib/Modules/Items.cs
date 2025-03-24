@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace REPOLib.Modules;
 
 public static class Items
 {
+    public static IReadOnlyList<Item> AllItems => GetItems();
     public static IReadOnlyList<Item> RegisteredItems => _itemsRegistered;
 
     private static readonly List<Item> _itemsToRegister = [];
@@ -100,5 +102,71 @@ public static class Items
         Utilities.FixAudioMixerGroups(item.prefab);
 
         _itemsToRegister.Add(item);
+    }
+
+    public static GameObject SpawnItem(Item item, Vector3 position, Quaternion rotation)
+    {
+        if (item == null)
+        {
+            Logger.LogError("Failed to spawn item. Item is null.");
+            return null;
+        }
+
+        if (item.prefab == null)
+        {
+            Logger.LogError("Failed to spawn item. Prefab is null.");
+            return null;
+        }
+
+        if (!SemiFunc.IsMasterClientOrSingleplayer())
+        {
+            Logger.LogError($"Failed to spawn item \"{item.itemName}\". You are not the host.");
+            return null;
+        }
+
+        string prefabId = ResourcesHelper.GetItemPrefabPath(item);
+        GameObject gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
+
+        if (gameObject == null)
+        {
+            Logger.LogError($"Failed to spawn item \"{item.itemName}\"");
+            return null;
+        }
+
+        Logger.LogInfo($"Spawned item \"{item.itemName}\" at position {position}, rotation: {rotation.eulerAngles}", extended: true);
+
+        return gameObject;
+    }
+
+    public static IReadOnlyList<Item> GetItems()
+    {
+        if (StatsManager.instance == null)
+        {
+            return [];
+        }
+
+        return StatsManager.instance.GetItems();
+    }
+
+    public static bool TryGetItemByName(string name, out Item item)
+    {
+        item = GetItemByName(name);
+        return item != null;
+    }
+
+    public static Item GetItemByName(string name)
+    {
+        return StatsManager.instance?.GetItemByName(name);
+    }
+
+    public static bool TryGetItemThatContainsName(string name, out Item item)
+    {
+        item = GetItemThatContainsName(name);
+        return item != null;
+    }
+
+    public static Item GetItemThatContainsName(string name)
+    {
+        return StatsManager.instance?.GetItemThatContainsName(name);
     }
 }

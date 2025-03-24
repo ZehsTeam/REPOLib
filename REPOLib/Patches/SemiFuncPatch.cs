@@ -76,10 +76,11 @@ internal static class SemiFuncPatch
     [HarmonyPrefix]
     private static bool EnemySpawnPatch(ref bool __result)
     {
-        if (Enemies.SpawnNextEnemyNotDespawned)
+        if (Enemies.SpawnNextEnemiesNotDespawned > 0)
         {
+            Enemies.SpawnNextEnemiesNotDespawned--;
+
             __result = true;
-            Enemies.SpawnNextEnemyNotDespawned = false;
             return false;
         }
 

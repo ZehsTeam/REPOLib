@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace REPOLib.Extensions;
 
@@ -27,5 +28,34 @@ public static class StatsManagerExtension
         }
 
         return true;
+    }
+
+    public static List<Item> GetItems(this StatsManager statsManager)
+    {
+        return statsManager.itemDictionary.Values.ToList();
+    }
+
+    public static bool TryGetItemByName(this StatsManager statsManager, string name, out Item item)
+    {
+        item = statsManager.GetItemByName(name);
+        return item != null;
+    }
+
+    public static Item GetItemByName(this StatsManager statsManager, string name)
+    {
+        return statsManager.GetItems()
+            .FirstOrDefault(x => x.NameEquals(name));
+    }
+
+    public static bool TryGetItemThatContainsName(this StatsManager statsManager, string name, out Item item)
+    {
+        item = statsManager.GetItemThatContainsName(name);
+        return item != null;
+    }
+
+    public static Item GetItemThatContainsName(this StatsManager statsManager, string name)
+    {
+        return statsManager.GetItems()
+            .FirstOrDefault(x => x.NameContains(name));
     }
 }

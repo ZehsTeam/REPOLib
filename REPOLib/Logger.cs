@@ -36,7 +36,7 @@ internal static class Logger
         ManualLogSource?.Log(logLevel, data);
     }
 
-    private static bool IsExtendedLoggingEnabled()
+    public static bool IsExtendedLoggingEnabled()
     {
         if (ConfigManager.ExtendedLogging == null)
         {

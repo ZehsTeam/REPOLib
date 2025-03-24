@@ -1,9 +1,5 @@
-﻿using Photon.Pun;
-using REPOLib.Modules;
-using System;
-using System.Linq;
+﻿using REPOLib.Modules;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace REPOLib.Commands;
 
@@ -44,62 +40,18 @@ internal static class SpawnItemCommand
             return;
         }
 
-        SpawnItemByName(args);
-    }
+        string name = args;
 
-    private static void SpawnItemByName(string name)
-    {
-        Vector3 spawnPos = PlayerAvatar.instance.transform.position + PlayerAvatar.instance.transform.forward * 1f;
+        Vector3 position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) + PlayerAvatar.instance.transform.forward * 1f;
 
-        Logger.LogInfo($"Trying to spawn item \"{name}\" at {spawnPos}...", extended: true);
+        Logger.LogInfo($"Trying to spawn item \"{name}\" at {position}...", extended: true);
 
-        if (!TryGetItemByName(name, out Item item))
+        if (!Items.TryGetItemThatContainsName(name, out Item item))
         {
-            Logger.LogWarning($"Could not find an item with the name \"{name}\" to spawn.");
+            Logger.LogWarning($"Spawn command failed. Unknown item with name \"{name}\"");
             return;
         }
 
-        try
-        {
-            if (SemiFunc.IsMultiplayer())
-            {
-                string itemPath = ResourcesHelper.GetItemPrefabPath(item);
-
-                if (itemPath == string.Empty)
-                {
-                    Logger.LogError($"Failed to get the path of item \"{item.itemName}\"");
-                    return;
-                }
-
-                Logger.LogInfo($"Network spawning \"{itemPath}\" at {spawnPos}.");
-                PhotonNetwork.InstantiateRoomObject(itemPath, spawnPos, Quaternion.identity);
-            }
-            else
-            {
-                Logger.LogInfo($"Locally spawning \"{item.itemName}\" at {spawnPos}.");
-                Object.Instantiate(item.prefab, spawnPos, Quaternion.identity);
-            }
-        }
-        catch (Exception e)
-        {
-            Logger.LogError($"Failed to spawn \"{item.itemName}\":\n{e}");
-        }
-    }
-
-    private static bool TryGetItemByName(string name, out Item item)
-    {
-        if (StatsManager.instance == null)
-        {
-            item = null;
-            return false;
-        }
-
-        Item[] items = StatsManager.instance.itemDictionary.Values.ToArray();
-
-        item = items.FirstOrDefault(x => 
-            x.itemAssetName.Contains(name, StringComparison.OrdinalIgnoreCase) ||
-            x.itemName.Contains(name, StringComparison.OrdinalIgnoreCase));
-
-        return item != null;
+        Items.SpawnItem(item, position, Quaternion.identity);
     }
 }
