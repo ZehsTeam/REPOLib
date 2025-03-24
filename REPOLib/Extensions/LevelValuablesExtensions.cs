@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace REPOLib.Extensions;
 
-public static class LevelValuablesExtension
+public static class LevelValuablesExtensions
 {
     public static bool HasValuable(this LevelValuables levelValuables, GameObject prefab)
     {

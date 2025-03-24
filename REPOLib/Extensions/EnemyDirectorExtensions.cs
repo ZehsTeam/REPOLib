@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace REPOLib.Extensions;
 
-public static class EnemyDirectorExtension
+public static class EnemyDirectorExtensions
 {
     public static bool HasEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
     {

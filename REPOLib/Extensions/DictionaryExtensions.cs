@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace REPOLib.Extensions;
 
-public static class DictionaryExtension
+public static class DictionaryExtensions
 {
     public static bool TryGetKey<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value, out TKey key)
     {

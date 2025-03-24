@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace REPOLib.Extensions;
 
-public static class EnemySetupExtension
+public static class EnemySetupExtensions
 {
     public static List<GameObject> GetDistinctSpawnObjects(this EnemySetup enemySetup)
     {
@@ -57,14 +57,24 @@ public static class EnemySetupExtension
         return enemyParent != null;
     }
 
-    public static bool AnySpawnObjectsNameEquals(this EnemySetup enemySetup, string name, StringComparison comparisonType = StringComparison.OrdinalIgnoreCase)
+    public static bool AnySpawnObjectsNameEquals(this EnemySetup enemySetup, string name)
     {
         if (enemySetup == null)
         {
             return false;
         }
 
-        return enemySetup.GetDistinctSpawnObjects().Any(x => x.name.Equals(name, comparisonType));
+        return enemySetup.GetDistinctSpawnObjects().Any(x => x.name.Equals(name, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public static bool AnySpawnObjectsNameEqualsThatIsNotTheSameObject(this EnemySetup enemySetup, GameObject gameObject)
+    {
+        if (enemySetup == null || gameObject == null)
+        {
+            return false;
+        }
+
+        return enemySetup.GetDistinctSpawnObjects().Any(x => x.name.Equals(gameObject.name, StringComparison.OrdinalIgnoreCase) && x != gameObject);
     }
 
     public static bool NameEquals(this EnemySetup enemySetup, string name)

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace REPOLib.Extensions;
 
-public static class StatsManagerExtension
+public static class StatsManagerExtensions
 {
     public static bool HasItem(this StatsManager statsManager, Item item)
     {

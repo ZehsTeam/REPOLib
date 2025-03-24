@@ -2,7 +2,7 @@
 
 namespace REPOLib.Extensions;
 
-internal static class ItemExtension
+internal static class ItemExtensions
 {
     public static bool NameEquals(this Item item, string name)
     {

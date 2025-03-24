@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace REPOLib.Modules;
 
-public static class Enemies 
+public static class Enemies
 {
     public static IReadOnlyList<EnemySetup> AllEnemies => GetEnemies();
     public static IReadOnlyList<EnemySetup> RegisteredEnemies => _enemiesRegistered;
@@ -87,7 +87,7 @@ public static class Enemies
         {
             foreach (var previousEnemy in _enemiesToRegister)
             {
-                if (previousEnemy.AnySpawnObjectsNameEquals(spawnObject.name))
+                if (previousEnemy.AnySpawnObjectsNameEqualsThatIsNotTheSameObject(spawnObject))
                 {
                     Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". Enemy \"{previousEnemy.name}\" already has a spawn object called \"{spawnObject.name}\"");
                     return;
@@ -99,7 +99,11 @@ public static class Enemies
         foreach (var spawnObject in enemySetup.GetDistinctSpawnObjects())
         {
             string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
-            NetworkPrefabs.RegisterNetworkPrefab(prefabId, spawnObject);
+
+            if (!NetworkPrefabs.HasNetworkPrefab(prefabId))
+            {
+                NetworkPrefabs.RegisterNetworkPrefab(prefabId, spawnObject);
+            }
 
             Utilities.FixAudioMixerGroups(spawnObject);
         }
