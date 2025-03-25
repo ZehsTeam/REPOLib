@@ -15,9 +15,9 @@ public static class TypeExtensions
         }
         catch (Exception ex)
         {
-            // Log and return an empty sequence if there's an error
+            // Log and return null if there's an error
             // Console.WriteLine($"Error retrieving methods for type {type.FullName}: {ex.Message}");
-            return Enumerable.Empty<MethodInfo?>(); // Return empty if an error occurs
+            return null;
         }
     }
 }
