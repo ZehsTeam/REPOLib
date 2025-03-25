@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+namespace REPOLib.Extensions;
+
 public static class TypeExtensions
 {
     public static IEnumerable<MethodInfo?> SafeGetMethods(this Type type)
