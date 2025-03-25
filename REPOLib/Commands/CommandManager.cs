@@ -60,8 +60,8 @@ internal static class CommandManager
     {
         _commandExecutionMethodCache = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(assembly => assembly.GetTypes())
-            .SelectMany(type => type.GetMethods())
-            .Where(method => method.GetCustomAttribute<CommandExecutionAttribute>() != null)
+            .SelectMany(type => type.SafeGetMethods())
+            .Where(method => method != null && method.GetCustomAttribute<CommandExecutionAttribute>() != null)
             .ToList();
 
         foreach (var method in _commandExecutionMethodCache)
