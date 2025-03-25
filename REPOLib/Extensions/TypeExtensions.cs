@@ -11,7 +11,7 @@ public static class TypeExtensions
         try
         {
             // Return methods safely
-            return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+            return type.GetMethods();
         }
         catch (Exception ex)
         {
