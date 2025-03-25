@@ -1,0 +1,21 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+
+public static class TypeExtensions
+{
+    public static IEnumerable<MethodInfo?> SafeGetMethods(this Type type)
+    {
+        try
+        {
+            // Return methods safely
+            return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+        }
+        catch (Exception ex)
+        {
+            // Log and return an empty sequence if there's an error
+            // Console.WriteLine($"Error retrieving methods for type {type.FullName}: {ex.Message}");
+            return Enumerable.Empty<MethodInfo?>(); // Return empty if an error occurs
+        }
+    }
+}
