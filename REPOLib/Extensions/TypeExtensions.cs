@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace REPOLib.Extensions;
 
-public static class TypeExtensions
+internal static class TypeExtensions
 {
     public static IEnumerable<MethodInfo?> SafeGetMethods(this Type type)
     {
