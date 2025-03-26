@@ -1,0 +1,36 @@
+name: Publish
+
+on:
+  release:
+    types: [prereleased, released]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.x"
+
+      - name: Restore
+        run: |
+          dotnet restore --locked-mode
+          dotnet tool restore
+
+      - name: Build
+        run: |
+          dotnet build -c Release
+
+      - name: Pack and Publish to Thunderstore
+        env:
+          TCLI_AUTH_TOKEN: ${{ secrets.TCLI_AUTH_TOKEN }}
+        run: |
+          dotnet pack -c Release --no-build -target:PublishThunderstore
+
+      - name: Publish to NuGet.org
+        run: |
+          dotnet nuget push ./artifacts/package/*/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
