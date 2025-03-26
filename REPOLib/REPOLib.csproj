@@ -82,11 +82,11 @@
   </PropertyGroup>
   
   <!-- Copy DLL to Gale Zehs-REPOLib plugin folder -->
-  <Target Name="CopyToGalePluginFolder" AfterTargets="PostBuildEvent" Condition="Exists('$(BepInExPluginsFolder)')">
+  <Target Name="CopyToPluginsFolder" AfterTargets="PostBuildEvent" Condition="Exists('$(BepInExPluginsFolder)')">
     <Copy DestinationFolder="$(REPOLibPluginFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
   </Target>
 
-  <Target Name="ValidateCopiedPlugin" AfterTargets="CopyToGalePluginFolder" Condition="!Exists('$(BepInExPluginsFolder)') And $(CI) != 'true'" >
+  <Target Name="ValidateCopiedPlugin" AfterTargets="CopyToPluginsFolder" Condition="!Exists('$(BepInExPluginsFolder)') And $(CI) != 'true'" >
     <Warning Text="Couldn't copy build target to '$(BepInExPluginsFolder)' because the path does not exist. Configure the path in your REPOLib.csproj.user file."/>
   </Target>
 </Project>
