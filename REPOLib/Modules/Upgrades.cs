@@ -104,6 +104,12 @@ public class PlayerUpgrade
         return 0;
     }
 
+    public void Upgrade(PlayerAvatar player) 
+    {
+        string steamId = SemiFunc.PlayerGetSteamID(player);
+        if (player == null || steamId == null) return;
+        Upgrade(steamId);
+    }
 	public int Upgrade(string playerId)
 	{
         if (!playerDictionary.TryGetValue(playerId, out int num))
