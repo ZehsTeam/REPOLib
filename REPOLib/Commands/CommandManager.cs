@@ -59,8 +59,8 @@ internal static class CommandManager
     public static void FindAllCommandMethods()
     {
         _commandExecutionMethodCache = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .SelectMany(type => type.SafeGetMethods())
+            .SelectMany(assembly => HarmonyLib.AccessTools.GetTypesFromAssembly(assembly))
+            .SelectMany(type => type.GetMethods())
             .Where(method => method != null && method.GetCustomAttribute<CommandExecutionAttribute>() != null)
             .ToList();
 
