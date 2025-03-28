@@ -10,13 +10,11 @@ internal static class TypeExtensions
     {
         try
         {
-            // Return methods safely
             return type.GetMethods();
         }
         catch (Exception ex)
         {
-            // Log and return null if there's an error
-            // Console.WriteLine($"Error retrieving methods for type {type.FullName}: {ex.Message}");
+            // Log($"Error retrieving methods for type {type.FullName}: {ex.Message}");
             return null;
         }
     }
