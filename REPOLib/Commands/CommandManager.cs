@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using REPOLib.Extensions;
 
 namespace REPOLib.Commands;
 
@@ -19,9 +20,9 @@ internal static class CommandManager
         Logger.LogInfo($"CommandManager initializing.", extended: true);
 
         CommandInitializerMethods = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .SelectMany(type => type.GetMethods())
-            .Where(method => method.GetCustomAttribute<CommandInitializerAttribute>() != null)
+            .SelectMany(HarmonyLib.AccessTools.GetTypesFromAssembly)
+            .SelectMany(type => type.SafeGetMethods())
+            .Where(method => method?.GetCustomAttribute<CommandInitializerAttribute>() != null)
             .ToList();
 
         foreach (var command in CommandInitializerMethods)
@@ -59,9 +60,9 @@ internal static class CommandManager
     public static void FindAllCommandMethods()
     {
         _commandExecutionMethodCache = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => HarmonyLib.AccessTools.GetTypesFromAssembly(assembly))
-            .SelectMany(type => type.GetMethods())
-            .Where(method => method != null && method.GetCustomAttribute<CommandExecutionAttribute>() != null)
+            .SelectMany(HarmonyLib.AccessTools.GetTypesFromAssembly)
+            .SelectMany(type => type.SafeGetMethods())
+            .Where(method => method?.GetCustomAttribute<CommandExecutionAttribute>() != null)
             .ToList();
 
         foreach (var method in _commandExecutionMethodCache)
@@ -105,7 +106,7 @@ internal static class CommandManager
         {
             var execAttribute = method.GetCustomAttribute<CommandExecutionAttribute>();
 
-            var bepinPluginClass = method.Module.Assembly.GetTypes()
+            var bepinPluginClass = HarmonyLib.AccessTools.GetTypesFromAssembly(method.Module.Assembly)
                 .Where(type => type.GetCustomAttribute<BepInPlugin>() != null)
                 .ToList()[0].GetCustomAttribute<BepInPlugin>();
             string sourceModGUID = bepinPluginClass?.GUID ?? "Unknown";
