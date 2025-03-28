@@ -73,7 +73,7 @@ public static class NetworkingEvents
             eventCode++;
         }
 
-        if (eventCode > 200)
+        if (eventCode > 200 || (eventCode == 200 && IsEventCodeTaken(eventCode)))
         {
             eventCode = 0;
             return false;

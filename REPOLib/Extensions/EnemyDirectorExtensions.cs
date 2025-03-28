@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace REPOLib.Extensions;
 
-public static class EnemyDirectorExtension
+public static class EnemyDirectorExtensions
 {
     public static bool HasEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
     {
@@ -83,37 +83,27 @@ public static class EnemyDirectorExtension
         ];
     }
 
-    public static EnemySetup GetEnemyByName(this EnemyDirector enemyDirector, string name)
-    {
-        foreach (var enemySetup in GetEnemies(enemyDirector))
-        {
-            if (enemySetup.name.Contains(name, StringComparison.OrdinalIgnoreCase))
-            {
-                return enemySetup;
-            }
-
-            if (!enemySetup.TryGetEnemyParent(out EnemyParent enemyParent))
-            {
-                continue;
-            }
-
-            if (enemyParent.gameObject.name.Contains(name, StringComparison.OrdinalIgnoreCase))
-            {
-                return enemySetup;
-            }
-
-            if (enemyParent.enemyName.Contains(name, StringComparison.OrdinalIgnoreCase))
-            {
-                return enemySetup;
-            }
-        }
-
-        return null;
-    }
-
     public static bool TryGetEnemyByName(this EnemyDirector enemyDirector, string name, out EnemySetup enemySetup)
     {
         enemySetup = enemyDirector.GetEnemyByName(name);
         return enemySetup != null;
+    }
+
+    public static EnemySetup GetEnemyByName(this EnemyDirector enemyDirector, string name)
+    {
+        return enemyDirector.GetEnemies()
+            .FirstOrDefault(x => x.NameEquals(name));
+    }
+
+    public static bool TryGetEnemyThatContainsName(this EnemyDirector enemyDirector, string name, out EnemySetup enemySetup)
+    {
+        enemySetup = enemyDirector.GetEnemyThatContainsName(name);
+        return enemySetup != null;
+    }
+
+    public static EnemySetup GetEnemyThatContainsName(this EnemyDirector enemyDirector, string name)
+    {
+        return enemyDirector.GetEnemies()
+            .FirstOrDefault(x => x.NameContains(name));
     }
 }

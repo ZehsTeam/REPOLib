@@ -8,6 +8,7 @@ namespace REPOLib.Modules;
 
 public static class Valuables
 {
+    public static IReadOnlyList<GameObject> AllValuables => GetValuables();
     public static IReadOnlyList<GameObject> RegisteredValuables => _valuablesRegistered;
     public static IReadOnlyList<LevelValuables> ValuablePresets => _valuablePresets.Values.ToList();
 
@@ -99,7 +100,6 @@ public static class Valuables
         }
     }
 
-    #region Public
     public static void RegisterValuable(GameObject prefab)
     {
         RegisterValuable(prefab, new List<string>());
@@ -183,7 +183,7 @@ public static class Valuables
         }
     }
 
-    public static ValuableObject SpawnValuable(ValuableObject valuableObject, Vector3 position, Quaternion rotation)
+    public static GameObject SpawnValuable(ValuableObject valuableObject, Vector3 position, Quaternion rotation)
     {
         if (valuableObject == null)
         {
@@ -197,13 +197,86 @@ public static class Valuables
             return null;
         }
 
-        GameObject gameObject = NetworkPrefabs.SpawnNetworkPrefab(valuableObject.gameObject, position, rotation);
+        string prefabId = ResourcesHelper.GetValuablePrefabPath(valuableObject);
+        GameObject gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
+
+        if (gameObject == null)
+        {
+            Logger.LogError($"Failed to spawn valuable \"{valuableObject.gameObject.name}\"");
+            return null;
+        }
 
         Logger.LogInfo($"Spawned valuable \"{gameObject.name}\" at position {position}, rotation: {rotation.eulerAngles}", extended: true);
 
-        return gameObject.GetComponent<ValuableObject>();
+        return gameObject;
     }
-    #endregion
+
+    public static IReadOnlyList<GameObject> GetValuables()
+    {
+        if (RunManager.instance == null)
+        {
+            return [];
+        }
+
+        if (_valuablePresets.Count == 0)
+        {
+            CacheValuablePresets();
+        }
+
+        return _valuablePresets.Values
+            .Select(levelValuables => levelValuables.GetCombinedList())
+            .SelectMany(list => list)
+            .Distinct()
+            .ToList();
+    }
+
+    public static bool TryGetValuableByName(string name, out ValuableObject valuableObject)
+    {
+        valuableObject = GetValuableByName(name);
+        return valuableObject != null;
+    }
+
+    public static ValuableObject GetValuableByName(string name)
+    {
+        foreach (var gameObject in GetValuables())
+        {
+            if (!gameObject.TryGetComponent(out ValuableObject valuableObject))
+            {
+                continue;
+            }
+
+            if (gameObject.name.EqualsAny([name, $"Valuable {name}"], StringComparison.OrdinalIgnoreCase))
+            {
+                return valuableObject;
+            }
+        }
+
+        return default;
+    }
+
+    public static bool TryGetValuableThatContainsName(string name, out ValuableObject valuableObject)
+    {
+        valuableObject = GetValuableThatContainsName(name);
+        return valuableObject != null;
+    }
+
+    public static ValuableObject GetValuableThatContainsName(string name)
+    {
+        foreach (var gameObject in GetValuables())
+        {
+            if (!gameObject.TryGetComponent(out ValuableObject valuableObject))
+            {
+                continue;
+            }
+
+            if (gameObject.name.Contains(name, StringComparison.OrdinalIgnoreCase))
+            {
+                return valuableObject;
+            }
+        }
+
+        return default;
+    }
 
     #region Deprecated
     [Obsolete("prefabId is no longer supported", true)]

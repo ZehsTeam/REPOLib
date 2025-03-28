@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using Photon.Pun;
+using REPOLib.Extensions;
 using REPOLib.Modules;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,7 @@ public class CustomPrefabPool : IPunPrefabPool
 
     public CustomPrefabPool()
     {
+
     }
     
     public bool RegisterPrefab(string prefabId, GameObject prefab)
@@ -68,14 +70,14 @@ public class CustomPrefabPool : IPunPrefabPool
             return false;
         }
 
-        if (Prefabs.TryGetValue(prefabId, out GameObject value))
+        if (Prefabs.TryGetValue(prefabId, out GameObject value, ignoreKeyCase: true))
         {
             LogLevel logLevel = value == prefab ? LogLevel.Warning: LogLevel.Error;
             Logger.Log(logLevel, $"CustomPrefabPool: failed to register network prefab \"{prefabId}\". There is already a prefab registered with the same prefab id.");
             return false;
         }
 
-        Prefabs[prefabId.ToLower()] = prefab;
+        Prefabs[prefabId] = prefab;
 
         Logger.LogInfo($"CustomPrefabPool: registered network prefab \"{prefabId}\"", extended: true);
         return true;
@@ -93,12 +95,12 @@ public class CustomPrefabPool : IPunPrefabPool
             return true;
         }
 
-        return true;
+        return false;
     }
 
     public bool HasPrefab(string prefabId)
     {
-        if (Prefabs.ContainsKey(prefabId.ToLower()))
+        if (Prefabs.ContainsKey(prefabId, ignoreKeyCase: true))
         {
             return true;
         }
@@ -108,7 +110,7 @@ public class CustomPrefabPool : IPunPrefabPool
             return true;
         }
 
-        return true;
+        return false;
     }
 
     public string GetPrefabId(GameObject prefab)
@@ -119,27 +121,19 @@ public class CustomPrefabPool : IPunPrefabPool
             return string.Empty;
         }
 
-        foreach (var key in Prefabs.Keys)
-        {
-            if (Prefabs[key] == prefab)
-            {
-                return key;
-            }
-        }
-
-        return string.Empty;
+        return Prefabs.GetKeyOrDefault(prefab);
     }
 
     public GameObject GetPrefab(string prefabId)
     {
-        return Prefabs.GetValueOrDefault(prefabId.ToLower());
+        return Prefabs.GetValueOrDefault(prefabId, ignoreKeyCase: true);
     }
 
     public GameObject Instantiate(string prefabId, Vector3 position, Quaternion rotation)
     {
         GameObject result;
 
-        if (!Prefabs.TryGetValue(prefabId.ToLower(), out GameObject prefab))
+        if (!Prefabs.TryGetValue(prefabId, out GameObject prefab, ignoreKeyCase: true))
         {
             result = DefaultPool.Instantiate(prefabId, position, rotation);
 

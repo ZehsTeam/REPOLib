@@ -7,15 +7,20 @@
 **Library for adding content to R.E.P.O.**
 
 ## Features
-- Registering network prefabs.
-- Registering valuables.
-- Registering items.
-- Registering enemies.
+- **Registering network prefabs.**
+- **Registering valuables.**
+- **Registering items.**
+- **Registering enemies.**
+- ResourcesHelper to help get network prefab IDs.
+- Method to spawn network prefabs. (Which works in both multiplayer and singleplayer)
+- Methods to get valuables and spawn valuables.
+- Methods to get items and spawn items.
+- Methods to get enemies and spawn enemies.
 - Registering custom chat /commands
-    - Built-in dev mode commands: Spawn Valuable, Spawn Item
-- Fixing audio mixer groups.
+    - Built-in dev mode commands: `Spawn Valuable`, `Spawn Item`, `Spawn Enemy`
+- **Fixing audio mixer groups.**
 - Making networked events.
-- Registering features without code using the [REPOLib-Sdk](https://github.com/ZehsTeam/REPOLib-Sdk).
+- **Registering features without code using the [REPOLib-Sdk](https://github.com/ZehsTeam/REPOLib-Sdk).**
 
 ## Usage
 <details><summary>Click to expand</summary><br>
@@ -309,6 +314,15 @@ This command has one alias: `/si`\
 <ins>**This command requires developer mode to be enabled.**</ins>\
 <ins>**This command is host-only!**</ins>
 
+### 3. Spawn Enemy `/spawnenemy <name>`
+This command will spawn an enemy on top of you after a few seconds.\
+Replace `<name>` with the name of the enemy or enemy prefab.\
+Names are not case-sensitive.\
+Example usage: `/spawnenemy huntsman`\
+This command has one alias: `/se`\
+<ins>**This command requires developer mode to be enabled.**</ins>\
+<ins>**This command is host-only!**</ins>
+
 > [!TIP]
 > Commands can be enabled/disabled in the config settings.
 
@@ -365,6 +379,11 @@ IEnumerator OnBundleLoaded(AssetBundle bundle) {
 
 ## Developer Contact
 **Report bugs, suggest features, or provide feedback:**
+
+| **Discord Server** | **Forum** | **Post** |  
+|--------------------|-----------|----------|  
+| [R.E.P.O. Modding Server](https://discord.com/invite/vPJtKhYAFe) | `#released-mods` | [REPOLib](https://discord.com/channels/1344557689979670578/1346055794533339217) |
+
 - **GitHub Issues Page:** [REPOLib](https://github.com/ZehsTeam/REPOLib/issues)
 - **Email:** crithaxxog@gmail.com
 - **Twitch:** [CritHaxXoG](https://www.twitch.tv/crithaxxog)

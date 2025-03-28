@@ -3,7 +3,7 @@ using UnityEngine.Audio;
 
 namespace REPOLib.Extensions;
 
-public static class AudioSourceExtension
+public static class AudioSourceExtensions
 {
     public static void FixAudioMixerGroup(this AudioSource audioSource)
     {

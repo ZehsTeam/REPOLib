@@ -2,7 +2,7 @@
 
 namespace REPOLib.Extensions;
 
-public static class GameObjectExtension
+public static class GameObjectExtensions
 {
     public static void FixAudioMixerGroups(this GameObject gameObject)
     {

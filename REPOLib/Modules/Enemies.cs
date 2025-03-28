@@ -5,11 +5,12 @@ using UnityEngine;
 
 namespace REPOLib.Modules;
 
-public static class Enemies 
+public static class Enemies
 {
+    public static IReadOnlyList<EnemySetup> AllEnemies => GetEnemies();
     public static IReadOnlyList<EnemySetup> RegisteredEnemies => _enemiesRegistered;
 
-    internal static bool SpawnNextEnemyNotDespawned = false;
+    internal static int SpawnNextEnemiesNotDespawned = 0;
 
     private static readonly List<EnemySetup> _enemiesToRegister = [];
     private static readonly List<EnemySetup> _enemiesRegistered = [];
@@ -91,7 +92,7 @@ public static class Enemies
         {
             foreach (var previousEnemy in _enemiesToRegister)
             {
-                if (previousEnemy.AnySpawnObjectsNameEquals(spawnObject.name))
+                if (previousEnemy.AnySpawnObjectsNameEqualsThatIsNotTheSameObject(spawnObject))
                 {
                     Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". Enemy \"{previousEnemy.name}\" already has a spawn object called \"{spawnObject.name}\"");
                     return;
@@ -103,7 +104,11 @@ public static class Enemies
         foreach (var spawnObject in enemySetup.GetDistinctSpawnObjects())
         {
             string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
-            NetworkPrefabs.RegisterNetworkPrefab(prefabId, spawnObject);
+
+            if (!NetworkPrefabs.HasNetworkPrefab(prefabId))
+            {
+                NetworkPrefabs.RegisterNetworkPrefab(prefabId, spawnObject);
+            }
 
             Utilities.FixAudioMixerGroups(spawnObject);
         }
@@ -118,37 +123,125 @@ public static class Enemies
         }
     }
 
-    public static void SpawnEnemy(EnemySetup enemySetup, Vector3 position, bool spawnDespawned = true)
+    public static List<EnemyParent> SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
     {
         if (enemySetup == null)
         {
             Logger.LogError("Failed to spawn enemy. EnemySetup is null.");
-            return;
+            return null;
         }
 
-        if (!enemySetup.TryGetEnemyParent(out EnemyParent enemyParent))
+        if (!enemySetup.TryGetEnemyParent(out EnemyParent prefabEnemyParent))
         {
             Logger.LogError("Failed to spawn enemy. EnemyParent is null.");
-            return;
+            return null;
         }
 
         if (LevelGenerator.Instance == null)
         {
-            Logger.LogError($"Failed to spawn enemy \"{enemyParent.enemyName}\". EnemySetup instance is null.");
-            return;
+            Logger.LogError($"Failed to spawn enemy \"{prefabEnemyParent.enemyName}\". EnemySetup instance is null.");
+            return null;
         }
 
         if (RunManager.instance == null)
         {
-            Logger.LogError($"Failed to spawn enemy \"{enemyParent.enemyName}\". RunManager instance is null.");
-            return;
+            Logger.LogError($"Failed to spawn enemy \"{prefabEnemyParent.enemyName}\". RunManager instance is null.");
+            return null;
         }
 
-        SpawnNextEnemyNotDespawned = !spawnDespawned;
+        if (EnemyDirector.instance == null)
+        {
+            Logger.LogError($"Failed to spawn enemy \"{prefabEnemyParent.enemyName}\". EnemyDirector instance is null.");
+            return null;
+        }
 
-        LevelGenerator.Instance.EnemySpawn(enemySetup, position);
+        List<EnemyParent> enemyParents = [];
+
+        foreach (GameObject spawnObject in enemySetup.GetSortedSpawnObjects())
+        {
+            if (spawnObject == null)
+            {
+                Logger.LogError($"Failed to spawn enemy \"{prefabEnemyParent.enemyName}\" spawn object. GameObject is null.");
+                continue;
+            }
+
+            string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
+            GameObject gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
+
+            if (gameObject == null)
+            {
+                Logger.LogError($"Failed to spawn enemy \"{prefabEnemyParent.enemyName}\" spawn object \"{spawnObject.name}\"");
+                continue;
+            }
+
+            if (!gameObject.TryGetComponent(out EnemyParent enemyParent))
+            {
+                continue;
+            }
+
+            enemyParents.Add(enemyParent);
+
+            SpawnNextEnemiesNotDespawned++;
+
+            enemyParent.SetupDone = true;
+
+            Enemy enemy = gameObject.GetComponentInChildren<Enemy>();
+
+            if (enemy != null)
+            {
+                enemy.EnemyTeleported(position);
+            }
+            else
+            {
+                Logger.LogError($"Enemy \"{prefabEnemyParent.enemyName}\" spawn object \"{spawnObject.name}\" does not have an enemy component.");
+            }
+
+            LevelGenerator.Instance.EnemiesSpawnTarget++;
+            EnemyDirector.instance.FirstSpawnPointAdd(enemyParent);
+        }
+
+        if (enemyParents.Count == 0)
+        {
+            Logger.LogInfo($"Failed to spawn enemy \"{prefabEnemyParent.enemyName}\". No spawn objects where spawned.", extended: true);
+            return enemyParents;
+        }
+
+        Logger.LogInfo($"Spawned enemy \"{prefabEnemyParent.enemyName}\" at position {position}", extended: true);
+
         RunManager.instance.EnemiesSpawnedRemoveEnd();
 
-        Logger.LogInfo($"Spawned enemy \"{enemyParent.enemyName}\" at position {position}", extended: true);
+        return enemyParents;
+    }
+
+    public static IReadOnlyList<EnemySetup> GetEnemies()
+    {
+        if (EnemyDirector.instance == null)
+        {
+            return [];
+        }
+
+        return EnemyDirector.instance.GetEnemies();
+    }
+
+    public static bool TryGetEnemyByName(string name, out EnemySetup enemySetup)
+    {
+        enemySetup = GetEnemyByName(name);
+        return enemySetup != null;
+    }
+
+    public static EnemySetup GetEnemyByName(string name)
+    {
+        return EnemyDirector.instance?.GetEnemyByName(name);
+    }
+
+    public static bool TryGetEnemyThatContainsName(string name, out EnemySetup enemySetup)
+    {
+        enemySetup = GetEnemyThatContainsName(name);
+        return enemySetup != null;
+    }
+
+    public static EnemySetup GetEnemyThatContainsName(string name)
+    {
+        return EnemyDirector.instance?.GetEnemyThatContainsName(name);
     }
 }

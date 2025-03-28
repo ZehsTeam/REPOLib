@@ -1,4 +1,5 @@
 ﻿using BepInEx.Configuration;
+using REPOLib.Patches;
 
 namespace REPOLib;
 
@@ -19,5 +20,7 @@ internal static class ConfigManager
     {
         ExtendedLogging = ConfigFile.Bind("General", "ExtendedLogging", defaultValue: false, "Enable extended logging.");
         DeveloperMode = ConfigFile.Bind("General", "DeveloperMode", defaultValue: false, "Enable developer mode cheats for testing.");
+
+        DeveloperMode.SettingChanged += (object sender, System.EventArgs e) => SteamManagerPatch.UpdateDeveloperMode();
     }
 }
