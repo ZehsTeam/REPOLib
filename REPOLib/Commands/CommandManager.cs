@@ -61,7 +61,7 @@ internal static class CommandManager
         _commandExecutionMethodCache = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(assembly => HarmonyLib.AccessTools.GetTypesFromAssembly(assembly))
             .SelectMany(type => type.GetMethods())
-            .Where(method => method.GetCustomAttribute<CommandExecutionAttribute>() != null)
+            .Where(method => method != null && method.GetCustomAttribute<CommandExecutionAttribute>() != null)
             .ToList();
 
         foreach (var method in _commandExecutionMethodCache)
