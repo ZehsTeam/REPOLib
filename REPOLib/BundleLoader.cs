@@ -18,7 +18,7 @@ public static class BundleLoader
     
     private static readonly List<LoadOperation> _operations = [];
     
-    public static void LoadAllBundles(string root, string withExtension)
+    internal static void LoadAllBundles(string root, string withExtension)
     {
         Logger.LogInfo($"Loading all bundles with extension {withExtension} from root {root}", extended: true);
         
@@ -26,24 +26,20 @@ public static class BundleLoader
 
         foreach (string path in files)
         {
-            LoadBundle(path, path.Replace(root, ""));
+            LoadBundleAndContent(path);
         }
     }
 
-    public static void LoadBundle(string path)
+    public static void LoadBundleAndContent(string path)
     {
-        LoadBundle(path, path.Replace(Paths.PluginPath, ""));
+        Logger.LogInfo($"Loading bundle at {path}...");
+        _operations.Add(new LoadOperation(path));
     }
 
-    public static void LoadBundle(string path, string relativePath)
+    public static void LoadBundle(string path, Func<AssetBundle, IEnumerator> onLoaded, bool loadContents = false)
     {
-        Logger.LogInfo($"Loading bundle at {relativePath}...");
-
-        var start = DateTime.Now;
-        var request = AssetBundle.LoadFromFileAsync(path);
-        
-        var operation = new LoadOperation(start, request, relativePath);
-        _operations.Add(operation);
+        Logger.LogInfo($"Loading bundle at {path}...");
+        _operations.Add(new LoadOperation(path, onLoaded, loadContents));
     }
 
     internal static void FinishLoadOperations(MonoBehaviour behaviour)
@@ -129,35 +125,59 @@ public static class BundleLoader
     {
         yield return operation.BundleRequest;
         var bundle = operation.BundleRequest.assetBundle;
-        
+
         if (bundle == null)
         {
             Logger.LogError($"Failed to load bundle {operation.FileName}!");
             Finish();
             yield break;
         }
+        
+        if (operation.LoadContents)
+        {
+            yield return LoadBundleContent(operation, bundle);
+        }
+        
+        if (operation.OnBundleLoaded != null)
+        {
+            yield return operation.OnBundleLoaded(bundle);
+        }
 
-        operation.CurrentState = LoadOperation.State.LoadingAssets;
-        operation.AssetRequest = bundle.LoadAllAssetsAsync<ScriptableObject>();
-        yield return operation.AssetRequest;
+        if (ConfigManager.ExtendedLogging.Value)
+        {
+            Logger.LogInfo($"Loaded bundle {operation.FileName} in {operation.ElapsedTime.TotalSeconds:N1}s");
+        }
         
-        Object[] assets = operation.AssetRequest.allAssets;
+        Finish();
+        yield break;
+
+        void Finish()
+        {
+            _operations.Remove(operation);
+        }
+    }
+
+    private static IEnumerator LoadBundleContent(LoadOperation operation, AssetBundle bundle)
+    {
+        operation.CurrentState = LoadOperation.State.LoadingContent;
+        var assetRequest = bundle.LoadAllAssetsAsync<ScriptableObject>();
+        yield return assetRequest;
+
+        Object[] assets = assetRequest.allAssets;
         Mod[] mods = assets.OfType<Mod>().ToArray();
-        
+
         switch (mods.Length)
         {
             case 0:
                 Logger.LogError($"Bundle {operation.FileName} contains no mods!");
-                Finish();
                 yield break;
             case > 1:
                 Logger.LogError($"Bundle {operation.FileName} contains more than one mod!");
-                Finish();
                 yield break;
         }
 
         var mod = mods[0];
-        
+
         foreach (var content in assets.OfType<Content>())
         {
             try
@@ -169,38 +189,25 @@ public static class BundleLoader
                 Logger.LogError($"Failed to load {content.Name} ({content.GetType().Name}) from bundle {operation.FileName} ({mod.Identifier}): {e}");
             }
         }
-
-        if (ConfigManager.ExtendedLogging.Value)
-        {
-            Logger.LogInfo($"Loaded bundle {operation.FileName} ({mod.Identifier}) in {operation.ElapsedTime.TotalSeconds:N1}s");
-        }
-        
-        Finish();
-        yield break;
-        
-        void Finish()
-        {
-            _operations.Remove(operation);
-        }
     }
-    
-    private class LoadOperation(DateTime startTime, AssetBundleCreateRequest bundleRequest, string relativePath)
+
+    private class LoadOperation(string path, Func<AssetBundle, IEnumerator> onBundleLoaded = null, bool loadContents = true)
     {
-        public string RelativePath { get; } = relativePath;
-        public DateTime StartTime { get; } = startTime;
+        public string Path { get; } = path;
+        public DateTime StartTime { get; } = DateTime.Now;
         public State CurrentState { get; set; } = State.LoadingBundle;
-        
-        public AssetBundleCreateRequest BundleRequest { get; } = bundleRequest;
-        public AssetBundleRequest AssetRequest { get; set; }
+        public bool LoadContents { get; } = loadContents;
+        public Func<AssetBundle, IEnumerator> OnBundleLoaded { get; } = onBundleLoaded;
+
+        public AssetBundleCreateRequest BundleRequest { get; } = AssetBundle.LoadFromFileAsync(path);
         
         public TimeSpan ElapsedTime => DateTime.Now - StartTime;
+        public string FileName => System.IO.Path.GetFileNameWithoutExtension(Path);
 
-        public string FileName => Path.GetFileNameWithoutExtension(RelativePath);
-        
         public enum State
         {
             LoadingBundle,
-            LoadingAssets,
+            LoadingContent
         }
     }
 }
