@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+#nullable enable
+
 namespace REPOLib.Extensions;
 
 internal static class TypeExtensions
