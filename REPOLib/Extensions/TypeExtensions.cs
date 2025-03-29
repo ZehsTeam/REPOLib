@@ -12,7 +12,7 @@ internal static class TypeExtensions
         {
             return type.GetMethods();
         }
-        catch (Exception ex)
+        catch /*(Exception ex)*/
         {
             // Logger.LogWarning($"Error retrieving methods for type {type.FullName}: {ex.Message}");
             return Array.Empty<MethodInfo>();
