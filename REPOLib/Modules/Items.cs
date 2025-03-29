@@ -14,16 +14,11 @@ public static class Items
     private static readonly List<Item> _itemsToRegister = [];
     private static readonly List<Item> _itemsRegistered = [];
 
-    private static bool _canRegisterItems = true;
+    private static bool _initialItemsRegistered;
 
     // This will run multiple times because of how the vanilla game registers items.
     internal static void RegisterItems()
     {
-        //if (!_canRegisterItems)
-        //{
-        //    return;
-        //}
-
         if (StatsManager.instance == null)
         {
             Logger.LogError("Failed to register items. StatsManager instance is null.");
@@ -34,23 +29,29 @@ public static class Items
 
         foreach (var item in _itemsToRegister)
         {
-            if (StatsManager.instance.AddItem(item))
-            {
-                if (!_itemsRegistered.Contains(item))
-                {
-                    _itemsRegistered.Add(item);
-                }
-
-                Logger.LogInfo($"Added item \"{item.itemName}\"", extended: true);
-            }
-            else
-            {
-                Logger.LogWarning($"Failed to add item \"{item.itemName}\"", extended: true);
-            }
+            RegisterItemWithGame(item);
         }
+        
+        _initialItemsRegistered = true;
+    }
 
-        //_itemsToRegister.Clear();
-        _canRegisterItems = false;
+    private static void RegisterItemWithGame(Item item)
+    {
+        Utilities.FixAudioMixerGroups(item.prefab);
+        
+        if (StatsManager.instance.AddItem(item))
+        {
+            if (!_itemsRegistered.Contains(item))
+            {
+                _itemsRegistered.Add(item);
+            }
+
+            Logger.LogInfo($"Added item \"{item.itemName}\"", extended: true);
+        }
+        else
+        {
+            Logger.LogWarning($"Failed to add item \"{item.itemName}\"", extended: true);
+        }
     }
 
     public static void RegisterItem(Item item)
@@ -69,12 +70,6 @@ public static class Items
         if (item.itemAssetName != item.prefab.name)
         {
             Logger.LogError($"Failed to register item \"{item.itemName}\". Item itemAssetName does not match the prefab name.");
-            return;
-        }
-
-        if (!_canRegisterItems)
-        {
-            Logger.LogError($"Failed to register item \"{item.itemName}\". You can only register items from your plugins awake!");
             return;
         }
 
@@ -99,9 +94,12 @@ public static class Items
         string prefabId = ResourcesHelper.GetItemPrefabPath(item);
         NetworkPrefabs.RegisterNetworkPrefab(prefabId, item.prefab);
 
-        Utilities.FixAudioMixerGroups(item.prefab);
-
         _itemsToRegister.Add(item);
+        
+        if (_initialItemsRegistered)
+        { 
+            RegisterItemWithGame(item);   
+        }
     }
 
     public static GameObject SpawnItem(Item item, Vector3 position, Quaternion rotation)
