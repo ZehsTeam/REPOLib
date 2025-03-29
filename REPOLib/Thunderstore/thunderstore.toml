@@ -1,0 +1,36 @@
+[config]
+schemaVersion = "0.0.1"
+
+[general]
+repository = "https://thunderstore.io"
+
+[package]
+namespace = "Zehs"
+name = "REPOLib"
+description = "Library for adding content to R.E.P.O."
+websiteUrl = "https://github.com/ZehsTeam/REPOLib"
+containsNsfwContent = false
+[package.dependencies]
+BepInEx-BepInExPack = "5.4.2100"
+
+[build]
+icon = "../../icon.png"
+readme = "../../README.md"
+outdir = "../../artifacts/thunderstore/"
+
+[[build.copy]]
+source = "../../artifacts/bin/REPOLib/release/REPOLib.dll"
+target = "plugins/"
+
+[[build.copy]]
+source = "../../CHANGELOG.md"
+target = "/"
+
+[[build.copy]]
+source = "../../LICENSE.txt"
+target = "/"
+
+[publish]
+communities = [ "repo", ]
+[publish.categories]
+repo = [ "mods", "tools", "libraries", ]
