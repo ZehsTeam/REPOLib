@@ -12,7 +12,7 @@ public class ValuableContent : Content
     private ValuableObject _prefab;
 
     [SerializeField]
-    private string[] _valuablePresets = [Valuables.GenericValuablePresetName];
+    private string[] _valuablePresets = [Modules.ValuablePresets.GenericValuablePresetName];
     
     public ValuableObject Prefab => _prefab;
     public IReadOnlyList<string> ValuablePresets => _valuablePresets;
