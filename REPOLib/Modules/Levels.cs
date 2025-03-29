@@ -49,8 +49,10 @@ public static class Levels
                     continue;
                 }
                 
+                // This allows custom levels to use vanilla presets, by using a proxy preset with the same name
                 if (ValuablePresets.AllValuablePresets.TryGetValue(valuablePreset.name, out var foundPreset))
                 {
+                    // Check if the mod author accidentally included a vanilla preset (and all of its valuables) in their bundle
                     if (valuablePreset.GetCombinedList().Count > 0)
                     {
                         Logger.LogWarning($"Proxy preset \"{valuablePreset.name}\" in level \"{level.name}\" contains valuables! This might have caused duplicate valuables to load!");
@@ -89,15 +91,7 @@ public static class Levels
             Logger.LogError($"Failed to register level \"{level.name}\". You can only register levels from your plugins awake!");
             return;
         }
-
-        /*
-        if (ResourcesHelper.HasValuablePrefab(valuableObject))
-        {
-            Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable prefab already exists in Resources with the same name.");
-            return;
-        }
-        */
-
+        
         if (_levelsToRegister.Any(x => x.name.Equals(level.name, StringComparison.OrdinalIgnoreCase)))
         {
             Logger.LogError($"Failed to register level \"{level.name}\". Level already exists with the same name.");
@@ -132,7 +126,7 @@ public static class Levels
         
         foreach (var prefab in level.StartRooms)
         {
-            modules.Add((prefab, ResourcesHelper.LevelPrefabType.Module));
+            modules.Add((prefab, ResourcesHelper.LevelPrefabType.StartRoom));
         }
 
         if (level.ConnectObject != null)
@@ -147,6 +141,8 @@ public static class Levels
         
         foreach (var (prefab, type) in modules)
         {
+            // maybe check if the prefab is already registered?
+            
             string prefabId = ResourcesHelper.GetLevelPrefabPath(level, prefab, type);
             NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
 
