@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
 using REPOLib.Extensions;
 
 namespace REPOLib.Commands;
@@ -19,8 +20,7 @@ internal static class CommandManager
     {
         Logger.LogInfo($"CommandManager initializing.", extended: true);
 
-        CommandInitializerMethods = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(HarmonyLib.AccessTools.GetTypesFromAssembly)
+        CommandInitializerMethods = AccessTools.AllTypes()
             .SelectMany(type => type.SafeGetMethods())
             .Where(method => method?.GetCustomAttribute<CommandInitializerAttribute>() != null)
             .ToList();
@@ -59,8 +59,7 @@ internal static class CommandManager
 
     public static void FindAllCommandMethods()
     {
-        _commandExecutionMethodCache = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(HarmonyLib.AccessTools.GetTypesFromAssembly)
+        _commandExecutionMethodCache = AccessTools.AllTypes()
             .SelectMany(type => type.SafeGetMethods())
             .Where(method => method?.GetCustomAttribute<CommandExecutionAttribute>() != null)
             .ToList();
@@ -106,7 +105,7 @@ internal static class CommandManager
         {
             var execAttribute = method.GetCustomAttribute<CommandExecutionAttribute>();
 
-            var bepinPluginClass = HarmonyLib.AccessTools.GetTypesFromAssembly(method.Module.Assembly)
+            var bepinPluginClass = AccessTools.GetTypesFromAssembly(method.Module.Assembly)
                 .Where(type => type.GetCustomAttribute<BepInPlugin>() != null)
                 .ToList()[0].GetCustomAttribute<BepInPlugin>();
             string sourceModGUID = bepinPluginClass?.GUID ?? "Unknown";
