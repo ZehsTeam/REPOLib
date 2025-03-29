@@ -6,9 +6,10 @@ namespace REPOLib.Objects.Sdk;
 [CreateAssetMenu(menuName = "REPOLib/Mod", order = 0, fileName = "New Mod")]
 public class Mod : ScriptableObject
 {
+    #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
     private string _name;
-
+    
     [SerializeField]
     private string _author;
 
@@ -29,6 +30,7 @@ public class Mod : ScriptableObject
 
     [SerializeField]
     private TextAsset _readme;
+    #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     public string Name => _name;
     public string Author => _author;
