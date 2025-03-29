@@ -73,19 +73,20 @@
   <!-- Default values in case the .csproj.user file doesn't exist -->
   <PropertyGroup>
     <GaleProfile Condition="'$(GaleProfile)' == ''">Mod Development</GaleProfile>
-    <GaleDataFolder Condition="'$(GaleDataFolder)' == ''">$(AppData)\com.kesomannen.gale/</GaleDataFolder>
+    <GaleDataFolder Condition="'$(GaleDataFolder)' == ''">$(AppData)\com.kesomannen.gale</GaleDataFolder>
   </PropertyGroup>
   
   <PropertyGroup>
-    <!-- Gale plugins folder -->
-    <GalePluginsFolder>$(GaleDataFolder)\repo\profiles\$(GaleProfile)\BepInEx\plugins</GalePluginsFolder>
-    
-    <!-- Gale plugin folder -->
-    <GalePluginFolder>$(GalePluginsFolder)\Zehs-$(MSBuildProjectName)</GalePluginFolder>
+    <BepInExPluginsFolder Condition="'$(BepInExPluginsFolder)' == ''">$(GaleDataFolder)\repo\profiles\$(GaleProfile)\BepInEx\plugins\</BepInExPluginsFolder>
+    <REPOLibPluginFolder Condition="'$(REPOLibPluginFolder)' == ''">$(BepInExPluginsFolder)Zehs-$(MSBuildProjectName)\</REPOLibPluginFolder>
   </PropertyGroup>
   
   <!-- Copy DLL to Gale Zehs-REPOLib plugin folder -->
-  <Target Name="CopyToGalePluginFolder" AfterTargets="PostBuildEvent">
-    <Copy DestinationFolder="$(GalePluginFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
+  <Target Name="CopyToPluginsFolder" AfterTargets="PostBuildEvent" Condition="Exists('$(BepInExPluginsFolder)')">
+    <Copy DestinationFolder="$(REPOLibPluginFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
+  </Target>
+
+  <Target Name="ValidateCopiedPlugin" AfterTargets="CopyToPluginsFolder" Condition="!Exists('$(BepInExPluginsFolder)') And $(CI) != 'true'" >
+    <Warning Text="Couldn't copy build target to '$(BepInExPluginsFolder)' because the path does not exist. Configure the path in your REPOLib.csproj.user file."/>
   </Target>
 </Project>

@@ -6,5 +6,8 @@
         
         <!-- Gale data folder -->
         <GaleDataFolder>$(AppData)\com.kesomannen.gale</GaleDataFolder>
+
+        <!-- If not using Gale, set the BepInExPluginsFolder path directly, otherwise leave empty -->
+        <BepInExPluginsFolder></BepInExPluginsFolder>
     </PropertyGroup>
 </Project>
