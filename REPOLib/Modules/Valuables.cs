@@ -10,45 +10,17 @@ public static class Valuables
 {
     public static IReadOnlyList<GameObject> AllValuables => GetValuables();
     public static IReadOnlyList<GameObject> RegisteredValuables => _valuablesRegistered;
-    public static IReadOnlyList<LevelValuables> ValuablePresets => _valuablePresets.Values.ToList();
-
-    public static string GenericValuablePresetName => "Valuables - Generic";
     
-    private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
     private static readonly Dictionary<GameObject, List<string>> _valuablesToRegister = [];
     private static readonly List<GameObject> _valuablesRegistered = [];
 
     private static bool _canRegisterValuables = true;
-
-    private static void CacheValuablePresets()
-    {
-        if (RunManager.instance == null)
-        {
-            Logger.LogError($"Failed to cache LevelValuables. RunManager instance is null.");
-            return;
-        }
-
-        foreach (var level in RunManager.instance.levels)
-        {
-            foreach (var valuablePreset in level.ValuablePresets)
-            {
-                _valuablePresets.TryAdd(valuablePreset.name, valuablePreset);
-            }
-        }
-    }
+    
 
     internal static void RegisterValuables()
     {
         if (!_canRegisterValuables)
         {
-            return;
-        }
-
-        CacheValuablePresets();
-
-        if (_valuablePresets.Count == 0)
-        {
-            Logger.LogError($"Failed to register valuables. LevelValuables list is empty!");
             return;
         }
 
@@ -63,21 +35,21 @@ public static class Valuables
 
             List<string> presetNames = _valuablesToRegister[valuable];
 
-            if (!presetNames.Any(x => _valuablePresets.Keys.Any(y => x == y)))
+            if (!presetNames.Any(x => ValuablePresets.AllValuablePresets.Keys.Any(y => x == y)))
             {
                 Logger.LogError($"Valuable \"{valuable.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
-                presetNames.Add(GenericValuablePresetName);
+                presetNames.Add(ValuablePresets.GenericValuablePresetName);
             }
 
             foreach (var presetName in presetNames)
             {
-                if (presetName == null || !_valuablePresets.ContainsKey(presetName))
+                if (presetName == null || !ValuablePresets.AllValuablePresets.ContainsKey(presetName))
                 {
                     Logger.LogError($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\". The valuable preset does not exist.");
                     continue;
                 }
 
-                if (_valuablePresets[presetName].AddValuable(valuable))
+                if (ValuablePresets.AllValuablePresets[presetName].AddValuable(valuable))
                 {
                     _valuablesRegistered.Add(valuable);
                     Logger.LogInfo($"Added valuable \"{valuable.name}\" to valuable preset \"{presetName}\"", extended: true);
@@ -143,7 +115,7 @@ public static class Valuables
         if (presetNames == null || presetNames.Count == 0)
         {
             //Logger.LogInfo($"No valuable presets specified for valuable \"{prefab.name}\". Adding valuable to generic preset.", extended: true);
-            presetNames = [GenericValuablePresetName];
+            presetNames = [ValuablePresets.GenericValuablePresetName];
         }
 
         if (!_canRegisterValuables)
@@ -213,12 +185,7 @@ public static class Valuables
             return [];
         }
 
-        if (_valuablePresets.Count == 0)
-        {
-            CacheValuablePresets();
-        }
-
-        return _valuablePresets.Values
+        return ValuablePresets.AllValuablePresets.Values
             .Select(levelValuables => levelValuables.GetCombinedList())
             .SelectMany(list => list)
             .Distinct()

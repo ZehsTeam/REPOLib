@@ -19,6 +19,7 @@ internal static class RunManagerPatch
 
         NetworkPrefabs.Initialize();
         NetworkingEvents.Initialize();
+        Levels.RegisterLevels();
         Valuables.RegisterValuables();
 
         CommandManager.Initialize();

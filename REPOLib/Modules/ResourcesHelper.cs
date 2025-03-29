@@ -33,6 +33,19 @@ public static class ResourcesHelper
     {
         return "Enemies/";
     }
+    
+    public static string GetLevelPrefabsFolderPath(Level level, LevelPrefabType type)
+    {
+        string folder = type switch
+        {
+            LevelPrefabType.Module => "Modules",
+            LevelPrefabType.Other => "Other",
+            LevelPrefabType.StartRoom => "Start Room",
+            _ => string.Empty
+        };
+        
+        return Path.Combine("Level", level.ResourcePath, folder);
+    }
     #endregion
 
     #region Paths
@@ -112,6 +125,25 @@ public static class ResourcesHelper
         }
 
         string folderPath = GetEnemiesFolderPath();
+
+        return Path.Combine(folderPath, prefab.name);
+    }
+
+    public enum LevelPrefabType
+    {
+        Module,
+        Other,
+        StartRoom
+    }
+    
+    public static string GetLevelPrefabPath(Level level, GameObject prefab, LevelPrefabType type)
+    {
+        if (prefab == null)
+        {
+            return string.Empty;
+        }
+
+        string folderPath = GetLevelPrefabsFolderPath(level, type);
 
         return Path.Combine(folderPath, prefab.name);
     }
