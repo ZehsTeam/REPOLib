@@ -28,6 +28,7 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll(typeof(SteamManagerPatch));
         _harmony.PatchAll(typeof(EnemyGnomeDirectorPatch));
         _harmony.PatchAll(typeof(EnemyBangDirectorPatch));
+        _harmony.PatchAll(typeof(PlayerControllerPatch));
 
         ConfigManager.Initialize(Config);
 
