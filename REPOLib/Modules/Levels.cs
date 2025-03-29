@@ -55,7 +55,7 @@ public static class Levels
                     // Check if the mod author accidentally included a vanilla preset (and all of its valuables) in their bundle
                     if (valuablePreset.GetCombinedList().Count > 0)
                     {
-                        Logger.LogWarning($"Proxy preset \"{valuablePreset.name}\" in level \"{level.name}\" contains valuables! This might have caused duplicate valuables to load!");
+                        Logger.LogWarning($"Proxy preset \"{valuablePreset.name}\" in level \"{level.name}\" contains valuables! This likely caused duplicate valuables to load!");
                     }
                     
                     level.ValuablePresets[i] = foundPreset;
