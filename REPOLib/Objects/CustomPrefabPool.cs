@@ -31,22 +31,6 @@ public class CustomPrefabPool : IPunPrefabPool
 
     private DefaultPool _defaultPool;
 
-    public IPunPrefabPool OtherPool
-    {
-        get => _otherPool;
-        set
-        {
-            if (value is DefaultPool || value is CustomPrefabPool)
-            {
-                return;
-            }
-
-            _otherPool = value;
-        }
-    }
-
-    private IPunPrefabPool _otherPool;
-
     public CustomPrefabPool()
     {
 
@@ -131,15 +115,32 @@ public class CustomPrefabPool : IPunPrefabPool
 
     public GameObject Instantiate(string prefabId, Vector3 position, Quaternion rotation)
     {
+        if (string.IsNullOrWhiteSpace(prefabId))
+        {
+            throw new ArgumentException("CustomPrefabPool: failed to spawn network prefab. PrefabId is null.");
+        }
+
+        if (position == null)
+        {
+            position = Vector3.zero;
+            Logger.LogError($"CustomPrefabPool: tried to spawn network prefab \"{prefabId}\" with an invalid position. Using default position.");
+        }
+
+        if (rotation == null)
+        {
+            rotation = Quaternion.identity;
+            Logger.LogError($"CustomPrefabPool: tried to spawn network prefab \"{prefabId}\" with an invalid rotation. Using default rotation.");
+        }
+
         GameObject result;
 
         if (!Prefabs.TryGetValue(prefabId, out GameObject prefab, ignoreKeyCase: true))
         {
             result = DefaultPool.Instantiate(prefabId, position, rotation);
 
-            if (result == null && OtherPool != null)
+            if (result == null)
             {
-                result = OtherPool.Instantiate(prefabId, position, rotation);
+                Logger.LogError($"CustomPrefabPool: failed to spawn network prefab \"{prefabId}\". GameObject is null.");
             }
 
             return result;

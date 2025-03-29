@@ -26,6 +26,11 @@ internal static class Logger
         Log(LogLevel.Error, data, extended);
     }
 
+    public static void LogFatal(object data, bool extended = false)
+    {
+        Log(LogLevel.Fatal, data, extended);
+    }
+
     public static void Log(LogLevel logLevel, object data, bool extended = false)
     {
         if (extended && !IsExtendedLoggingEnabled())
