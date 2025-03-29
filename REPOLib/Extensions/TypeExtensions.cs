@@ -6,7 +6,7 @@ namespace REPOLib.Extensions;
 
 internal static class TypeExtensions
 {
-    public static IEnumerable<MethodInfo?> SafeGetMethods(this Type type)
+    public static IEnumerable<MethodInfo> SafeGetMethods(this Type type)
     {
         try
         {
@@ -14,8 +14,8 @@ internal static class TypeExtensions
         }
         catch /*(Exception ex)*/
         {
-            //Logger.LogWarning($"Error retrieving methods for type {type.FullName}: {ex.Message}");
-            return null;
+            // Logger.LogWarning($"Error retrieving methods for type {type.FullName}: {ex.Message}");
+            return Array.Empty<MethodInfo>();
         }
     }
 }
