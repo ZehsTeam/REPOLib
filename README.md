@@ -11,6 +11,7 @@
 - **Registering valuables.**
 - **Registering items.**
 - **Registering enemies.**
+- **Registering levels.**
 - ResourcesHelper to help get network prefab IDs.
 - Method to spawn network prefabs. (Which works in both multiplayer and singleplayer)
 - Methods to get valuables and spawn valuables.
@@ -171,6 +172,32 @@ public class YourMod : BaseUnityPlugin
     }
 }
 ```
+</details>
+
+
+<details><summary>Levels</summary><br>
+
+Registering a level.
+```cs
+[BepInPlugin("You.YourMod", "YourMod", "1.0.0")]
+[BepInDependency(REPOLib.MyPluginInfo.PLUGIN_GUID, BepInDependency.DependencyFlags.HardDependency)]
+public class YourMod : BaseUnityPlugin
+{
+    // ...
+
+    private void Awake()
+    {
+        // ...
+
+        AssetBundle assetBundle = AssetBundle.LoadFromFile("your_assetbundle_file_path");
+        Level level = assetBundle.LoadAsset<Level>("your_level");
+
+        // Register a level.
+        REPOLib.Modules.Levels.RegisterLevel(level);
+    }
+}
+```
+
 </details>
 
 <details><summary>Chat commands</summary><br>
