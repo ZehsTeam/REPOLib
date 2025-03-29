@@ -22,7 +22,7 @@ internal static class CommandManager
 
         CommandInitializerMethods = AccessTools.AllTypes()
             .SelectMany(type => type.SafeGetMethods())
-            .Where(method => method?.GetCustomAttribute<CommandInitializerAttribute>() != null)
+            .Where(method => method.GetCustomAttribute<CommandInitializerAttribute>() != null)
             .ToList();
 
         foreach (var command in CommandInitializerMethods)
@@ -61,7 +61,7 @@ internal static class CommandManager
     {
         _commandExecutionMethodCache = AccessTools.AllTypes()
             .SelectMany(type => type.SafeGetMethods())
-            .Where(method => method?.GetCustomAttribute<CommandExecutionAttribute>() != null)
+            .Where(method => method.GetCustomAttribute<CommandExecutionAttribute>() != null)
             .ToList();
 
         foreach (var method in _commandExecutionMethodCache)
