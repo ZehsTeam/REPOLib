@@ -7,7 +7,7 @@
     
     <AssemblyName>$(MSBuildProjectName)</AssemblyName> <!-- PLUGIN_GUID -->
     <Product>$(MSBuildProjectName)</Product>           <!-- PLUGIN_NAME -->
-    <Version>1.5.0</Version>                           <!-- PLUGIN_VERSION -->
+    <!-- <Version/> is handled by MinVer with Git tags -->
     <Authors>Zehs</Authors>
     <Description>Library for adding content to R.E.P.O.</Description>
     <PackageTags>R.E.P.O., unity, bepinex, photon-pun, modding</PackageTags>
@@ -24,16 +24,13 @@
     <PackageId>Zehs.$(AssemblyName)</PackageId>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
-    
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
+    <!-- Trim the project path in debug symbols -->
+    <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
     
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;
@@ -41,6 +38,14 @@
       https://nuget.samboy.dev/v3/index.json;
     </RestoreAdditionalProjectSources>
   </PropertyGroup>
+  
+  <!-- Target 'AddGeneratedFile' is from BepInEx.PluginInfoProps -->
+  <Target Name="SetPluginVersion" BeforeTargets="AddGeneratedFile" DependsOnTargets="MinVer">
+      <PropertyGroup>
+          <PlainVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</PlainVersion>
+          <BepInExPluginVersion>$(PlainVersion)</BepInExPluginVersion>
+      </PropertyGroup>
+  </Target>
   
   <Target Name="ClearReferenceCopyLocalPaths" AfterTargets="ResolveAssemblyReferences">
     <ItemGroup>
@@ -60,32 +65,45 @@
   <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
-    <PackageReference Include="BepInEx.Core" Version="5.*" />
-    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.21" IncludeAssets="compile" PrivateAssets="all" />
-    <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.1.2-ngd.0" />
+    <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.1.2-ngd.0" PrivateAssets="all"/>
   </ItemGroup>
-  
-  <!-- Import settings from .csproj.user file -->
-  <Import Project="$(MSBuildProjectFile).user" Condition="Exists('$(MSBuildProjectFile).user')" />
   
   <!-- Default values in case the .csproj.user file doesn't exist -->
   <PropertyGroup>
     <GaleProfile Condition="'$(GaleProfile)' == ''">Mod Development</GaleProfile>
-    <GaleDataFolder Condition="'$(GaleDataFolder)' == ''">$(AppData)\com.kesomannen.gale/</GaleDataFolder>
+    <GaleDataFolder Condition="'$(GaleDataFolder)' == ''">$(AppData)\com.kesomannen.gale</GaleDataFolder>
   </PropertyGroup>
   
   <PropertyGroup>
-    <!-- Gale plugins folder -->
-    <GalePluginsFolder>$(GaleDataFolder)\repo\profiles\$(GaleProfile)\BepInEx\plugins</GalePluginsFolder>
-    
-    <!-- Gale plugin folder -->
-    <GalePluginFolder>$(GalePluginsFolder)\Zehs-$(MSBuildProjectName)</GalePluginFolder>
+    <BepInExPluginsFolder Condition="'$(BepInExPluginsFolder)' == ''">$(GaleDataFolder)\repo\profiles\$(GaleProfile)\BepInEx\plugins\</BepInExPluginsFolder>
+    <REPOLibPluginFolder Condition="'$(REPOLibPluginFolder)' == ''">$(BepInExPluginsFolder)Zehs-$(MSBuildProjectName)\</REPOLibPluginFolder>
   </PropertyGroup>
   
   <!-- Copy DLL to Gale Zehs-REPOLib plugin folder -->
-  <Target Name="CopyToGalePluginFolder" AfterTargets="PostBuildEvent">
-    <Copy DestinationFolder="$(GalePluginFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
+  <Target Name="CopyToPluginsFolder" AfterTargets="PostBuildEvent" Condition="Exists('$(BepInExPluginsFolder)')">
+    <Copy DestinationFolder="$(REPOLibPluginFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
+  </Target>
+
+  <Target Name="ValidateCopiedPlugin" AfterTargets="CopyToPluginsFolder" Condition="!Exists('$(BepInExPluginsFolder)') And $(CI) != 'true'" >
+    <Warning Text="Couldn't copy build target to '$(BepInExPluginsFolder)' because the path does not exist. Configure the path in your REPOLib.csproj.user file."/>
+  </Target>
+
+  <!-- Call with `dotnet build -target:PackThunderstore` -->
+  <Target Name="PackThunderstore" DependsOnTargets="PostBuildEvent;SetPluginVersion">
+    <Exec Command="dotnet tool restore" />
+    <Exec Command="dotnet tcli build --config-path &quot;$(ProjectDir)Thunderstore/thunderstore.toml&quot; --package-version $(PlainVersion)" />
+    <ItemGroup>
+      <FilesToRename Include="$(ProjectDir)dist/*-$(PlainVersion).zip" />
+    </ItemGroup>
+    <Move SourceFiles="@(FilesToRename)" DestinationFiles="@(FilesToRename -&gt; Replace($(PlainVersion), $(MinVerVersion)))" />
+  </Target>
+
+  <!-- This is manually called by the github actions publish workflow -->
+  <Target Name="PublishThunderstore" DependsOnTargets="PackThunderstore">
+    <Exec Command="dotnet tcli publish --config-path &quot;$(ProjectDir)Thunderstore/thunderstore.toml&quot; --file &quot;$(SolutionDir)artifacts/thunderstore/Zehs-REPOLib-$(MinVerVersion).zip&quot;" />
   </Target>
 </Project>

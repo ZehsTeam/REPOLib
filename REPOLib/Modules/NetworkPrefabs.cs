@@ -36,9 +36,9 @@ public static class NetworkPrefabs
         {
             CustomPrefabPool.DefaultPool = defaultPool;
         }
-        else
+        else if (PhotonNetwork.PrefabPool is not Objects.CustomPrefabPool)
         {
-            CustomPrefabPool.OtherPool = PhotonNetwork.PrefabPool;
+            Logger.LogWarning($"PhotonNetwork has an unknown prefab pool assigned. PhotonNetwork.PrefabPool = {PhotonNetwork.PrefabPool.GetType()}");
         }
 
         PhotonNetwork.PrefabPool = CustomPrefabPool;

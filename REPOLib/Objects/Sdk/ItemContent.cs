@@ -5,8 +5,10 @@ namespace REPOLib.Objects.Sdk;
 [CreateAssetMenu(menuName = "REPOLib/Item", order = 2, fileName = "New Item")]
 public class ItemContent : Content
 {
+    #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
     private ItemAttributes _prefab;
+    #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     public ItemAttributes Prefab => _prefab;
 

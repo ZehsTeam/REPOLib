@@ -1,6 +1,8 @@
-﻿using HarmonyLib;
+﻿using BepInEx;
+using HarmonyLib;
 using REPOLib.Commands;
 using REPOLib.Modules;
+using System.Linq;
 
 namespace REPOLib.Patches;
 
@@ -12,7 +14,7 @@ internal static class RunManagerPatch
     [HarmonyPatch(nameof(RunManager.Awake))]
     [HarmonyPostfix]
     [HarmonyPriority(Priority.Last)]
-    private static void AwakePatch()
+    private static void AwakePatch(RunManager __instance)
     {
         if (_patchedAwake) return;
         _patchedAwake = true;
@@ -20,8 +22,9 @@ internal static class RunManagerPatch
         NetworkPrefabs.Initialize();
         NetworkingEvents.Initialize();
         Levels.RegisterLevels();
-        Valuables.RegisterValuables();
+        Valuables.RegisterInitialValuables();
 
-        CommandManager.Initialize();
+        BundleLoader.OnAllBundlesLoaded += CommandManager.Initialize;
+        BundleLoader.FinishLoadOperations(__instance);
     }
 }
