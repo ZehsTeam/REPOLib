@@ -39,7 +39,7 @@ public class Mod : ScriptableObject
     public string WebsiteUrl => _websiteUrl;
     public IReadOnlyList<string> Dependencies => _dependencies;
     public Sprite Icon => _icon;
-    public TextAsset Readme => _readme; 
+    public TextAsset Readme => _readme;
 
     public string FullName => $"{Author}-{Name}";
     // also known as a dependency string
