@@ -14,11 +14,11 @@ public static class Levels
     private static readonly List<Level> _levelsToRegister = [];
     private static readonly List<Level> _levelsRegistered = [];
 
-    private static bool _canRegisterLevels = true;
+    private static bool _initialLevelsRegistered;
 
-    internal static void RegisterLevels()
+    internal static void RegisterInitialLevels()
     {
-        if (!_canRegisterLevels)
+        if (_initialLevelsRegistered)
         {
             return;
         }
@@ -27,55 +27,59 @@ public static class Levels
 
         Logger.LogInfo($"Adding levels.");
         
-        foreach (var level in _levelsToRegister)
-        {
-            if (_levelsRegistered.Contains(level))
-            {
-                continue;
-            }
-
-            if (level.ValuablePresets.Count == 0)
-            {
-                Logger.LogWarning($"Level \"{level.name}\" does not have any valuable presets! Adding generic preset.");
-                level.ValuablePresets.Add(ValuablePresets.GenericPreset);
-            }
-
-            for (int i = 0; i < level.ValuablePresets.Count; i++)
-            {
-                var valuablePreset = level.ValuablePresets[i];
-
-                if (ValuablePresets.AllValuablePresets.Values.Contains(valuablePreset))
-                {
-                    continue;
-                }
-                
-                // This allows custom levels to use vanilla presets, by using a proxy preset with the same name
-                if (ValuablePresets.AllValuablePresets.TryGetValue(valuablePreset.name, out var foundPreset))
-                {
-                    // Check if the mod author accidentally included a vanilla preset (and all of its valuables) in their bundle
-                    if (valuablePreset.GetCombinedList().Count > 0)
-                    {
-                        Logger.LogWarning($"Proxy preset \"{valuablePreset.name}\" in level \"{level.name}\" contains valuables! This likely caused duplicate valuables to load!");
-                    }
-                    
-                    level.ValuablePresets[i] = foundPreset;
-                    Logger.LogInfo($"Replaced proxy preset \"{valuablePreset.name}\" in level \"{level.name}\".", extended: true);
-                }
-                else
-                {
-                    ValuablePresets.RegisterValuablePreset(valuablePreset);
-                    Logger.LogInfo($"Registered valuable preset \"{valuablePreset.name}\" from \"{level.name}\".", extended: true);
-                }
-            }
-
-            RunManager.instance.levels.Add(level);
-            Logger.LogInfo($"Added level \"{level.name}\"", extended: true);
-            
-            _levelsRegistered.Add(level);
+        foreach (var level in _levelsToRegister) {
+            RegisterLevelWithGame(level);
         }
 
         _levelsToRegister.Clear();
-        _canRegisterLevels = false;
+        _initialLevelsRegistered = true;
+    }
+
+    static void RegisterLevelWithGame(Level level)
+    {
+        if (_levelsRegistered.Contains(level)) 
+        {
+            return;
+        }
+
+        if (level.ValuablePresets.Count == 0)
+        {
+            Logger.LogWarning($"Level \"{level.name}\" does not have any valuable presets! Adding generic preset.");
+            level.ValuablePresets.Add(ValuablePresets.GenericPreset);
+        }
+
+        for (int i = 0; i < level.ValuablePresets.Count; i++)
+        {
+            var valuablePreset = level.ValuablePresets[i];
+
+            if (ValuablePresets.AllValuablePresets.Values.Contains(valuablePreset))
+            {
+                continue;
+            }
+                
+            // This allows custom levels to use vanilla presets, by using a proxy preset with the same name
+            if (ValuablePresets.AllValuablePresets.TryGetValue(valuablePreset.name, out var foundPreset))
+            {
+                // Check if the mod author accidentally included a vanilla preset (and all of its valuables) in their bundle
+                if (valuablePreset.GetCombinedList().Count > 0)
+                {
+                    Logger.LogWarning($"Proxy preset \"{valuablePreset.name}\" in level \"{level.name}\" contains valuables! This likely caused duplicate valuables to load!");
+                }
+                    
+                level.ValuablePresets[i] = foundPreset;
+                Logger.LogInfo($"Replaced proxy preset \"{valuablePreset.name}\" in level \"{level.name}\".", extended: true);
+            }
+            else
+            {
+                ValuablePresets.RegisterValuablePreset(valuablePreset);
+                Logger.LogInfo($"Registered valuable preset \"{valuablePreset.name}\" from \"{level.name}\".", extended: true);
+            }
+        }
+
+        RunManager.instance.levels.Add(level);
+        Logger.LogInfo($"Added level \"{level.name}\"", extended: true);
+            
+        _levelsRegistered.Add(level);
     }
 
     public static void RegisterLevel(Level level)
@@ -83,12 +87,6 @@ public static class Levels
         if (level == null)
         {
             Logger.LogError($"Failed to register level. Level is null.");
-            return;
-        }
-
-        if (!_canRegisterLevels)
-        {
-            Logger.LogError($"Failed to register level \"{level.name}\". You can only register levels from your plugins awake!");
             return;
         }
         
@@ -149,7 +147,14 @@ public static class Levels
             Utilities.FixAudioMixerGroups(prefab);
         }
 
-        _levelsToRegister.Add(level);
+        if (_initialLevelsRegistered)
+        {
+            RegisterLevelWithGame(level);
+        }
+        else 
+        {
+            _levelsToRegister.Add(level);
+        }
     }
 
     public static IReadOnlyList<Level> GetLevels()
