@@ -193,7 +193,7 @@ public static class YourCommand
         "Your Command Name",
         "Description of what the command does and how to use it.",
         enabledByDefault: true,
-        requiresDeveloperMode: false,
+        requiresDeveloperMode: false
         )]
     [CommandAlias("yourcommand")]
     [CommandAlias("yourcmd")]
