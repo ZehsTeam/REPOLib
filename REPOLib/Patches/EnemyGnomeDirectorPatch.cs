@@ -34,7 +34,7 @@ internal static class EnemyGnomeDirectorPatch
             {
                 // Replace original method call with replacement method call
                 modifiedInstructions.Add(new CodeInstruction(OpCodes.Call, replacementMethod));
-                Logger.LogInfo($"EnemyGnomeDirectorPatch: AwakeTranspiler replaced {originalMethod.Name} call with {replacementMethod.Name}.", extended: true);
+                Logger.LogDebug($"EnemyGnomeDirectorPatch: AwakeTranspiler replaced {originalMethod.Name} call with {replacementMethod.Name}.", extended: true);
                 continue;
             }
 

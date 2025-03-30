@@ -63,7 +63,7 @@ public class CustomPrefabPool : IPunPrefabPool
 
         Prefabs[prefabId] = prefab;
 
-        Logger.LogInfo($"CustomPrefabPool: registered network prefab \"{prefabId}\"", extended: true);
+        Logger.LogDebug($"CustomPrefabPool: registered network prefab \"{prefabId}\"", extended: true);
         return true;
     }
 

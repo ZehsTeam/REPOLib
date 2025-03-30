@@ -91,7 +91,7 @@ public static class Valuables
             if (_valuablePresets[presetName].AddValuable(valuable))
             {
                 _valuablesRegistered.Add(valuable);
-                Logger.LogInfo($"Added valuable \"{valuable.name}\" to valuable preset \"{presetName}\"", extended: true);
+                Logger.LogDebug($"Added valuable \"{valuable.name}\" to valuable preset \"{presetName}\"", extended: true);
             }
             else
             {

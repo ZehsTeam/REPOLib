@@ -80,7 +80,7 @@ public static class BundleLoader
                     
                     if (progress.HasValue) msg += $" {progress.Value:P0}";
                     
-                    Logger.LogInfo(msg, extended: true);
+                    Logger.LogDebug(msg, extended: true);
                 }
             }
             
