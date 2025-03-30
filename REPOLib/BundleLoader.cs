@@ -1,5 +1,4 @@
-﻿using BepInEx;
-using REPOLib.Modules;
+﻿using REPOLib.Modules;
 using REPOLib.Objects.Sdk;
 using System;
 using System.Collections;

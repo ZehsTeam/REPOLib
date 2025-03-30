@@ -40,7 +40,7 @@ public static class Enemies
             return;
         }
 
-        if (!enemy.spawnObjects[0].TryGetComponent(out EnemyParent enemyParent))
+        if (!enemy.TryGetEnemyParent(out EnemyParent enemyParent))
         {
             return;
         }
@@ -48,11 +48,11 @@ public static class Enemies
         if (EnemyDirector.instance.AddEnemy(enemy))
         {
             _enemiesRegistered.Add(enemy);
-            Logger.LogInfo($"Added enemy \"{enemy.spawnObjects[0].name}\" to difficulty {enemyParent.difficulty.ToString()}", extended: true);
+            Logger.LogInfo($"Added enemy \"{enemyParent.enemyName}\" to difficulty {enemyParent.difficulty}", extended: true);
         }
         else
         {
-            Logger.LogWarning($"Failed to add enemy \"{enemy.spawnObjects[0].name}\" to difficulty {enemyParent.difficulty.ToString()}", extended: true);
+            Logger.LogWarning($"Failed to add enemy \"{enemyParent.enemyName}\" to difficulty {enemyParent.difficulty}", extended: true);
         }
     }
 
@@ -71,10 +71,10 @@ public static class Enemies
             return;
         }
 
-        if (!_initialEnemiesRegistered)
-        {
-            Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". You can only register enemies in awake!");
-        }
+        //if (!_initialEnemiesRegistered)
+        //{
+        //    Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". You can only register enemies in awake!");
+        //}
 
         if (ResourcesHelper.HasEnemyPrefab(enemySetup))
         {
