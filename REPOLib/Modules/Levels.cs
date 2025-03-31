@@ -27,7 +27,8 @@ public static class Levels
 
         Logger.LogInfo($"Adding levels.");
         
-        foreach (var level in _levelsToRegister) {
+        foreach (var level in _levelsToRegister)
+        {
             RegisterLevelWithGame(level);
         }
 
@@ -56,7 +57,7 @@ public static class Levels
             {
                 continue;
             }
-                
+            
             // This allows custom levels to use vanilla presets, by using a proxy preset with the same name
             if (ValuablePresets.AllValuablePresets.TryGetValue(valuablePreset.name, out var foundPreset))
             {
@@ -65,7 +66,7 @@ public static class Levels
                 {
                     Logger.LogWarning($"Proxy preset \"{valuablePreset.name}\" in level \"{level.name}\" contains valuables! This likely caused duplicate valuables to load!");
                 }
-                    
+                
                 level.ValuablePresets[i] = foundPreset;
                 Logger.LogInfo($"Replaced proxy preset \"{valuablePreset.name}\" in level \"{level.name}\".", extended: true);
             }
@@ -78,7 +79,7 @@ public static class Levels
 
         RunManager.instance.levels.Add(level);
         Logger.LogInfo($"Added level \"{level.name}\"", extended: true);
-            
+        
         _levelsRegistered.Add(level);
     }
 

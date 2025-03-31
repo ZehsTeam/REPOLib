@@ -43,8 +43,8 @@ public static class ResourcesHelper
             LevelPrefabType.StartRoom => "Start Room",
             _ => string.Empty
         };
-        
-        return Path.Combine("Level", level.ResourcePath, folder);
+
+        return Path.Combine("Level", level.ResourcePath, folder).ConvertBackToForwardSlash();
     }
     #endregion
 
@@ -145,7 +145,7 @@ public static class ResourcesHelper
 
         string folderPath = GetLevelPrefabsFolderPath(level, type);
 
-        return Path.Combine(folderPath, prefab.name);
+        return Path.Combine(folderPath, prefab.name).ConvertBackToForwardSlash();
     }
     #endregion
 
