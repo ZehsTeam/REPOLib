@@ -44,7 +44,7 @@ internal static class SemiFuncPatch
                     return false;
                 }
             }
-            if (execAttribute != null &&  execAttribute.RequiresDeveloperMode == true && !SteamManager.instance.developerMode)
+            if (execAttribute != null &&  execAttribute.RequiresDeveloperMode && !ConfigManager.DeveloperMode.Value)
             {
                 Logger.LogWarning($"Command {command} requires developer mode to be enabled. Enable it in REPOLib.cfg");
                 return false;

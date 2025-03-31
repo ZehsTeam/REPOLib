@@ -11,12 +11,11 @@ public static class Valuables
     public static IReadOnlyList<GameObject> AllValuables => GetValuables();
     public static IReadOnlyList<GameObject> RegisteredValuables => _valuablesRegistered;
     private static IEnumerable<GameObject> PendingAndRegisteredValuables => _valuablesToRegister.Keys.Concat(_valuablesRegistered);
-
     
     private static readonly Dictionary<GameObject, List<string>> _valuablesToRegister = [];
     private static readonly List<GameObject> _valuablesRegistered = [];
 
-    private static bool _initialValuablesRegistered = true;
+    private static bool _initialValuablesRegistered;
     
     internal static void RegisterInitialValuables()
     {
@@ -47,7 +46,7 @@ public static class Valuables
 
         if (!presetNames.Any(x => ValuablePresets.AllValuablePresets.Keys.Any(y => x == y)))
         {
-            Logger.LogError($"Valuable \"{valuable.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
+            Logger.LogWarning($"Valuable \"{valuable.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
             presetNames.Add(ValuablePresets.GenericValuablePresetName);
         }
 
@@ -55,7 +54,7 @@ public static class Valuables
         {
             if (presetName == null || !ValuablePresets.AllValuablePresets.ContainsKey(presetName))
             {
-                Logger.LogError($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\". The valuable preset does not exist.");
+                Logger.LogWarning($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\". The valuable preset does not exist.");
                 continue;
             }
 
@@ -120,7 +119,7 @@ public static class Valuables
 
         if (presetNames == null || presetNames.Count == 0)
         {
-            //Logger.LogInfo($"No valuable presets specified for valuable \"{prefab.name}\". Adding valuable to generic preset.", extended: true);
+            Logger.LogWarning($"Valuable \"{valuableObject.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.", extended: true);
             presetNames = [ValuablePresets.GenericValuablePresetName];
         }
 
@@ -148,6 +147,7 @@ public static class Valuables
         Utilities.FixAudioMixerGroups(prefab);
 
         _valuablesToRegister.Add(prefab, presetNames);
+
         if (_initialValuablesRegistered)
         {
             RegisterValuableWithGame(valuableObject.gameObject);

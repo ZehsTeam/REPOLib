@@ -9,6 +9,7 @@ internal static class ConfigManager
 
     public static ConfigEntry<bool> ExtendedLogging { get; private set; }
     public static ConfigEntry<bool> DeveloperMode { get; private set; }
+    public static ConfigEntry<bool> VanillaDeveloperMode { get; private set; }
 
     public static void Initialize(ConfigFile configFile)
     {
@@ -18,9 +19,10 @@ internal static class ConfigManager
 
     private static void BindConfigs()
     {
-        ExtendedLogging = ConfigFile.Bind("General", "ExtendedLogging", defaultValue: false, "Enable extended logging.");
-        DeveloperMode = ConfigFile.Bind("General", "DeveloperMode", defaultValue: false, "Enable developer mode cheats for testing.");
+        ExtendedLogging =      ConfigFile.Bind("General", "ExtendedLogging",      defaultValue: false, "Enable extended logging.");
+        DeveloperMode =        ConfigFile.Bind("General", "DeveloperMode",        defaultValue: false, "Enable developer mode cheats for testing.");
+        VanillaDeveloperMode = ConfigFile.Bind("General", "VanillaDeveloperMode", defaultValue: false, "Enable vanilla developer mode cheats for testing.");
 
-        DeveloperMode.SettingChanged += (object sender, System.EventArgs e) => SteamManagerPatch.UpdateDeveloperMode();
+        VanillaDeveloperMode.SettingChanged += (object sender, System.EventArgs e) => SteamManagerPatch.UpdateDeveloperMode();
     }
 }
