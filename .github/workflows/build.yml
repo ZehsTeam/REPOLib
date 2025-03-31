@@ -30,3 +30,19 @@ jobs:
       - name: Build
         run: |
           dotnet build -c Release
+
+      - name: Pack Thunderstore
+        run: |
+          dotnet pack -c Release --no-build -target:PackThunderstore
+
+      - name: Upload Thunderstore artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: thunderstore-build
+          path: ./artifacts/thunderstore/*.zip
+
+      - name: Upload nupkg artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg-build
+          path: ./artifacts/package/release/*.zip
