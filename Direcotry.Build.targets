@@ -1,0 +1,17 @@
+<Project>
+
+  <ItemGroup>
+    <!--
+      Give us Nullable attributes missing from .NET Standard 2.1:
+      - MemberNotNullAttribute
+      - MemberNotNullWhenAttribute
+      https://github.com/manuelroemer/Nullable
+    -->
+    <PackageReference
+      Include="Nullable"
+      Version="1.3.1"
+      PrivateAssets="all"
+    />
+  </ItemGroup>
+
+</Project>
