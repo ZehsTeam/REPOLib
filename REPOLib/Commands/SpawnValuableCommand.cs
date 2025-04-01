@@ -47,7 +47,7 @@ internal static class SpawnValuableCommand
 
         Logger.LogInfo($"Trying to spawn valuable \"{name}\" at {position}...", extended: true);
 
-        if (!Valuables.TryGetValuableThatContainsName(name, out ValuableObject valuableObject))
+        if (!Valuables.TryGetValuableThatContainsName(name, out ValuableObject? valuableObject))
         {
             Logger.LogWarning($"Spawn command failed. Unknown valuable with name \"{name}\"");
             return;

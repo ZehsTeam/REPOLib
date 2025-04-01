@@ -48,7 +48,7 @@ public static class Utilities
         _fixedPrefabs.Add(prefab);
     }
 
-    internal static void SafeInvokeEvent(Action action)
+    internal static void SafeInvokeEvent(Action? action)
     {
         try
         {

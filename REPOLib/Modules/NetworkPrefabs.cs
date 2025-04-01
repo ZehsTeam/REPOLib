@@ -19,7 +19,7 @@ public static class NetworkPrefabs
         }
     }
     
-    private static CustomPrefabPool _customPrefabPool;
+    private static CustomPrefabPool? _customPrefabPool;
 
     internal static void Initialize()
     {
@@ -50,7 +50,7 @@ public static class NetworkPrefabs
 
     public static void RegisterNetworkPrefab(GameObject prefab)
     {
-        RegisterNetworkPrefab(prefab?.name, prefab);
+        RegisterNetworkPrefab(prefab?.name!, prefab!);
     }
 
     public static void RegisterNetworkPrefab(string prefabId, GameObject prefab)
@@ -98,7 +98,7 @@ public static class NetworkPrefabs
     //}
     #endregion
 
-    public static GameObject SpawnNetworkPrefab(string prefabId, Vector3 position, Quaternion rotation, byte group = 0, object[] data = null)
+    public static GameObject? SpawnNetworkPrefab(string prefabId, Vector3 position, Quaternion rotation, byte group = 0, object[]? data = null)
     {
         if (string.IsNullOrWhiteSpace(prefabId))
         {

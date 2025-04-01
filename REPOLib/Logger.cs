@@ -4,7 +4,7 @@ namespace REPOLib;
 
 internal static class Logger
 {
-    public static ManualLogSource ManualLogSource { get; private set; }
+    public static ManualLogSource ManualLogSource { get; private set; } = null!;
 
     public static void Initialize(ManualLogSource manualLogSource)
     {

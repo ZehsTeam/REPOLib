@@ -5,11 +5,11 @@ namespace REPOLib;
 
 internal static class ConfigManager
 {
-    public static ConfigFile ConfigFile { get; private set; }
+    public static ConfigFile ConfigFile { get; private set; } = null!;
 
-    public static ConfigEntry<bool> ExtendedLogging { get; private set; }
-    public static ConfigEntry<bool> DeveloperMode { get; private set; }
-    public static ConfigEntry<bool> VanillaDeveloperMode { get; private set; }
+    public static ConfigEntry<bool> ExtendedLogging { get; private set; } = null!;
+    public static ConfigEntry<bool> DeveloperMode { get; private set; } = null!;
+    public static ConfigEntry<bool> VanillaDeveloperMode { get; private set; } = null!;
 
     public static void Initialize(ConfigFile configFile)
     {

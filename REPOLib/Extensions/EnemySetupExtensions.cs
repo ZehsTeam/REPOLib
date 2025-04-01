@@ -1,6 +1,7 @@
 ﻿using REPOLib.Objects;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
 
@@ -33,12 +34,12 @@ public static class EnemySetupExtensions
             .ToList();
     }
 
-    public static GameObject GetMainSpawnObject(this EnemySetup enemySetup)
+    public static GameObject? GetMainSpawnObject(this EnemySetup enemySetup)
     {
         return GetEnemyParent(enemySetup)?.gameObject;
     }
 
-    public static EnemyParent GetEnemyParent(this EnemySetup enemySetup)
+    public static EnemyParent? GetEnemyParent(this EnemySetup enemySetup)
     {
         foreach (var spawnObject in GetDistinctSpawnObjects(enemySetup))
         {
@@ -51,7 +52,7 @@ public static class EnemySetupExtensions
         return null;
     }
 
-    public static bool TryGetEnemyParent(this EnemySetup enemySetup, out EnemyParent enemyParent)
+    public static bool TryGetEnemyParent(this EnemySetup enemySetup, [NotNullWhen(true)] out EnemyParent? enemyParent)
     {
         enemyParent = enemySetup.GetEnemyParent();
         return enemyParent != null;
@@ -89,7 +90,7 @@ public static class EnemySetupExtensions
             return true;
         }
 
-        if (enemySetup.TryGetEnemyParent(out EnemyParent enemyParent))
+        if (enemySetup.TryGetEnemyParent(out EnemyParent? enemyParent))
         {
             if (enemyParent.enemyName.Equals(name, StringComparison.OrdinalIgnoreCase))
             {
@@ -117,7 +118,7 @@ public static class EnemySetupExtensions
             return true;
         }
 
-        if (enemySetup.TryGetEnemyParent(out EnemyParent enemyParent))
+        if (enemySetup.TryGetEnemyParent(out EnemyParent? enemyParent))
         {
             if (enemyParent.enemyName.Contains(name, StringComparison.OrdinalIgnoreCase))
             {

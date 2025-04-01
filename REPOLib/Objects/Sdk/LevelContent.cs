@@ -7,7 +7,7 @@ public class LevelContent : Content
 {
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
-    private Level _level;
+    private Level _level = null!;
     #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     public Level Level => _level;

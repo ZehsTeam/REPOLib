@@ -46,7 +46,7 @@ internal static class SpawnItemCommand
 
         Logger.LogInfo($"Trying to spawn item \"{name}\" at {position}...", extended: true);
 
-        if (!Items.TryGetItemThatContainsName(name, out Item item))
+        if (!Items.TryGetItemThatContainsName(name, out Item? item))
         {
             Logger.LogWarning($"Spawn command failed. Unknown item with name \"{name}\"");
             return;

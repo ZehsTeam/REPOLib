@@ -1,6 +1,7 @@
 ﻿using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
 
@@ -168,13 +169,13 @@ public static class Levels
         return RunManager.instance.levels;
     }
 
-    public static bool TryGetLevelByName(string name, out Level level)
+    public static bool TryGetLevelByName(string name, [NotNullWhen(true)] out Level? level)
     {
         level = GetLevelByName(name);
         return level != null;
     }
 
-    public static Level GetLevelByName(string name)
+    public static Level? GetLevelByName(string name)
     {
         foreach (var level in GetLevels())
         {
@@ -187,13 +188,13 @@ public static class Levels
         return default;
     }
 
-    public static bool TryGetLevelThatContainsName(string name, out Level valuableObject)
+    public static bool TryGetLevelThatContainsName(string name, [NotNullWhen(true)] out Level? valuableObject)
     {
         valuableObject = GetLevelThatContainsName(name);
         return valuableObject != null;
     }
 
-    public static Level GetLevelThatContainsName(string name)
+    public static Level? GetLevelThatContainsName(string name)
     {
         foreach (var level in GetLevels())
         {

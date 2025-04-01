@@ -26,6 +26,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- See: https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references -->
+    <Nullable>enable</Nullable>
     
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>

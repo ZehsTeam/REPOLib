@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace REPOLib.Extensions;
@@ -19,7 +20,7 @@ public static class EnemyDirectorExtensions
                 continue;
             }
 
-            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup> list))
+            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup>? list))
             {
                 continue;
             }
@@ -44,7 +45,7 @@ public static class EnemyDirectorExtensions
                 continue;
             }
 
-            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup> list))
+            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup>? list))
             {
                 continue;
             }
@@ -61,7 +62,7 @@ public static class EnemyDirectorExtensions
         return false;
     }
     
-    public static bool TryGetList(this EnemyDirector enemyDirector, EnemyParent.Difficulty difficultyType, out List<EnemySetup> list)
+    public static bool TryGetList(this EnemyDirector enemyDirector, EnemyParent.Difficulty difficultyType, [NotNullWhen(true)] out List<EnemySetup>? list)
     {
         list = difficultyType switch
         {

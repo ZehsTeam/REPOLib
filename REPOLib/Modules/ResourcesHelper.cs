@@ -105,7 +105,7 @@ public static class ResourcesHelper
             return string.Empty;
         }
 
-        GameObject mainSpawnObject = enemySetup.GetMainSpawnObject();
+        GameObject? mainSpawnObject = enemySetup.GetMainSpawnObject();
 
         if (mainSpawnObject == null)
         {
