@@ -96,11 +96,11 @@ public static class EnemySetupExtensions
             {
                 return true;
             }
-        }
 
-        if (enemyParent.gameObject.name.EqualsAny([name, $"Enemy - {name}"], StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
+            if (enemyParent.gameObject.name.EqualsAny([name, $"Enemy - {name}"], StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
         }
 
         return false;
@@ -124,11 +124,11 @@ public static class EnemySetupExtensions
             {
                 return true;
             }
-        }
 
-        if (enemyParent.gameObject.name.Contains(name, StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
+            if (enemyParent.gameObject.name.Contains(name, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
         }
 
         return false;
