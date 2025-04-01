@@ -15,9 +15,4 @@ public static class StringExtensions
 
         return inputs.Contains(value, StringComparer.FromComparison(comparisonType));
     }
-
-    public static string ConvertBackToForwardSlash(this string value)
-    {
-        return value.Replace("\\", "/");
-    }
 }
