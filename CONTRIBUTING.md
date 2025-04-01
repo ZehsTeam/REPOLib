@@ -12,7 +12,18 @@ For trying out the automatic publishing of the Thunderstore package, use `dotnet
 > [!NOTE]  
 > This project uses [MinVer](<https://github.com/adamralph/minver>) for versioning via git tags.
 
-New releases can be published by creating a new GitHub release, and setting the tag to a valid SemVer version, prefixed with `v`. GitHub Actions will then build the new version and automatically attach files to the new release, so don't add any files to the release manually. The Thunderstore package and NuGet package also get published.
+New releases can be published by pushing a new git tag prefixed with `v`. This publishes Thunderstore and NuGet packages with that version. Examples:
 
-- Examples: `v1.0.0`, `v1.1.1`.
-- To release a prerelease version, use the `dev`-prefix: `v1.1.1-dev`, `v1.1.1-dev.0`. Don't release a prerelease version though, since those aren't supported on Thunderstore and we haven't setup a separate Thunderstore package for a beta version.
+- Valid tags: `v1.0.0`, `v1.1.1`
+- NOT valid: `v1`, `v1.0`, `1.0.0`
+
+To release a prerelease version, use the `dev`-postfix:
+
+- Valid tags: `v1.0.0-dev`, `v1.1.1-dev`
+- NOT valid: `v1-dev`, `v1.0-dev`, `v1.0.0-dev.0`, `1.0.0-dev`
+
+Don't release a prerelease version though, since those aren't supported on Thunderstore and we haven't setup a separate Thunderstore package for a beta version.
+
+### Ensuring Validity of Packages Before Release
+
+A build workflow is run on every commit on the `main` branch, including on every PR (needs to be approved first). The workflow tries to mirror the publish workflow as closely as possible, and uploads the package artifacts for the workflow. For downloading these artifacts, see: <https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/downloading-workflow-artifacts>
