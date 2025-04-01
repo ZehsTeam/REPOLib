@@ -181,7 +181,10 @@ public static class Enemies
 
             enemyParents.Add(enemyParent);
 
-            SpawnNextEnemiesNotDespawned++;
+            if (!spawnDespawned)
+            {
+                SpawnNextEnemiesNotDespawned++;
+            }
 
             enemyParent.SetupDone = true;
 
