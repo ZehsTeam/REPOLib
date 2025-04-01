@@ -313,6 +313,7 @@ Printing all custom valuables:
 
 ```cs
 using REPOLib.Modules;
+using UnityEngine;
 
 foreach (var (source, valuables) in ContentRegistry.GetAll<ValuableObject>())
 {
@@ -343,6 +344,7 @@ foreach (Object content in ContentRegistry.GetAllFrom(source))
     if (content is ValuableObject) Debug.Log("Valuable");
     else if (content is Item) Debug.Log("Item");
     else if (content is EnemySetup) Debug.Log("Enemy");
+    else if (content is Level) Debug.Log("Level");
     else Debug.Log("Unknown");
 }
 ```
