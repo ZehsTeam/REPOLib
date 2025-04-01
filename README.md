@@ -304,6 +304,49 @@ ExampleEvent.RaiseEvent(message, REPOLib.Modules.NetworkingEvents.RaiseOthers, S
 ExampleEvent.RaiseEvent(message, REPOLib.Modules.NetworkingEvents.RaiseMasterClient, SendOptions.SendReliable);
 ```
 </details>
+
+<details> <summary>Content Registry</summary><br>
+
+REPOLib maintains a record of all registered content and their sources. This data can be accessed from `REPOLib.Modules.ContentRegistry`.
+
+Printing all custom valuables:
+
+```cs
+using REPOLib.Modules;
+
+foreach (var (source, valuables) in ContentRegistry.GetAll<ValuableObject>())
+{
+    Debug.Log($"Valuables from {source.Guid} ({source.Version}):");
+    foreach (var valuable in valuables)
+    {
+        Debug.Log(valuable.name);
+    }
+}
+```
+
+Getting all the content from a specific mod:
+
+```cs
+using REPOLib.Modules;
+using UnityEngine;
+
+// Find a source from a guid. If it isn't found, null is returned.
+var source = ContentRegistry.GetSource("DiscipleShadow-Pokeball_Valuables");
+if (source == null)
+{
+    Debug.LogError("Content source not found!");
+    return;
+}
+
+foreach (Object content in ContentRegistry.GetAllFrom(source))
+{
+    if (content is ValuableObject) Debug.Log("Valuable");
+    else if (content is Item) Debug.Log("Item");
+    else if (content is EnemySetup) Debug.Log("Enemy");
+    else Debug.Log("Unknown");
+}
+```
+</details>
 </details>
 
 > [!NOTE]
