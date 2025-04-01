@@ -74,7 +74,10 @@
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.21" IncludeAssets="compile" PrivateAssets="all" />
     <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.1.2-ngd.0" PrivateAssets="all"/>
   </ItemGroup>
-  
+    
+  <!-- Import settings from .csproj.user file -->
+  <Import Project="$(MSBuildProjectFile).user" Condition="Exists('$(MSBuildProjectFile).user')" />
+    
   <!-- Default values in case the .csproj.user file doesn't exist -->
   <PropertyGroup>
     <GaleProfile Condition="'$(GaleProfile)' == ''">Mod Development</GaleProfile>
