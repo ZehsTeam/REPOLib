@@ -29,7 +29,7 @@ public class CustomPrefabPool : IPunPrefabPool
         }
     }
 
-    private DefaultPool _defaultPool;
+    private DefaultPool? _defaultPool;
 
     public CustomPrefabPool()
     {
@@ -54,7 +54,7 @@ public class CustomPrefabPool : IPunPrefabPool
             return false;
         }
 
-        if (Prefabs.TryGetValue(prefabId, out GameObject value, ignoreKeyCase: true))
+        if (Prefabs.TryGetValue(prefabId, out GameObject? value, ignoreKeyCase: true))
         {
             LogLevel logLevel = value == prefab ? LogLevel.Warning: LogLevel.Error;
             Logger.Log(logLevel, $"CustomPrefabPool: failed to register network prefab \"{prefabId}\". There is already a prefab registered with the same prefab id.");
@@ -97,7 +97,7 @@ public class CustomPrefabPool : IPunPrefabPool
         return false;
     }
 
-    public string GetPrefabId(GameObject prefab)
+    public string? GetPrefabId(GameObject prefab)
     {
         if (prefab == null)
         {
@@ -108,12 +108,12 @@ public class CustomPrefabPool : IPunPrefabPool
         return Prefabs.GetKeyOrDefault(prefab);
     }
 
-    public GameObject GetPrefab(string prefabId)
+    public GameObject? GetPrefab(string prefabId)
     {
         return Prefabs.GetValueOrDefault(prefabId, ignoreKeyCase: true);
     }
 
-    public GameObject Instantiate(string prefabId, Vector3 position, Quaternion rotation)
+    public GameObject? Instantiate(string prefabId, Vector3 position, Quaternion rotation)
     {
         if (string.IsNullOrWhiteSpace(prefabId))
         {
@@ -134,7 +134,7 @@ public class CustomPrefabPool : IPunPrefabPool
 
         GameObject result;
 
-        if (!Prefabs.TryGetValue(prefabId, out GameObject prefab, ignoreKeyCase: true))
+        if (!Prefabs.TryGetValue(prefabId, out GameObject? prefab, ignoreKeyCase: true))
         {
             result = DefaultPool.Instantiate(prefabId, position, rotation);
 

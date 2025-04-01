@@ -1,6 +1,7 @@
 ﻿using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
 
@@ -102,7 +103,7 @@ public static class Items
         }
     }
 
-    public static GameObject SpawnItem(Item item, Vector3 position, Quaternion rotation)
+    public static GameObject? SpawnItem(Item item, Vector3 position, Quaternion rotation)
     {
         if (item == null)
         {
@@ -123,7 +124,7 @@ public static class Items
         }
 
         string prefabId = ResourcesHelper.GetItemPrefabPath(item);
-        GameObject gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
+        GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
 
         if (gameObject == null)
         {
@@ -146,24 +147,24 @@ public static class Items
         return StatsManager.instance.GetItems();
     }
 
-    public static bool TryGetItemByName(string name, out Item item)
+    public static bool TryGetItemByName(string name, [NotNullWhen(true)] out Item? item)
     {
         item = GetItemByName(name);
         return item != null;
     }
 
-    public static Item GetItemByName(string name)
+    public static Item? GetItemByName(string name)
     {
         return StatsManager.instance?.GetItemByName(name);
     }
 
-    public static bool TryGetItemThatContainsName(string name, out Item item)
+    public static bool TryGetItemThatContainsName(string name, [NotNullWhen(true)] out Item? item)
     {
         item = GetItemThatContainsName(name);
         return item != null;
     }
 
-    public static Item GetItemThatContainsName(string name)
+    public static Item? GetItemThatContainsName(string name)
     {
         return StatsManager.instance?.GetItemThatContainsName(name);
     }

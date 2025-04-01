@@ -1,6 +1,7 @@
 ﻿using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
 
@@ -154,7 +155,7 @@ public static class Valuables
         }
     }
 
-    public static GameObject SpawnValuable(ValuableObject valuableObject, Vector3 position, Quaternion rotation)
+    public static GameObject? SpawnValuable(ValuableObject valuableObject, Vector3 position, Quaternion rotation)
     {
         if (valuableObject == null)
         {
@@ -169,7 +170,7 @@ public static class Valuables
         }
 
         string prefabId = ResourcesHelper.GetValuablePrefabPath(valuableObject);
-        GameObject gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
+        GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
 
         if (gameObject == null)
         {
@@ -196,13 +197,13 @@ public static class Valuables
             .ToList();
     }
 
-    public static bool TryGetValuableByName(string name, out ValuableObject valuableObject)
+    public static bool TryGetValuableByName(string name, [NotNullWhen(true)] out ValuableObject? valuableObject)
     {
         valuableObject = GetValuableByName(name);
         return valuableObject != null;
     }
 
-    public static ValuableObject GetValuableByName(string name)
+    public static ValuableObject? GetValuableByName(string name)
     {
         foreach (var gameObject in GetValuables())
         {
@@ -220,13 +221,13 @@ public static class Valuables
         return default;
     }
 
-    public static bool TryGetValuableThatContainsName(string name, out ValuableObject valuableObject)
+    public static bool TryGetValuableThatContainsName(string name, [NotNullWhen(true)] out ValuableObject? valuableObject)
     {
         valuableObject = GetValuableThatContainsName(name);
         return valuableObject != null;
     }
 
-    public static ValuableObject GetValuableThatContainsName(string name)
+    public static ValuableObject? GetValuableThatContainsName(string name)
     {
         foreach (var gameObject in GetValuables())
         {

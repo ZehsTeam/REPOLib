@@ -8,28 +8,28 @@ public class Mod : ScriptableObject
 {
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
-    private string _name;
+    private string _name = null!;
     
     [SerializeField]
-    private string _author;
+    private string _author = null!;
 
     [SerializeField]
     private string _version = "1.0.0";
     
     [SerializeField]
-    private string _description;
+    private string _description = null!;
     
     [SerializeField]
-    private string _websiteUrl;
+    private string _websiteUrl = null!;
 
     [SerializeField]
     private string[] _dependencies = [$"Zehs-REPOLib-{MyPluginInfo.PLUGIN_VERSION}"];
 
     [SerializeField]
-    private Sprite _icon;
+    private Sprite _icon = null!;
 
     [SerializeField]
-    private TextAsset _readme;
+    private TextAsset _readme = null!;
     #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     public string Name => _name;

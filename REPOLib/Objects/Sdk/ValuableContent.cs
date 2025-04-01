@@ -10,7 +10,7 @@ public class ValuableContent : Content
 {
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
-    private ValuableObject _prefab;
+    private ValuableObject _prefab = null!;
     #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     [SerializeField]

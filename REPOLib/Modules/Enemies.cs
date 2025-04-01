@@ -1,6 +1,7 @@
 using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -40,7 +41,7 @@ public static class Enemies
             return;
         }
 
-        if (!enemy.TryGetEnemyParent(out EnemyParent enemyParent))
+        if (!enemy.TryGetEnemyParent(out EnemyParent? enemyParent))
         {
             return;
         }
@@ -63,7 +64,7 @@ public static class Enemies
             throw new ArgumentException("Failed to register enemy. EnemySetup or spawnObjects list is empty.");
         }
 
-        EnemyParent enemyParent = enemySetup.GetEnemyParent();
+        EnemyParent? enemyParent = enemySetup.GetEnemyParent();
 
         if (enemyParent == null)
         {
@@ -123,7 +124,7 @@ public static class Enemies
         }
     }
 
-    public static List<EnemyParent> SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
+    public static List<EnemyParent>? SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
     {
         if (enemySetup == null)
         {
@@ -131,7 +132,7 @@ public static class Enemies
             return null;
         }
 
-        if (!enemySetup.TryGetEnemyParent(out EnemyParent prefabEnemyParent))
+        if (!enemySetup.TryGetEnemyParent(out EnemyParent? prefabEnemyParent))
         {
             Logger.LogError("Failed to spawn enemy. EnemyParent is null.");
             return null;
@@ -166,7 +167,7 @@ public static class Enemies
             }
 
             string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
-            GameObject gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
+            GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
 
             if (gameObject == null)
             {
@@ -226,24 +227,24 @@ public static class Enemies
         return EnemyDirector.instance.GetEnemies();
     }
 
-    public static bool TryGetEnemyByName(string name, out EnemySetup enemySetup)
+    public static bool TryGetEnemyByName(string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
     {
         enemySetup = GetEnemyByName(name);
         return enemySetup != null;
     }
 
-    public static EnemySetup GetEnemyByName(string name)
+    public static EnemySetup? GetEnemyByName(string name)
     {
         return EnemyDirector.instance?.GetEnemyByName(name);
     }
 
-    public static bool TryGetEnemyThatContainsName(string name, out EnemySetup enemySetup)
+    public static bool TryGetEnemyThatContainsName(string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
     {
         enemySetup = GetEnemyThatContainsName(name);
         return enemySetup != null;
     }
 
-    public static EnemySetup GetEnemyThatContainsName(string name)
+    public static EnemySetup? GetEnemyThatContainsName(string name)
     {
         return EnemyDirector.instance?.GetEnemyThatContainsName(name);
     }

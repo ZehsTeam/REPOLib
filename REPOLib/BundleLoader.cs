@@ -13,7 +13,7 @@ namespace REPOLib;
 
 public static class BundleLoader
 {
-    public static event Action OnAllBundlesLoaded;
+    public static event Action? OnAllBundlesLoaded;
     
     private static readonly List<LoadOperation> _operations = [];
     
@@ -190,13 +190,13 @@ public static class BundleLoader
         }
     }
 
-    private class LoadOperation(string path, Func<AssetBundle, IEnumerator> onBundleLoaded = null, bool loadContents = true)
+    private class LoadOperation(string path, Func<AssetBundle, IEnumerator>? onBundleLoaded = null, bool loadContents = true)
     {
         public string Path { get; } = path;
         public DateTime StartTime { get; } = DateTime.Now;
         public State CurrentState { get; set; } = State.LoadingBundle;
         public bool LoadContents { get; } = loadContents;
-        public Func<AssetBundle, IEnumerator> OnBundleLoaded { get; } = onBundleLoaded;
+        public Func<AssetBundle, IEnumerator>? OnBundleLoaded { get; } = onBundleLoaded;
 
         public AssetBundleCreateRequest BundleRequest { get; } = AssetBundle.LoadFromFileAsync(path);
         

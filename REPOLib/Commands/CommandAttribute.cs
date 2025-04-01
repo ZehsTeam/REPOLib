@@ -10,7 +10,7 @@ public class CommandExecutionAttribute : Attribute
     public string Name { get; private set; }
     public string Description { get; private set; }
 
-    public CommandExecutionAttribute(string name = null, string description = null, bool enabledByDefault = true, bool requiresDeveloperMode = false)
+    public CommandExecutionAttribute(string? name = null, string? description = null, bool enabledByDefault = true, bool requiresDeveloperMode = false)
     {
         RequiresDeveloperMode = requiresDeveloperMode;
         EnabledByDefault = enabledByDefault;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ public static class LevelValuablesExtensions
             return false;
         }
 
-        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject> list))
+        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject>? list))
         {
             return false;
         }
@@ -28,7 +29,7 @@ public static class LevelValuablesExtensions
             return false;
         }
 
-        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject> list))
+        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject>? list))
         {
             return false;
         }
@@ -42,7 +43,7 @@ public static class LevelValuablesExtensions
         return true;
     }
     
-    public static bool TryGetList(this LevelValuables levelValuables, ValuableVolume.Type volumeType, out List<GameObject> list)
+    public static bool TryGetList(this LevelValuables levelValuables, ValuableVolume.Type volumeType, [NotNullWhen(true)] out List<GameObject>? list)
     {
         list = volumeType switch
         {
