@@ -23,6 +23,6 @@ public class ValuableContent : Content
 
     public override void Initialize(Mod mod)
     {
-        Valuables.RegisterValuable(Prefab.gameObject, ValuablePresets.ToList());
+        Valuables.RegisterValuable(Prefab, ValuablePresets.ToList(), mod);
     }
 }

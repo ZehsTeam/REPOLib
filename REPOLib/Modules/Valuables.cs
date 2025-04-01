@@ -128,7 +128,7 @@ public static class Valuables
         RegisterValuable(valuableObject, presetNames, ContentRegistry.GetAssemblySource(Assembly.GetCallingAssembly()));
     }
 
-    private static void RegisterValuable(ValuableObject valuableObject, List<string> presetNames, IContentSource source)
+    internal static void RegisterValuable(ValuableObject valuableObject, List<string> presetNames, IContentSource source)
     {
         if (valuableObject == null)
         {
