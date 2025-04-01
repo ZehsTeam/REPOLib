@@ -16,6 +16,6 @@ public class LevelContent : Content
 
     public override void Initialize(Mod mod)
     {
-        Modules.Levels.RegisterLevel(Level);
+        Modules.Levels.RegisterLevel(Level, mod);
     }
 }

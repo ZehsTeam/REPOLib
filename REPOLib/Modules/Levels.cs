@@ -1,8 +1,10 @@
 ﻿using REPOLib.Extensions;
+using REPOLib.Objects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -37,7 +39,7 @@ public static class Levels
         _initialLevelsRegistered = true;
     }
 
-    static void RegisterLevelWithGame(Level level)
+    private static void RegisterLevelWithGame(Level level)
     {
         if (_levelsRegistered.Contains(level)) 
         {
@@ -84,7 +86,7 @@ public static class Levels
         _levelsRegistered.Add(level);
     }
 
-    public static void RegisterLevel(Level level)
+    internal static void RegisterLevel(Level level, IContentSource source)
     {
         if (level == null)
         {
@@ -157,6 +159,13 @@ public static class Levels
         {
             _levelsToRegister.Add(level);
         }
+        
+        ContentRegistry.Add(level, source);
+    }
+
+    public static void RegisterLevel(Level level)
+    {
+        RegisterLevel(level, ContentRegistry.GetAssemblySource(Assembly.GetCallingAssembly()));
     }
 
     public static IReadOnlyList<Level> GetLevels()

@@ -1,8 +1,10 @@
 ﻿using REPOLib.Extensions;
+using REPOLib.Objects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -55,7 +57,7 @@ public static class Items
         }
     }
 
-    public static void RegisterItem(Item item)
+    internal static void RegisterItem(Item item, IContentSource source)
     {
         if (item == null)
         {
@@ -101,6 +103,13 @@ public static class Items
         { 
             RegisterItemWithGame(item);   
         }
+        
+        ContentRegistry.Add(item, source);
+    }
+
+    public static void RegisterItem(Item item)
+    {
+        RegisterItem(item, ContentRegistry.GetAssemblySource(Assembly.GetCallingAssembly()));
     }
 
     public static GameObject? SpawnItem(Item item, Vector3 position, Quaternion rotation)

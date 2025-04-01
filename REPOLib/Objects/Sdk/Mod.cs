@@ -4,7 +4,7 @@ using UnityEngine;
 namespace REPOLib.Objects.Sdk;
 
 [CreateAssetMenu(menuName = "REPOLib/Mod", order = 0, fileName = "New Mod")]
-public class Mod : ScriptableObject
+public class Mod : ScriptableObject, IContentSource
 {
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
@@ -44,4 +44,6 @@ public class Mod : ScriptableObject
     public string FullName => $"{Author}-{Name}";
     // also known as a dependency string
     public string Identifier => $"{Author}-{Name}-{Version}";
+    
+    string IContentSource.Guid => FullName;
 }

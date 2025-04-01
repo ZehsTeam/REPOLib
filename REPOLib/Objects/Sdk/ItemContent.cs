@@ -19,6 +19,6 @@ public class ItemContent : Content
         // Set prefab on item
         _prefab.item.prefab = _prefab.gameObject;
 
-        Modules.Items.RegisterItem(Prefab.item);
+        Modules.Items.RegisterItem(Prefab.item, mod);
     }
 }

@@ -1,7 +1,9 @@
 using REPOLib.Extensions;
+using REPOLib.Objects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -57,7 +59,7 @@ public static class Enemies
         }
     }
 
-    public static void RegisterEnemy(EnemySetup enemySetup)
+    internal static void RegisterEnemy(EnemySetup enemySetup, IContentSource source)
     {
         if (enemySetup == null || enemySetup.spawnObjects == null || enemySetup.spawnObjects.Count == 0)
         {
@@ -122,6 +124,13 @@ public static class Enemies
         {
             _enemiesToRegister.Add(enemySetup);
         }
+        
+        ContentRegistry.Add(enemySetup, source);
+    }
+    
+    public static void RegisterEnemy(EnemySetup enemySetup)
+    {
+        RegisterEnemy(enemySetup, ContentRegistry.GetAssemblySource(Assembly.GetExecutingAssembly()));
     }
 
     public static List<EnemyParent>? SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
