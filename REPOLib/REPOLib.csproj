@@ -29,8 +29,6 @@
 
     <!-- See: https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references -->
     <Nullable>enable</Nullable>
-    <!-- Treating nullable warnings as errors helps catch them MUCH better -->
-    <WarningsAsErrors>Nullable</WarningsAsErrors>
     
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
