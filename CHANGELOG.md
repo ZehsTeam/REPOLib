@@ -1,3 +1,17 @@
+# v2.0.0
+
+- Added support for registering levels. (#32)
+- Added new async bundle loading system. (#15)
+- Added more safety checks when instantiating a network prefab.
+- Changed most of the extended logs to use the `Debug` log level, instead of `Info`. (#33)
+- Split the `DeveloperMode` config option into two ones:
+  - `DeveloperMode` enables developer-only chat commands.
+  - `VanillaDeveloperMode` enables the vanilla developer keyboard shortcuts.
+- Fixed the SpawnEnemy method ignoring the spawnDespawned parameter always spawning enemies not despawned.
+- **Breaking changes:**
+  - Changed the signature of `BundleLoader.LoadBundle` (due to async loading).
+  - Moved `GenericValuablePresetName` and `ValuablePresets` from `Modules.Valuables` to `Modules.ValuablePresets`.
+
 # v1.5.0
 
 - Added partial name matching to all spawn commands. (#17)
