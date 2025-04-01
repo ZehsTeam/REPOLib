@@ -11,27 +11,27 @@ public static class ResourcesHelper
     {
         string folder = volumeType switch
         {
-            ValuableVolume.Type.Tiny =>     "01 Tiny/",
-            ValuableVolume.Type.Small =>    "02 Small/",
-            ValuableVolume.Type.Medium =>   "03 Medium/",
-            ValuableVolume.Type.Big =>      "04 Big/",
-            ValuableVolume.Type.Wide =>     "05 Wide/",
-            ValuableVolume.Type.Tall =>     "06 Tall/",
-            ValuableVolume.Type.VeryTall => "07 Very Tall/",
+            ValuableVolume.Type.Tiny =>     "01 Tiny",
+            ValuableVolume.Type.Small =>    "02 Small",
+            ValuableVolume.Type.Medium =>   "03 Medium",
+            ValuableVolume.Type.Big =>      "04 Big",
+            ValuableVolume.Type.Wide =>     "05 Wide",
+            ValuableVolume.Type.Tall =>     "06 Tall",
+            ValuableVolume.Type.VeryTall => "07 Very Tall",
             _ => string.Empty
         };
 
-        return Path.Combine("Valuables/", folder);
+        return $"Valuables/{folder}";
     }
 
     public static string GetItemsFolderPath()
     {
-        return "Items/";
+        return "Items";
     }
 
     public static string GetEnemiesFolderPath()
     {
-        return "Enemies/";
+        return "Enemies";
     }
     
     public static string GetLevelPrefabsFolderPath(Level level, LevelPrefabType type)
@@ -44,7 +44,7 @@ public static class ResourcesHelper
             _ => string.Empty
         };
 
-        return Path.Combine("Level", level.ResourcePath, folder).ConvertBackToForwardSlash();
+        return $"Level/{level.ResourcePath}/{folder}";
     }
     #endregion
 
@@ -58,7 +58,7 @@ public static class ResourcesHelper
 
         string folderPath = GetValuablesFolderPath(valuableObject.volumeType);
 
-        return Path.Combine(folderPath, valuableObject.gameObject.name);
+        return $"{folderPath}/{valuableObject.gameObject.name}";
     }
 
     public static string GetValuablePrefabPath(GameObject prefab)
@@ -95,7 +95,7 @@ public static class ResourcesHelper
 
         string folderPath = GetItemsFolderPath();
 
-        return Path.Combine(folderPath, prefab.name);
+        return $"{folderPath}/{prefab.name}";
     }
 
     public static string GetEnemyPrefabPath(EnemySetup enemySetup)
@@ -114,7 +114,7 @@ public static class ResourcesHelper
 
         string folderPath = GetEnemiesFolderPath();
 
-        return Path.Combine(folderPath, mainSpawnObject.name);
+        return $"{folderPath}/{mainSpawnObject.name}";
     }
 
     public static string GetEnemyPrefabPath(GameObject prefab)
@@ -126,7 +126,7 @@ public static class ResourcesHelper
 
         string folderPath = GetEnemiesFolderPath();
 
-        return Path.Combine(folderPath, prefab.name);
+        return $"{folderPath}/{prefab.name}";
     }
 
     public enum LevelPrefabType
@@ -145,7 +145,7 @@ public static class ResourcesHelper
 
         string folderPath = GetLevelPrefabsFolderPath(level, type);
 
-        return Path.Combine(folderPath, prefab.name).ConvertBackToForwardSlash();
+        return $"{folderPath}/{prefab.name}";
     }
     #endregion
 
