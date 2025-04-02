@@ -11,16 +11,22 @@ using Object = UnityEngine.Object;
 
 namespace REPOLib;
 
+/// <summary>
+/// Loads AssetBundles asynchronously.
+/// </summary>
 public static class BundleLoader
 {
+    /// <summary>
+    /// An event that runs when all AssetBundles are loaded by REPOLib.
+    /// </summary>
     public static event Action? OnAllBundlesLoaded;
-    
+
     private static readonly List<LoadOperation> _operations = [];
-    
+
     internal static void LoadAllBundles(string root, string withExtension)
     {
         Logger.LogInfo($"Loading all bundles with extension {withExtension} from root {root}", extended: true);
-        
+
         string[] files = Directory.GetFiles(root, "*" + withExtension, SearchOption.AllDirectories);
 
         foreach (string path in files)
@@ -29,12 +35,23 @@ public static class BundleLoader
         }
     }
 
+    /// <summary>
+    /// Load an AssetBundle async and register its content. Use <see cref="LoadBundle"/>
+    /// for a callback for when the AssetBundle is loaded.
+    /// </summary>
+    /// <param name="path">The absolute path to the AssetBundle.</param>
     public static void LoadBundleAndContent(string path)
     {
         Logger.LogInfo($"Loading bundle at {path}...");
         _operations.Add(new LoadOperation(path));
     }
 
+    /// <summary>
+    /// Load an AssetBundle async and get a callback for when it's loaded. Optionally also register its contents automatically.
+    /// </summary>
+    /// <param name="path">The absolute path to the AssetBundle.</param>
+    /// <param name="onLoaded">Callback for when the AssetBundle is loaded.</param>
+    /// <param name="loadContents">Whether or not REPOLib should register the AssetBundle's contents automatically.</param>
     public static void LoadBundle(string path, Func<AssetBundle, IEnumerator> onLoaded, bool loadContents = false)
     {
         Logger.LogInfo($"Loading bundle at {path}...");
@@ -49,12 +66,12 @@ public static class BundleLoader
     private static IEnumerator FinishLoadOperationsRoutine(MonoBehaviour behaviour)
     {
         yield return null;
-        
+
         foreach (var loadOperation in _operations.ToArray()) // collection might change
         {
             behaviour.StartCoroutine(FinishLoadOperation(loadOperation));
         }
-        
+
         var (text, disableLoadingUI) = SetupLoadingUI();
 
         float lastUpdate = Time.time;
@@ -64,11 +81,11 @@ public static class BundleLoader
             {
                 lastUpdate = Time.time;
 
-                string bundlesWord = _operations.Count == 1 ? "bundle": "bundles" ;
+                string bundlesWord = _operations.Count == 1 ? "bundle" : "bundles";
                 text.text = $"REPOLib: Waiting for {_operations.Count} {bundlesWord} to load...";
 
                 if (!ConfigManager.ExtendedLogging.Value) continue;
-                    
+
                 foreach (var operation in _operations)
                 {
                     string msg = $"Loading {operation.FileName}: {operation.CurrentState}";
@@ -77,18 +94,18 @@ public static class BundleLoader
                         LoadOperation.State.LoadingBundle => operation.BundleRequest.progress,
                         _ => null
                     };
-                    
+
                     if (progress.HasValue) msg += $" {progress.Value:P0}";
-                    
+
                     Logger.LogDebug(msg, extended: true);
                 }
             }
-            
+
             yield return null;
         }
 
         Logger.LogInfo("Finished loading bundles.");
-        
+
         disableLoadingUI();
         Utilities.SafeInvokeEvent(OnAllBundlesLoaded);
     }
@@ -106,7 +123,7 @@ public static class BundleLoader
         text.text = "REPOLib is loading bundles... Hang tight!";
         text.color = Color.white;
         text.alignment = TextAlignmentOptions.Center;
-        
+
         var rectTransform = text.GetComponent<RectTransform>();
         rectTransform.anchoredPosition = Vector2.zero;
         rectTransform.anchorMin = Vector2.zero;
@@ -131,12 +148,12 @@ public static class BundleLoader
             Finish();
             yield break;
         }
-        
+
         if (operation.LoadContents)
         {
             yield return LoadBundleContent(operation, bundle);
         }
-        
+
         if (operation.OnBundleLoaded != null)
         {
             yield return operation.OnBundleLoaded(bundle);
@@ -146,7 +163,7 @@ public static class BundleLoader
         {
             Logger.LogInfo($"Loaded bundle {operation.FileName} in {operation.ElapsedTime.TotalSeconds:N1}s");
         }
-        
+
         Finish();
         yield break;
 
@@ -199,7 +216,7 @@ public static class BundleLoader
         public Func<AssetBundle, IEnumerator>? OnBundleLoaded { get; } = onBundleLoaded;
 
         public AssetBundleCreateRequest BundleRequest { get; } = AssetBundle.LoadFromFileAsync(path);
-        
+
         public TimeSpan ElapsedTime => DateTime.Now - StartTime;
         public string FileName => System.IO.Path.GetFileNameWithoutExtension(Path);
 
