@@ -28,14 +28,25 @@ public static class BundleLoader
             LoadBundleAndContent(path);
         }
     }
-
+    
     public static void LoadBundleAndContent(string path)
     {
-        Logger.LogInfo($"Loading bundle at {path}...");
-        _operations.Add(new LoadOperation(path));
+        LoadBundle(path, onLoaded: null, loadContents: true);
     }
+    
+    public static void LoadBundle(string path, Action<AssetBundle> onLoaded, bool loadContents = false)
+    {
+        LoadBundle(path, OnLoaded, loadContents);
+        return;
 
-    public static void LoadBundle(string path, Func<AssetBundle, IEnumerator> onLoaded, bool loadContents = false)
+        IEnumerator OnLoaded(AssetBundle bundle) 
+        {
+            onLoaded(bundle);
+            yield break;
+        }
+    }
+    
+    public static void LoadBundle(string path, Func<AssetBundle, IEnumerator>? onLoaded = null, bool loadContents = false)
     {
         Logger.LogInfo($"Loading bundle at {path}...");
         _operations.Add(new LoadOperation(path, onLoaded, loadContents));
@@ -209,4 +220,14 @@ public static class BundleLoader
             LoadingContent
         }
     }
+    
+    #region Obsolete
+    
+    [Obsolete("Use LoadBundleAndContent instead")]
+    public static void LoadBundle(string path, string relativePath) 
+    {
+        LoadBundleAndContent(path);
+    }
+    
+    #endregion
 }
