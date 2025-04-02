@@ -6,16 +6,24 @@ using UnityEngine;
 
 namespace REPOLib.Modules;
 
+/// <summary>
+/// The Enemies module of REPOLib.
+/// </summary>
 public static class Enemies
 {
+    /// <inheritdoc cref="GetEnemies"/>
     public static IReadOnlyList<EnemySetup> AllEnemies => GetEnemies();
+
+    /// <summary>
+    /// Gets all enemies registered by REPOLib.
+    /// </summary>
     public static IReadOnlyList<EnemySetup> RegisteredEnemies => _enemiesRegistered;
 
     internal static int SpawnNextEnemiesNotDespawned = 0;
 
     private static readonly List<EnemySetup> _enemiesToRegister = [];
     private static readonly List<EnemySetup> _enemiesRegistered = [];
-    
+
     private static bool _initialEnemiesRegistered;
 
     internal static void RegisterInitialEnemies()
@@ -24,12 +32,12 @@ public static class Enemies
         {
             return;
         }
-        
+
         foreach (var enemy in _enemiesToRegister)
         {
             RegisterEnemyWithGame(enemy);
         }
-        
+
         _enemiesToRegister.Clear();
         _initialEnemiesRegistered = true;
     }
@@ -57,6 +65,11 @@ public static class Enemies
         }
     }
 
+    /// <summary>
+    /// Registers an <see cref="EnemySetup"/>.
+    /// </summary>
+    /// <param name="enemySetup">The <see cref="EnemySetup"/> to register.</param>
+    /// <exception cref="ArgumentException"></exception>
     public static void RegisterEnemy(EnemySetup enemySetup)
     {
         if (enemySetup == null || enemySetup.spawnObjects == null || enemySetup.spawnObjects.Count == 0)
@@ -100,7 +113,7 @@ public static class Enemies
                 }
             }
         }
-        
+
         // Register all spawn prefabs to the network
         foreach (var spawnObject in enemySetup.GetDistinctSpawnObjects())
         {
@@ -124,6 +137,14 @@ public static class Enemies
         }
     }
 
+    /// <summary>
+    /// Spawns an enemy or enemies from a <see cref="EnemySetup"/>.
+    /// </summary>
+    /// <param name="enemySetup">The <see cref="EnemySetup"/> to spawn the enemy or enemies from.</param>
+    /// <param name="position">The position where the enemy will be spawned.</param>
+    /// <param name="rotation">The rotation of the enemy.</param>
+    /// <param name="spawnDespawned">Whether or not this enemy spawn prevents the next enemy from spawning.</param>
+    /// <returns>The <see cref="EnemyParent"/> objects from spawned enemies.</returns>
     public static List<EnemyParent>? SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
     {
         if (enemySetup == null)
@@ -217,6 +238,7 @@ public static class Enemies
         return enemyParents;
     }
 
+    /// <inheritdoc cref="EnemyDirectorExtensions.GetEnemies(EnemyDirector)"/>
     public static IReadOnlyList<EnemySetup> GetEnemies()
     {
         if (EnemyDirector.instance == null)
@@ -227,23 +249,27 @@ public static class Enemies
         return EnemyDirector.instance.GetEnemies();
     }
 
+    /// <inheritdoc cref="EnemyDirectorExtensions.TryGetEnemyByName(EnemyDirector, string, out EnemySetup?)"/>
     public static bool TryGetEnemyByName(string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
     {
         enemySetup = GetEnemyByName(name);
         return enemySetup != null;
     }
 
+    /// <inheritdoc cref="EnemyDirectorExtensions.GetEnemyByName(EnemyDirector, string)"/>
     public static EnemySetup? GetEnemyByName(string name)
     {
         return EnemyDirector.instance?.GetEnemyByName(name);
     }
 
+    /// <inheritdoc cref="EnemyDirectorExtensions.TryGetEnemyThatContainsName(EnemyDirector, string, out EnemySetup)"/>
     public static bool TryGetEnemyThatContainsName(string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
     {
         enemySetup = GetEnemyThatContainsName(name);
         return enemySetup != null;
     }
 
+    /// <inheritdoc cref="EnemyDirectorExtensions.GetEnemyThatContainsName(EnemyDirector, string)"/>
     public static EnemySetup? GetEnemyThatContainsName(string name)
     {
         return EnemyDirector.instance?.GetEnemyThatContainsName(name);
