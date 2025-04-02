@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace REPOLib.Modules;
 
+/// <summary>
+/// The NetworkPrefabs module of REPOLib.
+/// </summary>
 public static class NetworkPrefabs
 {
     internal static CustomPrefabPool CustomPrefabPool
@@ -18,7 +21,7 @@ public static class NetworkPrefabs
             _customPrefabPool = value;
         }
     }
-    
+
     private static CustomPrefabPool? _customPrefabPool;
 
     internal static void Initialize()
@@ -48,16 +51,19 @@ public static class NetworkPrefabs
         Logger.LogInfo($"Finished initializing NetworkPrefabs.");
     }
 
+    /// <inheritdoc cref="CustomPrefabPool.RegisterPrefab(string, GameObject)"/>
     public static void RegisterNetworkPrefab(GameObject prefab)
     {
         RegisterNetworkPrefab(prefab?.name!, prefab!);
     }
 
+    /// <inheritdoc cref="CustomPrefabPool.RegisterPrefab(string, GameObject)"/>
     public static void RegisterNetworkPrefab(string prefabId, GameObject prefab)
     {
         CustomPrefabPool.RegisterPrefab(prefabId, prefab);
     }
 
+    /// <inheritdoc cref="CustomPrefabPool.HasPrefab(string)"/>
     public static bool HasNetworkPrefab(string prefabId)
     {
         return CustomPrefabPool.HasPrefab(prefabId);
@@ -98,6 +104,15 @@ public static class NetworkPrefabs
     //}
     #endregion
 
+    /// <summary>
+    /// Spawns a network prefab.
+    /// </summary>
+    /// <param name="prefabId">The network prefab ID for the <see cref="GameObject"/> to spawn.</param>
+    /// <param name="position">The position where the <see cref="GameObject"/> will be spawned.</param>
+    /// <param name="rotation">The rotation of the <see cref="GameObject"/>.</param>
+    /// <param name="group">The interest group. See: https://doc.photonengine.com/pun/current/gameplay/interestgroups</param>
+    /// <param name="data">Custom instantiation data. See: https://doc.photonengine.com/pun/current/gameplay/instantiation#custom-instantiation-data</param>
+    /// <returns>The <see cref="GameObject"/> or null.</returns>
     public static GameObject? SpawnNetworkPrefab(string prefabId, Vector3 position, Quaternion rotation, byte group = 0, object[]? data = null)
     {
         if (string.IsNullOrWhiteSpace(prefabId))
