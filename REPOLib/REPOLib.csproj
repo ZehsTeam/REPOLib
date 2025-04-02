@@ -81,9 +81,9 @@
     
   <!-- Default values in case the Directory.Repo.props file doesn't exist -->
   <PropertyGroup>
-    <GaleProfileName Condition="'$(GaleProfile)' == ''">Mod Development</GaleProfileName>
+    <GaleProfileName Condition="'$(GaleProfileName)' == ''">Mod Development</GaleProfileName>
     <GaleDataFolder Condition="'$(GaleDataFolder)' == ''">$(AppData)\com.kesomannen.gale</GaleDataFolder>
-    <BepInExDirectory Condition="'$(BepInExDirectory)' == ''">$(GaleDataFolder)\repo\profiles\$(GaleProfile)\BepInEx\</BepInExDirectory>
+    <BepInExDirectory Condition="'$(BepInExDirectory)' == ''">$(GaleDataFolder)\repo\profiles\$(GaleProfileName)\BepInEx\</BepInExDirectory>
     <StartArguments Condition="'$(BepInExDirectory)' == ''">--doorstop-enable true --doorstop-target "$(BepInExDirectory)\core\BepInEx.Preloader.dll" --gale-profile "$(GaleProfileName)"</StartArguments>
   </PropertyGroup>
   
