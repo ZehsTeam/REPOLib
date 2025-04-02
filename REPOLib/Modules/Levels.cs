@@ -219,12 +219,12 @@ public static class Levels
     /// Tries to get a <see cref="Level"/> that contains the specified name.
     /// </summary>
     /// <param name="name">The <see cref="string"/> to compare.</param>
-    /// <param name="valuableObject">The found <see cref="Level"/>.</param>
+    /// <param name="level">The found <see cref="Level"/>.</param>
     /// <returns>Whether or not the <see cref="Level"/> was found.</returns>
-    public static bool TryGetLevelThatContainsName(string name, [NotNullWhen(true)] out Level? valuableObject)
+    public static bool TryGetLevelThatContainsName(string name, [NotNullWhen(true)] out Level? level)
     {
-        valuableObject = GetLevelThatContainsName(name);
-        return valuableObject != null;
+        level = GetLevelThatContainsName(name);
+        return level != null;
     }
 
     /// <summary>
