@@ -15,7 +15,7 @@ public static class Enemies
     public static IReadOnlyList<EnemySetup> AllEnemies => GetEnemies();
 
     /// <summary>
-    /// Gets all enemies registered by REPOLib.
+    /// Gets all enemies registered with REPOLib.
     /// </summary>
     public static IReadOnlyList<EnemySetup> RegisteredEnemies => _enemiesRegistered;
 
