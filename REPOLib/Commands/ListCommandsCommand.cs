@@ -11,7 +11,7 @@ internal static class ListCommandsCommand
         requiresDeveloperMode: false
     )]
     [CommandAlias("listcommands")]
-    [CommandAlias("listcom")]
+    [CommandAlias("commands")]
     [CommandAlias("lc")]
     public static void Execute(string args)
     {
