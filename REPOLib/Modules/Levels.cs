@@ -153,11 +153,15 @@ public static class Levels
 
         foreach (var (prefab, type) in modules)
         {
-            // maybe check if the prefab is already registered?
-
             string prefabId = ResourcesHelper.GetLevelPrefabPath(level, prefab, type);
-            NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
 
+            if (ResourcesHelper.HasPrefab(prefabId))
+            {
+                // allow duplicate prefabs
+                continue;
+            }
+
+            NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
             Utilities.FixAudioMixerGroups(prefab);
         }
 

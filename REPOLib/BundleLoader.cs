@@ -36,23 +36,38 @@ public static class BundleLoader
     }
 
     /// <summary>
-    /// Load an AssetBundle async and register its content. Use <see cref="LoadBundle"/>
-    /// for a callback for when the AssetBundle is loaded.
+    /// Load an AssetBundle async and register its content. Use <see cref="LoadBundle(string, Func{AssetBundle, IEnumerator}?, bool)"/> or<br/>
+    /// <see cref="LoadBundle(string, Action{AssetBundle}, bool)"/> for a callback for when the AssetBundle is loaded.
     /// </summary>
     /// <param name="path">The absolute path to the AssetBundle.</param>
     public static void LoadBundleAndContent(string path)
     {
-        Logger.LogInfo($"Loading bundle at {path}...");
-        _operations.Add(new LoadOperation(path));
+        LoadBundle(path, onLoaded: null, loadContents: true);
+    }
+
+    /// <param name="onLoaded">Callback for when the AssetBundle is loaded.</param>
+    /// <inheritdoc cref="LoadBundle(string, Func{AssetBundle, IEnumerator}?, bool)"/>
+    /// <param name="path"></param>
+    /// <param name="loadContents"></param>
+    public static void LoadBundle(string path, Action<AssetBundle> onLoaded, bool loadContents = false)
+    {
+        LoadBundle(path, OnLoaded, loadContents);
+        return;
+
+        IEnumerator OnLoaded(AssetBundle bundle)
+        {
+            onLoaded(bundle);
+            yield break;
+        }
     }
 
     /// <summary>
     /// Load an AssetBundle async and get a callback for when it's loaded. Optionally also register its contents automatically.
     /// </summary>
     /// <param name="path">The absolute path to the AssetBundle.</param>
-    /// <param name="onLoaded">Callback for when the AssetBundle is loaded.</param>
+    /// <param name="onLoaded">Callback for when the AssetBundle is loaded. Supports waiting as an IEnumerator coroutine.</param>
     /// <param name="loadContents">Whether or not REPOLib should register the AssetBundle's contents automatically.</param>
-    public static void LoadBundle(string path, Func<AssetBundle, IEnumerator> onLoaded, bool loadContents = false)
+    public static void LoadBundle(string path, Func<AssetBundle, IEnumerator>? onLoaded = null, bool loadContents = false)
     {
         Logger.LogInfo($"Loading bundle at {path}...");
         _operations.Add(new LoadOperation(path, onLoaded, loadContents));
@@ -226,4 +241,15 @@ public static class BundleLoader
             LoadingContent
         }
     }
+
+    #region Obsolete
+
+    /// <summary>Deprecated.</summary>
+    [Obsolete("Use LoadBundleAndContent instead")]
+    public static void LoadBundle(string path, string relativePath)
+    {
+        LoadBundleAndContent(path);
+    }
+
+    #endregion
 }
