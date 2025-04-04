@@ -5,8 +5,17 @@ using UnityEngine;
 
 namespace REPOLib.Extensions;
 
+/// <summary>
+/// REPOLib's <see cref="LevelValuables"/> extension methods.
+/// </summary>
 public static class LevelValuablesExtensions
 {
+    /// <summary>
+    /// Check if the <see cref="LevelValuables"/> has the specified valuable <see cref="GameObject"/>.
+    /// </summary>
+    /// <param name="levelValuables">The <see cref="LevelValuables"/> object.</param>
+    /// <param name="prefab">The <see cref="GameObject"/> to check.</param>
+    /// <returns>Whether or not the <see cref="LevelValuables"/> object has the valuable <see cref="GameObject"/>.</returns>
     public static bool HasValuable(this LevelValuables levelValuables, GameObject prefab)
     {
         if (!prefab.TryGetComponent(out ValuableObject valuableObject))
@@ -42,7 +51,14 @@ public static class LevelValuablesExtensions
         list.Add(prefab);
         return true;
     }
-    
+
+    /// <summary>
+    /// Tries to get a list of valuable <see cref="GameObject"/>s for the specified <see cref="ValuableVolume.Type"/>.
+    /// </summary>
+    /// <param name="levelValuables">The <see cref="LevelValuables"/> object.</param>
+    /// <param name="volumeType">The specified <see cref="ValuableVolume.Type"/>.</param>
+    /// <param name="list">The list of valuable <see cref="GameObject"/>s.</param>
+    /// <returns>Whether or not the <see cref="ValuableVolume.Type"/> is in valid range and the corresponding list isn't null.</returns>
     public static bool TryGetList(this LevelValuables levelValuables, ValuableVolume.Type volumeType, [NotNullWhen(true)] out List<GameObject>? list)
     {
         list = volumeType switch
@@ -60,6 +76,12 @@ public static class LevelValuablesExtensions
         return list != null;
     }
 
+    /// <summary>
+    /// Tries to get a list of valuable <see cref="GameObject"/>s for all <see cref="ValuableVolume.Type"/>s.
+    /// </summary>
+    /// <param name="levelValuables">The <see cref="LevelValuables"/> object.</param>
+    /// <param name="list">The list of all valuable <see cref="GameObject"/>s.</param>
+    /// <returns>Always true.</returns>
     public static bool TryGetCombinedList(this LevelValuables levelValuables, out List<GameObject> list)
     {
         var allValuables = new List<List<GameObject>>()
@@ -81,6 +103,11 @@ public static class LevelValuablesExtensions
         return list != null;
     }
 
+    /// <summary>
+    /// Gets a list of valuable <see cref="GameObject"/>s for all <see cref="ValuableVolume.Type"/>s.
+    /// </summary>
+    /// <param name="levelValuables">The <see cref="LevelValuables"/> object.</param>
+    /// <returns>The list of all valuable <see cref="GameObject"/>s.</returns>
     public static List<GameObject> GetCombinedList(this LevelValuables levelValuables)
     {
         if (levelValuables.TryGetCombinedList(out List<GameObject> list))
