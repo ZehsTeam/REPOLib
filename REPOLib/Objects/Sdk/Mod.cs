@@ -33,7 +33,7 @@ public class Mod : ScriptableObject
 
     [SerializeField]
     private TextAsset _readme = null!;
-#pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
+    #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     /// <summary>
     /// The name of this mod.

@@ -11,7 +11,7 @@ public class ItemContent : Content
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
     private ItemAttributes _prefab = null!;
-#pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
+    #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     /// <summary>
     /// The <see cref="ItemAttributes"/> of this content.

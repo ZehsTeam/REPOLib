@@ -143,7 +143,7 @@ public static class Enemies
     /// <param name="enemySetup">The <see cref="EnemySetup"/> to spawn the enemy or enemies from.</param>
     /// <param name="position">The position where the enemy will be spawned.</param>
     /// <param name="rotation">The rotation of the enemy.</param>
-    /// <param name="spawnDespawned">Whether or not this enemy spawn prevents the next enemy from spawning.</param>
+    /// <param name="spawnDespawned">Whether or not this enemy will spawn despawned.</param>
     /// <returns>The <see cref="EnemyParent"/> objects from spawned enemies.</returns>
     public static List<EnemyParent>? SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
     {

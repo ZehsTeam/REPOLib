@@ -131,14 +131,13 @@ public static class EnemyDirectorExtensions
             .FirstOrDefault(x => x.NameEquals(name));
     }
 
-
-  /// <summary>
-  /// Tries to get an <see cref="EnemySetup"/> that contains the name or by its <see cref="EnemyParent"/> that contains the name.
-  /// </summary>
-  /// <param name="enemyDirector">The <see cref="EnemyDirector"/> from which to check.</param>
-  /// <param name="name">The <see cref="string"/> to compare.</param>
-  /// <param name="enemySetup">The found <see cref="EnemySetup"/>.</param>
-  /// <returns>Whether or not the <see cref="EnemySetup"/> was found.</returns>
+    /// <summary>
+    /// Tries to get an <see cref="EnemySetup"/> that contains the name or by its <see cref="EnemyParent"/> that contains the name.
+    /// </summary>
+    /// <param name="enemyDirector">The <see cref="EnemyDirector"/> from which to check.</param>
+    /// <param name="name">The <see cref="string"/> to compare.</param>
+    /// <param name="enemySetup">The found <see cref="EnemySetup"/>.</param>
+    /// <returns>Whether or not the <see cref="EnemySetup"/> was found.</returns>
     public static bool TryGetEnemyThatContainsName(this EnemyDirector enemyDirector, string name, out EnemySetup enemySetup)
     {
         enemySetup = enemyDirector.GetEnemyThatContainsName(name);
