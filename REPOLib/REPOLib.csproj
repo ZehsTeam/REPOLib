@@ -61,8 +61,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="$(ProjectDir)../README.md" Pack="true" PackagePath="/" />
-    <None Include="$(ProjectDir)../icon.png" Pack="true" PackagePath="/" />
+    <None Include="$(ProjectDir)../README.md" Pack="true" PackagePath="/" CopyToPluginOutputDirectory="true" />
+    <None Include="$(ProjectDir)../icon.png" Pack="true" PackagePath="/" CopyToPluginOutputDirectory="true" />
   </ItemGroup>
   
   <ItemGroup>
@@ -72,30 +72,27 @@
     <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="UnityEngine.Modules" Version="2022.3.21" IncludeAssets="compile" PrivateAssets="all" />
-    <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.1.2-ngd.0" PrivateAssets="all"/>
+    <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.1.2-ngd.0" PrivateAssets="all" />
+    <PackageReference Include="Linkoid.Repo.Plugin.Build" Version="0.2.2" PrivateAssets="all" />
   </ItemGroup>
     
   <!-- Import settings from .csproj.user file -->
-  <Import Project="$(MSBuildProjectFile).user" Condition="Exists('$(MSBuildProjectFile).user')" />
+  <!--<Import Project="$(MSBuildProjectFile).user" Condition="Exists('$(MSBuildProjectFile).user')" />-->
     
-  <!-- Default values in case the .csproj.user file doesn't exist -->
+  <!-- Default values in case the Directory.Repo.props file doesn't exist -->
   <PropertyGroup>
-    <GaleProfile Condition="'$(GaleProfile)' == ''">Mod Development</GaleProfile>
+    <GaleProfileName Condition="'$(GaleProfileName)' == ''">Mod Development</GaleProfileName>
     <GaleDataFolder Condition="'$(GaleDataFolder)' == ''">$(AppData)\com.kesomannen.gale</GaleDataFolder>
+    <BepInExDirectory Condition="'$(BepInExDirectory)' == ''">$(GaleDataFolder)\repo\profiles\$(GaleProfileName)\BepInEx\</BepInExDirectory>
+    <StartArguments Condition="'$(BepInExDirectory)' == ''">--doorstop-enable true --doorstop-target "$(BepInExDirectory)\core\BepInEx.Preloader.dll" --gale-profile "$(GaleProfileName)"</StartArguments>
   </PropertyGroup>
   
-  <PropertyGroup>
-    <BepInExPluginsFolder Condition="'$(BepInExPluginsFolder)' == ''">$(GaleDataFolder)\repo\profiles\$(GaleProfile)\BepInEx\plugins\</BepInExPluginsFolder>
-    <REPOLibPluginFolder Condition="'$(REPOLibPluginFolder)' == ''">$(BepInExPluginsFolder)Zehs-$(MSBuildProjectName)\</REPOLibPluginFolder>
-  </PropertyGroup>
-  
-  <!-- Copy DLL to Gale Zehs-REPOLib plugin folder -->
-  <Target Name="CopyToPluginsFolder" AfterTargets="PostBuildEvent" Condition="Exists('$(BepInExPluginsFolder)')">
-    <Copy DestinationFolder="$(REPOLibPluginFolder)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
-  </Target>
-
-  <Target Name="ValidateCopiedPlugin" AfterTargets="CopyToPluginsFolder" Condition="!Exists('$(BepInExPluginsFolder)') And $(CI) != 'true'" >
-    <Warning Text="Couldn't copy build target to '$(BepInExPluginsFolder)' because the path does not exist. Configure the path in your REPOLib.csproj.user file."/>
+  <!-- Validate that DLL is copied tp Gale Zehs-REPOLib plugin folder -->
+  <Target Name="ValidateCopiedPlugin" AfterTargets="CopyFilesToPluginOutputDirectory" Condition="$(CI) != 'true'">
+    <Message Condition="Exists('$(PluginOutputDirectory)')"
+             Text="Copied build target to '$(PluginOutputDirectory)'." />
+    <Warning Condition="!Exists('$(PluginOutputDirectory)')"
+             Text="Couldn't copy build target to '$(PluginOutputDirectory)' because the path does not exist. Configure the path in your Directory.Repo.props file." />
   </Target>
 
   <!-- Call with `dotnet build -target:PackThunderstore` -->

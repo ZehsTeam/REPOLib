@@ -360,7 +360,8 @@ Anyone is free to contribute.
 
 https://github.com/ZehsTeam/REPOLib
 
-To set up the project, copy the `REPOLib.csproj.user.example` file to `REPOLib.csproj.user`. If needed, change the settings found in that file.
+To set up the project, copy the `Directory.Repo.props.example` file to `Directory.Repo.props`.
+If needed, change the settings found in that file. It can then be placed in either this folder or any parent folders.
 
 ## Bundle Loading
 
