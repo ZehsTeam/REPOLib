@@ -7,9 +7,17 @@ using UnityEngine;
 
 namespace REPOLib.Modules;
 
+/// <summary>
+/// The Items module of REPOLib.
+/// </summary>
 public static class Items
 {
+    /// <inheritdoc cref="GetItems"/>
     public static IReadOnlyList<Item> AllItems => GetItems();
+
+    /// <summary>
+    /// Gets all items registered with REPOLib.
+    /// </summary>
     public static IReadOnlyList<Item> RegisteredItems => _itemsRegistered;
 
     private static readonly List<Item> _itemsToRegister = [];
@@ -32,14 +40,14 @@ public static class Items
         {
             RegisterItemWithGame(item);
         }
-        
+
         _initialItemsRegistered = true;
     }
 
     private static void RegisterItemWithGame(Item item)
     {
         Utilities.FixAudioMixerGroups(item.prefab);
-        
+
         if (StatsManager.instance.AddItem(item))
         {
             if (!_itemsRegistered.Contains(item))
@@ -55,6 +63,11 @@ public static class Items
         }
     }
 
+    /// <summary>
+    /// Registers an <see cref="Item"/>.
+    /// </summary>
+    /// <param name="item">The <see cref="Item"/> to register.</param>
+    /// <exception cref="ArgumentException"></exception>
     public static void RegisterItem(Item item)
     {
         if (item == null)
@@ -96,13 +109,20 @@ public static class Items
         NetworkPrefabs.RegisterNetworkPrefab(prefabId, item.prefab);
 
         _itemsToRegister.Add(item);
-        
+
         if (_initialItemsRegistered)
-        { 
-            RegisterItemWithGame(item);   
+        {
+            RegisterItemWithGame(item);
         }
     }
 
+    /// <summary>
+    /// Spawns an <see cref="Item"/>.
+    /// </summary>
+    /// <param name="item">The <see cref="Item"/> to spawn.</param>
+    /// <param name="position">The position where the item will be spawned.</param>
+    /// <param name="rotation">The rotation of the item.</param>
+    /// <returns>The <see cref="Item"/> object that was spawned.</returns>
     public static GameObject? SpawnItem(Item item, Vector3 position, Quaternion rotation)
     {
         if (item == null)
@@ -137,6 +157,7 @@ public static class Items
         return gameObject;
     }
 
+    /// <inheritdoc cref="StatsManagerExtensions.GetItems(StatsManager)"/>
     public static IReadOnlyList<Item> GetItems()
     {
         if (StatsManager.instance == null)
@@ -147,23 +168,27 @@ public static class Items
         return StatsManager.instance.GetItems();
     }
 
+    /// <inheritdoc cref="StatsManagerExtensions.TryGetItemByName(StatsManager, string, out Item)"/>
     public static bool TryGetItemByName(string name, [NotNullWhen(true)] out Item? item)
     {
         item = GetItemByName(name);
         return item != null;
     }
 
+    /// <inheritdoc cref="StatsManagerExtensions.GetItemByName(StatsManager, string)"/>
     public static Item? GetItemByName(string name)
     {
         return StatsManager.instance?.GetItemByName(name);
     }
 
+    /// <inheritdoc cref="StatsManagerExtensions.TryGetItemThatContainsName(StatsManager, string, out Item)"/>
     public static bool TryGetItemThatContainsName(string name, [NotNullWhen(true)] out Item? item)
     {
         item = GetItemThatContainsName(name);
         return item != null;
     }
 
+    /// <inheritdoc cref="StatsManagerExtensions.GetItemThatContainsName(StatsManager, string)"/>
     public static Item? GetItemThatContainsName(string name)
     {
         return StatsManager.instance?.GetItemThatContainsName(name);

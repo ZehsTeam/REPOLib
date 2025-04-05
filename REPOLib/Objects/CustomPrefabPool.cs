@@ -9,10 +9,19 @@ using Object = UnityEngine.Object;
 
 namespace REPOLib.Objects;
 
+/// <summary>
+/// REPOLib's custom prefab pool.
+/// </summary>
 public class CustomPrefabPool : IPunPrefabPool
 {
+    /// <summary>
+    /// Registered custom network prefabs.
+    /// </summary>
     public readonly Dictionary<string, GameObject> Prefabs = [];
 
+    /// <summary>
+    /// The DefaultPool.
+    /// </summary>
     public DefaultPool DefaultPool
     {
         get
@@ -31,11 +40,17 @@ public class CustomPrefabPool : IPunPrefabPool
 
     private DefaultPool? _defaultPool;
 
+    /// <inheritdoc cref="CustomPrefabPool"/>
     public CustomPrefabPool()
     {
 
     }
-    
+
+    /// <summary>
+    /// Register a <see cref="GameObject"/> as a network prefab.
+    /// </summary>
+    /// <param name="prefabId">The ID for this <see cref="GameObject"/>.</param>
+    /// <param name="prefab">The <see cref="GameObject"/> to register.</param>
     public bool RegisterPrefab(string prefabId, GameObject prefab)
     {
         if (prefab == null)
@@ -56,7 +71,7 @@ public class CustomPrefabPool : IPunPrefabPool
 
         if (Prefabs.TryGetValue(prefabId, out GameObject? value, ignoreKeyCase: true))
         {
-            LogLevel logLevel = value == prefab ? LogLevel.Warning: LogLevel.Error;
+            LogLevel logLevel = value == prefab ? LogLevel.Warning : LogLevel.Error;
             Logger.Log(logLevel, $"CustomPrefabPool: failed to register network prefab \"{prefabId}\". There is already a prefab registered with the same prefab id.");
             return false;
         }
@@ -67,6 +82,11 @@ public class CustomPrefabPool : IPunPrefabPool
         return true;
     }
 
+    /// <summary>
+    /// Check if a <see cref="GameObject"/> is a network prefab.
+    /// </summary>
+    /// <param name="prefab">The <see cref="GameObject"/> to check.</param>
+    /// <returns>Whether or not the <see cref="GameObject"/> is a network prefab.</returns>
     public bool HasPrefab(GameObject prefab)
     {
         if (Prefabs.ContainsValue(prefab))
@@ -82,6 +102,11 @@ public class CustomPrefabPool : IPunPrefabPool
         return false;
     }
 
+    /// <summary>
+    /// Check if a <see cref="GameObject"/> with the specified ID is a network prefab.
+    /// </summary>
+    /// <param name="prefabId">The <see cref="GameObject"/> ID to check.</param>
+    /// <returns>Whether or not the <see cref="GameObject"/> is a network prefab.</returns>
     public bool HasPrefab(string prefabId)
     {
         if (Prefabs.ContainsKey(prefabId, ignoreKeyCase: true))
@@ -97,6 +122,11 @@ public class CustomPrefabPool : IPunPrefabPool
         return false;
     }
 
+    /// <summary>
+    /// Gets the network prefab ID for a <see cref="GameObject"/> if it has one.
+    /// </summary>
+    /// <param name="prefab">The <see cref="GameObject"/> whose network prefab ID we want.</param>
+    /// <returns>The network prefab ID or null.</returns>
     public string? GetPrefabId(GameObject prefab)
     {
         if (prefab == null)
@@ -108,11 +138,24 @@ public class CustomPrefabPool : IPunPrefabPool
         return Prefabs.GetKeyOrDefault(prefab);
     }
 
+    /// <summary>
+    /// Gets the <see cref="GameObject"/> for a network prefab ID if it has one.
+    /// </summary>
+    /// <param name="prefabId">The network prefab ID whose <see cref="GameObject"/> we want.</param>
+    /// <returns>The <see cref="GameObject"/> or null.</returns>
     public GameObject? GetPrefab(string prefabId)
     {
         return Prefabs.GetValueOrDefault(prefabId, ignoreKeyCase: true);
     }
 
+    /// <summary>
+    /// Spawns a network prefab.
+    /// </summary>
+    /// <param name="prefabId">The network prefab ID for the <see cref="GameObject"/> to spawn.</param>
+    /// <param name="position">The position where the <see cref="GameObject"/> will be spawned.</param>
+    /// <param name="rotation">The rotation of the <see cref="GameObject"/>.</param>
+    /// <returns>The <see cref="GameObject"/> or null.</returns>
+    /// <exception cref="ArgumentException"></exception>
     public GameObject? Instantiate(string prefabId, Vector3 position, Quaternion rotation)
     {
         if (string.IsNullOrWhiteSpace(prefabId))
@@ -165,6 +208,10 @@ public class CustomPrefabPool : IPunPrefabPool
         return result;
     }
 
+    /// <summary>
+    /// Destroys a <see cref="GameObject"/>.
+    /// </summary>
+    /// <param name="gameObject">The <see cref="GameObject"/> to destroy.</param>
     public void Destroy(GameObject gameObject)
     {
         Object.Destroy(gameObject);

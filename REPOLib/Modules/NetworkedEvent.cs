@@ -8,6 +8,8 @@ using UnityEngine;
 
 namespace REPOLib.Modules;
 
+// TODO: Document this.
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public static class NetworkingEvents
 {
     public static IReadOnlyList<NetworkedEvent> CustomEvents => _customEvents;
@@ -155,3 +157,4 @@ public class NetworkedEvent
         EventAction?.Invoke(eventData);
     }
 }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

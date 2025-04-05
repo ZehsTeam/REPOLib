@@ -14,4 +14,43 @@
     />
   </ItemGroup>
 
+  <Target Name="AddGeneratedFile" BeforeTargets="BeforeCompile;CoreCompile" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)GeneratedFile.cs">
+    <PropertyGroup>
+      <BepInExPluginGuid Condition="'$(BepInExPluginGuid)' == ''">$(AssemblyName)</BepInExPluginGuid>
+      <BepInExPluginName Condition="'$(BepInExPluginName)' == ''">$(Product)</BepInExPluginName>
+      <BepInExPluginVersion Condition="'$(BepInExPluginVersion)' == ''">$(Version)</BepInExPluginVersion>
+      <GeneratedText><![CDATA[
+namespace $(RootNamespace)
+{
+    /// <summary>
+    /// MyPluginInfo for REPOLib.
+    /// </summary>
+    public static class MyPluginInfo
+    {
+        /// <summary>
+        /// REPOLib's plugin GUID.
+        /// </summary>
+        public const string PLUGIN_GUID = "$(BepInExPluginGuid)"%3B
+
+        /// <summary>
+        /// REPOLib's plugin name.
+        /// </summary>
+        public const string PLUGIN_NAME = "$(BepInExPluginName)"%3B
+
+        /// <summary>
+        /// REPOLib's plugin version.
+        /// </summary>
+        public const string PLUGIN_VERSION = "$(BepInExPluginVersion)"%3B
+    }
+}
+  ]]></GeneratedText>
+      <GeneratedFilePath>$(IntermediateOutputPath)MyPluginInfo.cs</GeneratedFilePath>
+    </PropertyGroup>
+    <ItemGroup>
+      <Compile Include="$(GeneratedFilePath)" />
+      <FileWrites Include="$(GeneratedFilePath)" />
+    </ItemGroup>
+    <WriteLinesToFile Lines="$(GeneratedText)" File="$(GeneratedFilePath)" WriteOnlyWhenDifferent="true" Overwrite="true" />
+  </Target>
+
 </Project>

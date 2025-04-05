@@ -4,13 +4,19 @@ using REPOLib.Patches;
 
 namespace REPOLib;
 
+/// <summary>
+/// The Plugin class of REPOLib.
+/// </summary>
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class Plugin : BaseUnityPlugin
 {
     private readonly Harmony _harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
 
+    /// <summary>
+    /// The REPOLib plugin instance.
+    /// </summary>
     public static Plugin Instance { get; private set; } = null!;
-    
+
     #pragma warning disable IDE0051 // Remove unused private members
     private void Awake()
     #pragma warning restore IDE0051 // Remove unused private members

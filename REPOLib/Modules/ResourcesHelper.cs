@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace REPOLib.Modules;
 
+// TODO: Document this.
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public static class ResourcesHelper
 {
     #region Folder Paths
@@ -32,7 +34,7 @@ public static class ResourcesHelper
     {
         return "Enemies";
     }
-    
+
     public static string GetLevelPrefabsFolderPath(Level level, LevelPrefabType type)
     {
         string folder = type switch
@@ -134,7 +136,7 @@ public static class ResourcesHelper
         Other,
         StartRoom
     }
-    
+
     public static string GetLevelPrefabPath(Level level, GameObject prefab, LevelPrefabType type)
     {
         if (prefab == null)
@@ -202,3 +204,4 @@ public static class ResourcesHelper
         return Resources.Load<GameObject>(prefabId) != null;
     }
 }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

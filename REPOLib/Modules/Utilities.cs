@@ -5,11 +5,14 @@ using UnityEngine;
 
 namespace REPOLib.Modules;
 
+/// <summary>
+/// Utility methods from REPOLib.
+/// </summary>
 public static class Utilities
 {
     private static readonly List<GameObject> _prefabsToFix = [];
     private static readonly List<GameObject> _fixedPrefabs = [];
-    
+
     internal static void FixAudioMixerGroupsOnPrefabs()
     {
         foreach (var prefab in _prefabsToFix)
