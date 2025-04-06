@@ -1,4 +1,10 @@
-# v2.0.0
+# v2.0.1
+
+- Fixed BundleLoader causing an infinite loading screen when loading invalid content.
+- Moved documentation to the [R.E.P.O. Modding Wiki](https://repomods.com/repolib/overview.html).
+- Added XML documentation for most public API classes, methods, and properties. (#40)
+
+## v2.0.0
 
 - Added support for registering levels. (#32)
 - Added new async bundle loading system. (#15)
@@ -12,7 +18,7 @@
   - Changed the signature of `BundleLoader.LoadBundle` (due to async loading).
   - Moved `GenericValuablePresetName` and `ValuablePresets` from `Modules.Valuables` to `Modules.ValuablePresets`.
 
-# v1.5.0
+## v1.5.0
 
 - Added partial name matching to all spawn commands. (#17)
 - Added a new developer mode command `Spawn Enemy`.
