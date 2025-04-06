@@ -21,7 +21,7 @@ public class ItemContent : Content
     /// <summary>
     /// The name of the <see cref="Prefab"/>.
     /// </summary>
-    public override string Name => Prefab.name;
+    public override string Name => Prefab?.name ?? string.Empty;
 
     /// <inheritdoc/>
     public override void Initialize(Mod mod)

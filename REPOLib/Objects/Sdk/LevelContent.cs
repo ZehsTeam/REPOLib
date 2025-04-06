@@ -21,7 +21,7 @@ public class LevelContent : Content
     /// <summary>
     /// The name of the <see cref="Level"/>
     /// </summary>
-    public override string Name => Level.name;
+    public override string Name => Level?.name ?? string.Empty;
 
     /// <inheritdoc/>
     public override void Initialize(Mod mod)

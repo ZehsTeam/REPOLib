@@ -21,7 +21,7 @@ public class EnemyContent : Content
     /// <summary>
     /// The name of the <see cref="Setup"/>.
     /// </summary>
-    public override string Name => Setup.name;
+    public override string Name => Setup?.name ?? string.Empty;
 
     /// <inheritdoc/>
     public override void Initialize(Mod mod)
