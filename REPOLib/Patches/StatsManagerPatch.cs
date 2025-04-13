@@ -11,5 +11,6 @@ internal static class StatsManagerPatch
     private static void RunStartStatsPatch()
     {
         Items.RegisterItems();
+        Upgrades.RegisterUpgrades();
     }
 }
