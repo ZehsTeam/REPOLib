@@ -130,7 +130,7 @@ public static class Enemies
     
     public static void RegisterEnemy(EnemySetup enemySetup)
     {
-        RegisterEnemy(enemySetup, ContentRegistry.GetAssemblySource(Assembly.GetExecutingAssembly()));
+        RegisterEnemy(enemySetup, ContentRegistry.GetAssemblySource(Assembly.GetCallingAssembly()));
     }
 
     public static List<EnemyParent>? SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
