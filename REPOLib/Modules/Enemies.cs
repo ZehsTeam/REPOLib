@@ -227,7 +227,7 @@ public static class Enemies
 
         if (enemyParents.Count == 0)
         {
-            Logger.LogInfo($"Failed to spawn enemy \"{prefabEnemyParent.enemyName}\". No spawn objects where spawned.", extended: true);
+            Logger.LogInfo($"Failed to spawn enemy \"{prefabEnemyParent.enemyName}\". No spawn objects where spawned.");
             return enemyParents;
         }
 
