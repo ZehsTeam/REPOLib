@@ -14,17 +14,18 @@ internal static class PlayerControllerPatch
     private static IEnumerable<CodeInstruction> LateStartTranspiler(IEnumerable<CodeInstruction> instructions)
     {
         FieldInfo playerAvatarScript = AccessTools.Field(typeof(PlayerController), nameof(PlayerController.playerAvatarScript));
-        MethodInfo getPlayerSteamIdCall = AccessTools.Method(typeof(SemiFunc), nameof(SemiFunc.PlayerGetSteamID), new System.Type[] { typeof(PlayerAvatar) });
-        MethodInfo initUpgradesMethod = AccessTools.Method(typeof(Upgrades), nameof(Upgrades.LateStartInitUpgrades), new System.Type[] { typeof(PlayerController), typeof(string) });
+        MethodInfo getPlayerSteamIdCall = AccessTools.Method(typeof(SemiFunc), nameof(SemiFunc.PlayerGetSteamID), [typeof(PlayerAvatar)]);
+        MethodInfo initUpgradesMethod = AccessTools.Method(typeof(Upgrades), nameof(Upgrades.InvokeStartActions), [typeof(string)]);
 
         bool found = false;
         int place = 0;
 
-        List<CodeInstruction> newInstructions = new List<CodeInstruction>();
+        var newInstructions = new List<CodeInstruction>();
 
         foreach (CodeInstruction instruction in instructions)
         {
             newInstructions.Add(instruction);
+
             if (place switch
             {
                 0 => instruction.opcode == OpCodes.Ldloc_1,
@@ -40,7 +41,7 @@ internal static class PlayerControllerPatch
                 {
                     found = true;
                     place = 0;
-                    newInstructions.Add(new CodeInstruction(OpCodes.Ldloc_1));
+                    //newInstructions.Add(new CodeInstruction(OpCodes.Ldloc_1));
                     newInstructions.Add(new CodeInstruction(OpCodes.Ldloc_2));
                     newInstructions.Add(new CodeInstruction(OpCodes.Call, initUpgradesMethod));
                 }
@@ -56,6 +57,9 @@ internal static class PlayerControllerPatch
             yield return instruction;
         }
 
-        if (!found) Logger.LogWarning("Failed to patch PlayerController.LateStart!");
+        if (!found)
+        {
+            Logger.LogWarning("Failed to patch PlayerController.LateStart!");
+        }
     }
 }

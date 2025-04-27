@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using HarmonyLib;
+using REPOLib.Modules;
 using REPOLib.Patches;
 
 namespace REPOLib;
@@ -37,6 +38,8 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll(typeof(PlayerControllerPatch));
 
         ConfigManager.Initialize(Config);
+
+        Upgrades.Initialize();
 
         BundleLoader.LoadAllBundles(Paths.PluginPath, ".repobundle");
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Steamworks;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,5 +15,15 @@ internal static class StringExtensions
         }
 
         return inputs.Contains(value, StringComparer.FromComparison(comparisonType));
+    }
+
+    public static SteamId ToSteamId(this string value)
+    {
+        return ulong.TryParse(value, out ulong result) ? result : default;
+    }
+
+    public static bool IsValidSteamId(this string value)
+    {
+        return value.ToSteamId().IsValid;
     }
 }

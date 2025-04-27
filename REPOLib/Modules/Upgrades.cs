@@ -1,8 +1,11 @@
+using ExitGames.Client.Photon;
+using REPOLib.Extensions;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExitGames.Client.Photon;
 using UnityEngine;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 namespace REPOLib.Modules;
 
@@ -15,88 +18,144 @@ public static class Upgrades
     /// Gets all <see cref="PlayerUpgrade"/>s registered with REPOLib.
     /// </summary>
     public static IReadOnlyList<PlayerUpgrade> PlayerUpgrades => _playerUpgrades.Values.ToList();
+
     private static readonly Dictionary<string, PlayerUpgrade> _playerUpgrades = [];
 
-    /// <summary>
-    /// Retrieves a registered <see cref="PlayerUpgrade"/> by it's identifier.
-    /// </summary>
-    public static PlayerUpgrade? GetUpgrade(string upgradeId)
+    private static NetworkedEvent? _upgradeEvent;
+
+    internal static void Initialize()
     {
-        if (_playerUpgrades.TryGetValue(upgradeId, out PlayerUpgrade upgrade)) return upgrade;
-        return null;
+        _upgradeEvent = new NetworkedEvent("REPOLib Upgrade", HandleUpgradeEvent);
     }
-    
+
+    // This will run multiple times
     internal static void RegisterUpgrades()
     {
         if (StatsManager.instance == null)
         {
-            Logger.LogError("Failed to register upgrades. StatsManager instance is null.");
+            Logger.LogError("Upgrades: Failed to register upgrades. StatsManager instance is null.");
             return;
         }
 
-        foreach (KeyValuePair<string, PlayerUpgrade> pair in _playerUpgrades)
+        foreach (var pair in _playerUpgrades)
         {
             string key = $"playerUpgrade{pair.Key}";
+            var playerDictionary = pair.Value.PlayerDictionary;
 
-            if (StatsManager.instance.dictionaryOfDictionaries.ContainsKey(key))
+            if (StatsManager.instance.dictionaryOfDictionaries.TryGetValue(key, out Dictionary<string, int> dictionary))
             {
-                Logger.LogWarning($"Failed to add upgrade \"{key}\"", extended: true);
-                continue;
+                playerDictionary = dictionary;
+
+                Logger.LogInfo($"Upgrades: Loaded upgrade \"{key}\" from StatsManager.", extended: true);
             }
             else
             {
-                pair.Value.playerDictionary.Clear();
-                StatsManager.instance.dictionaryOfDictionaries.Add(key, pair.Value.playerDictionary);
-                Logger.LogInfo($"Added upgrade \"{key}\"", extended: true);
+                playerDictionary.Clear();
+                StatsManager.instance.dictionaryOfDictionaries.Add(key, playerDictionary);
+
+                Logger.LogInfo($"Upgrades: Added upgrade \"{key}\" to StatsManager.", extended: true);
             }
         }
     }
 
-    internal static void LateStartInitUpgrades(PlayerController playerController, string steamId)
+    internal static void InvokeStartActions(string steamId)
     {
-        foreach (PlayerUpgrade upgrade in _playerUpgrades.Values)
+        PlayerAvatar playerAvatar = SemiFunc.PlayerAvatarGetFromSteamID(steamId);
+
+        if (playerAvatar == null)
         {
-            if (upgrade.startAction == null) continue;
-            // Added safety since this code is inserted in the middle of vanilla coroutine via transpiler and I don't want to break too much if one mod throws an error
+            return;
+        }
+
+        foreach (PlayerUpgrade upgrade in PlayerUpgrades)
+        {
+            if (upgrade.StartAction == null)
+            {
+                continue;
+            }
+
             try
             {
-                upgrade.startAction.Invoke(playerController, upgrade.GetLevel(steamId));
+                upgrade.StartAction.Invoke(playerAvatar, upgrade.GetLevel(steamId));
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.LogError(e);
+                Logger.LogError($"Upgrades: Failed to invoke start action for upgrade \"{upgrade.UpgradeId}\". {ex}");
             }
         }
+    }
+
+    internal static void RaiseUpgradeEvent(string upgradeId, string steamId, int value)
+    {
+        if (_upgradeEvent == null)
+        {
+            return;
+        }
+
+        var data = new Hashtable
+        {
+            { "UpgradeId", upgradeId },
+            { "SteamId", steamId },
+            { "Value", value }
+        };
+
+        _upgradeEvent.RaiseEvent(data, NetworkingEvents.RaiseOthers, SendOptions.SendReliable);
+    }
+
+    private static void HandleUpgradeEvent(EventData eventData)
+    {
+        if (eventData.CustomData is not Hashtable data)
+        {
+            return;
+        }
+
+        string upgradeId = (string)data["UpgradeId"];
+        string steamId = (string)data["SteamId"];
+        int value = (int)data["Value"];
+
+        PlayerUpgrade? playerUpgrade = GetUpgrade(upgradeId);
+
+        if (playerUpgrade == null)
+        {
+            return;
+        }
+
+        playerUpgrade.UpgradeOthers(steamId, value);
     }
 
     /// <summary>
     /// Registers a <see cref="PlayerUpgrade"/>.
     /// </summary>
-    /// <param name="name">The name of the upgrade you want to create.</param>
-    /// <param name="startAction">The method to be called during <see cref="PlayerController.LateStart"/> to initialize values for the upgrade. (<see cref="PlayerController"/> is the player being refrenced.) (<see cref="int"/> is the level of this upgrade that the player has.)</param>
-    /// <param name="upgradeAction">The method called whenever an instance of this upgrade is triggered to change value. (<see cref="PlayerController"/> is the player being refrenced.) (<see cref="int"/> is the level of this upgrade that the player has.)</param>
-    public static PlayerUpgrade? RegisterUpgrade(string name, Action<PlayerController, int> startAction, Action<PlayerController, int> upgradeAction)
+    /// <param name="upgradeId">The ID of your upgrade.</param>
+    /// <param name="item">The upgrade item if it has one.</param>
+    /// <param name="startAction">The method to be called during <see cref="PlayerController.LateStart"/> to initialize values for the upgrade. (<see cref="PlayerAvatar"/> is the player being refrenced.) (<see cref="int"/> is the level of this upgrade that the player has.)</param>
+    /// <param name="upgradeAction">The method called whenever an instance of this upgrade is triggered to change value. (<see cref="PlayerAvatar"/> is the player being refrenced.) (<see cref="int"/> is the level of this upgrade that the player has.)</param>
+    public static PlayerUpgrade? RegisterUpgrade(string upgradeId, Item? item, Action<PlayerAvatar, int>? startAction, Action<PlayerAvatar, int>? upgradeAction)
     {
-        if (_playerUpgrades.ContainsKey(name))
+        if (_playerUpgrades.ContainsKey(upgradeId))
         {
-            Logger.LogError($"Failed to register upgrade \"{name}\". An upgrade with this key has already been registered.");
+            Logger.LogError($"Failed to register upgrade \"{upgradeId}\". An upgrade with this UpgradeId has already been registered.");
             return null;
         }
 
-        PlayerUpgrade upgrade = new(name, startAction, upgradeAction);
-
-        _playerUpgrades.Add(name, upgrade);
-
+        var upgrade = new PlayerUpgrade(upgradeId, item, startAction, upgradeAction);
+        _playerUpgrades.Add(upgradeId, upgrade);
         return upgrade;
     }
 
     /// <summary>
-    /// Registers a <see cref="PlayerUpgrade"/>.
+    /// Retrieves a registered <see cref="PlayerUpgrade"/> by it's identifier.
     /// </summary>
-    /// <param name="name">The name of the upgrade you want to create.</param>
-    /// <param name="upgradeAction">The method called whenever an instance of this upgrade is triggered to change value. (<see cref="PlayerController"/> is the player being refrenced.) (<see cref="int"/> is the level of this upgrade that the player has.)</param>
-    public static PlayerUpgrade? RegisterUpgrade(string name, Action<PlayerController, int> upgradeAction)
-    => RegisterUpgrade(name, upgradeAction, upgradeAction);
+    /// <param name="upgradeId">The ID of the upgrade.</param>
+    public static PlayerUpgrade? GetUpgrade(string upgradeId)
+    {
+        if (_playerUpgrades.TryGetValue(upgradeId, out PlayerUpgrade playerUpgrade))
+        {
+            return playerUpgrade;
+        }
+
+        return null;
+    }
 }
 
 /// <summary>
@@ -105,117 +164,187 @@ public static class Upgrades
 public class PlayerUpgrade
 {
     /// <summary>
-    /// The name used to register this upgrade.
-    /// This is used as the upgrade's key.
+    /// The ID for this upgrade.
     /// </summary>
-    public readonly string name;
+    public readonly string UpgradeId;
+
+    /// <summary>
+    /// The upgrade item.
+    /// </summary>
+    public readonly Item? Item;
+
     /// <summary>
     /// The dictionary of player identifiers and upgrade levels saved to the game file.
     /// </summary>
-    public readonly Dictionary<string, int> playerDictionary = [];
-    private readonly NetworkedEvent upgradeEvent;
-    internal readonly Action<PlayerController, int> startAction;
-    private readonly Action<PlayerController, int> upgradeAction;
+    public Dictionary<string, int> PlayerDictionary = [];
 
-    internal PlayerUpgrade(string name, Action<PlayerController, int> startAction, Action<PlayerController, int> upgradeAction)
+    internal readonly Action<PlayerAvatar, int>? StartAction;
+
+    private readonly Action<PlayerAvatar, int>? _upgradeAction;
+
+    internal PlayerUpgrade(string upgradeId, Item? item, Action<PlayerAvatar, int>? startAction, Action<PlayerAvatar, int>? upgradeAction)
     {
-        this.name = name;
-        this.startAction = startAction;
-        this.upgradeAction = upgradeAction;
-        upgradeEvent = new NetworkedEvent($"ModdedPlayerUpgrade{name}", UpgradeHandler);
+        UpgradeId = upgradeId;
+        Item = item;
+        StartAction = startAction;
+        _upgradeAction = upgradeAction;
     }
 
     /// <summary>
     /// Gets the level of this upgrade for the given player.
     /// </summary>
-    public int GetLevel(PlayerAvatar player) 
+    public int GetLevel(PlayerAvatar playerAvatar) 
     {
-        string steamId = SemiFunc.PlayerGetSteamID(player);
-        if (player == null || steamId == null) return 0;
-        return GetLevel(steamId);
+        if (playerAvatar == null)
+        {
+            return 0;
+        }
+
+        return GetLevel(playerAvatar.steamID);
     }
+    
     /// <summary>
     /// Gets the level of this upgrade for the given player's steamId.
     /// </summary>
     public int GetLevel(string steamId)
     {
-        if (playerDictionary.TryGetValue(steamId, out int value)) return value;
+        if (PlayerDictionary.TryGetValue(steamId, out int value))
+        {
+            return value;
+        }
+
         return 0;
     }
 
     /// <summary>
     /// Triggers using this upgrade for the given player. (Calling this will network this change to other clients)
     /// </summary>
-    public void Upgrade(PlayerAvatar player) 
+    public int Upgrade(PlayerAvatar playerAvatar) 
     {
-        string steamId = SemiFunc.PlayerGetSteamID(player);
-        if (player == null || steamId == null) return;
-        Upgrade(steamId);
+        if (playerAvatar == null)
+        {
+            return 0;
+        }
+
+        return Upgrade(playerAvatar.steamID);
     }
+    
     /// <summary>
     /// Triggers using this upgrade for the given player's steamId. (Calling this will network this change to other clients)
     /// </summary>
-	public int Upgrade(string playerId)
+	public int Upgrade(string steamId)
 	{
-        if (!playerDictionary.TryGetValue(playerId, out int num))
-        {
-            playerDictionary.Add(playerId, num = 0);
-        }
-        num++;
-		if (SemiFunc.IsMasterClientOrSingleplayer())
-		{
-			UpdateRightAway(playerId);
-		}
-		if (SemiFunc.IsMasterClient())
-		{
-            upgradeEvent.RaiseEvent(string.Concat(playerId, '\n', num), NetworkingEvents.RaiseOthers, SendOptions.SendReliable);
-		}
-		return playerDictionary[playerId] = num;
-	}
+        int value = GetLevel(steamId);
+        value++;
 
-	private void UpgradeHandler(EventData data)
-	{
-        string[] rawData = ((string)data.CustomData).Split('\n');
-        if (rawData.Length == 2 && int.TryParse(rawData[1], out int value))
-        {
-            string steamId = rawData[0];
-            if (playerDictionary.ContainsKey(steamId)) playerDictionary[steamId] = value;
-            else playerDictionary.Add(steamId, value);
+        PlayerDictionary[steamId] = value;
+
+        if (SemiFunc.IsMasterClientOrSingleplayer())
+		{
             UpdateRightAway(steamId);
         }
-	}
 
-	private void UpdateRightAway(string playerId)
+        if (SemiFunc.IsMasterClient())
+        {
+            Upgrades.RaiseUpgradeEvent(UpgradeId, steamId, value);
+        }
+
+        Logger.LogInfo($"PlayerUpgrade: Upgrade \"{UpgradeId}\" for player \"{steamId}\". Level: {value}");
+
+        return value;
+    }
+
+    internal void UpgradeOthers(string steamId, int value)
+    {
+        Logger.LogInfo($"PlayerUpgrade: UpgradeOthers \"{UpgradeId}\" for player \"{steamId}\". Level: {value}");
+
+        PlayerDictionary[steamId] = value;
+        UpdateRightAway(steamId);
+    }
+
+	private void UpdateRightAway(string steamId)
 	{
-        if (upgradeAction == null) return;
-		PlayerAvatar playerAvatar = SemiFunc.PlayerAvatarGetFromSteamID(playerId);
-		if (playerAvatar == SemiFunc.PlayerAvatarLocal() && playerAvatar.playerTransform.gameObject.TryGetComponent(out PlayerController controller))
-		{
-            upgradeAction.Invoke(controller, GetLevel(playerId));
-		}
+        if (_upgradeAction == null)
+        {
+            return;
+        }
+
+		PlayerAvatar playerAvatar = SemiFunc.PlayerAvatarGetFromSteamID(steamId);
+
+        if (playerAvatar == null)
+        {
+            return;
+        }
+
+        try
+        {
+            _upgradeAction.Invoke(playerAvatar, GetLevel(steamId));
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($"PlayerUpgrade: Failed to invoke upgrade action for upgrade \"{UpgradeId}\". {ex}");
+        }
 	}
 }
 
 /// <summary>
 /// A component for easily triggering a <see cref="PlayerUpgrade"/>.
 /// </summary>
-public class REPOLibUpgrade : MonoBehaviour
+public class REPOLibItemUpgrade : MonoBehaviour
 {
-    #pragma warning disable CS8618
-    private ItemToggle itemToggle;
-    #pragma warning restore CS8618
+    #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
+    [SerializeField]
+    private string _upgradeId = null!;
+    #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
-    void Start()
+    /// <summary>
+    /// The ID of your PlayerUpgrade.
+    /// </summary>
+    public string UpgradeId => _upgradeId;
+
+    private ItemToggle _itemToggle = null!;
+
+    private void Start()
     {
-        itemToggle = GetComponent<ItemToggle>();
+        _itemToggle = GetComponent<ItemToggle>();
     }
 
     /// <summary>
-    /// Gets the level of this upgrade for the given player's steamId.
+    /// Add the upgrade to the player that that triggered the <see cref="ItemToggle"/>.
     /// </summary>
-    public void Upgrade(string upgradeId)
+    public void Upgrade()
     {
-        PlayerUpgrade? upgrade = Upgrades.GetUpgrade(upgradeId);
-        upgrade?.Upgrade(SemiFunc.PlayerGetSteamID(SemiFunc.PlayerAvatarGetFromPhotonID(itemToggle.playerTogglePhotonID)));
+        if (_itemToggle == null)
+        {
+            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{UpgradeId}\". ItemToggle is null.");
+            return;
+        }
+
+        PlayerUpgrade? upgrade = Upgrades.GetUpgrade(UpgradeId);
+
+        if (upgrade == null)
+        {
+            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{UpgradeId}\". Could not find PlayerUpgrade from UpgradeId.");
+            return;
+        }
+
+        int playerTogglePhotonID = _itemToggle.playerTogglePhotonID;
+        PlayerAvatar playerAvatar = SemiFunc.PlayerAvatarGetFromPhotonID(playerTogglePhotonID);
+
+        if (playerAvatar == null)
+        {
+            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{UpgradeId}\". Could not find PlayerAvatar from ItemToggle's playerTogglePhotonID {playerTogglePhotonID}.");
+            return;
+        }
+
+        string steamId = playerAvatar.steamID;
+
+        if (!steamId.IsValidSteamId())
+        {
+            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{UpgradeId}\". Steam ID \"{steamId}\" is invalid.");
+            return;
+        }
+
+        upgrade.Upgrade(steamId);
     }
 }
