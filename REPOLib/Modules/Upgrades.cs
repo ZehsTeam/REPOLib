@@ -6,12 +6,21 @@ using UnityEngine;
 
 namespace REPOLib.Modules;
 
+/// <summary>
+/// The Upgrades module of REPOLib.
+/// </summary>
 public static class Upgrades
 {
+    /// <summary>
+    /// Gets all <see cref="PlayerUpgrade"/>s registered with REPOLib.
+    /// </summary>
     public static IReadOnlyList<PlayerUpgrade> PlayerUpgrades => _playerUpgrades.Values.ToList();
     private static readonly Dictionary<string, PlayerUpgrade> _playerUpgrades = [];
 
-    public static PlayerUpgrade GetUpgrade(string upgradeId)
+    /// <summary>
+    /// Retrieves a registered <see cref="PlayerUpgrade"/> by it's identifier.
+    /// </summary>
+    public static PlayerUpgrade? GetUpgrade(string upgradeId)
     {
         if (_playerUpgrades.TryGetValue(upgradeId, out PlayerUpgrade upgrade)) return upgrade;
         return null;
@@ -36,7 +45,7 @@ public static class Upgrades
             }
             else
             {
-                pair.Value.playerDictionary = [];
+                pair.Value.playerDictionary.Clear();
                 StatsManager.instance.dictionaryOfDictionaries.Add(key, pair.Value.playerDictionary);
                 Logger.LogInfo($"Added upgrade \"{key}\"", extended: true);
             }
@@ -60,7 +69,13 @@ public static class Upgrades
         }
     }
 
-    public static PlayerUpgrade RegisterUpgrade(string name, Action<PlayerController, int> startAction, Action<PlayerController, int> upgradeAction)
+    /// <summary>
+    /// Registers a <see cref="PlayerUpgrade"/>.
+    /// </summary>
+    /// <param name="name">The name of the upgrade you want to create.</param>
+    /// <param name="startAction">The method to be called during <see cref="PlayerController.LateStart"/> to initialize values for the upgrade. (<see cref="PlayerController"/> is the player being refrenced.) (<see cref="int"/> is the level of this upgrade that the player has.)</param>
+    /// <param name="upgradeAction">The method called whenever an instance of this upgrade is triggered to change value. (<see cref="PlayerController"/> is the player being refrenced.) (<see cref="int"/> is the level of this upgrade that the player has.)</param>
+    public static PlayerUpgrade? RegisterUpgrade(string name, Action<PlayerController, int> startAction, Action<PlayerController, int> upgradeAction)
     {
         if (_playerUpgrades.ContainsKey(name))
         {
@@ -74,12 +89,30 @@ public static class Upgrades
 
         return upgrade;
     }
+
+    /// <summary>
+    /// Registers a <see cref="PlayerUpgrade"/>.
+    /// </summary>
+    /// <param name="name">The name of the upgrade you want to create.</param>
+    /// <param name="upgradeAction">The method called whenever an instance of this upgrade is triggered to change value. (<see cref="PlayerController"/> is the player being refrenced.) (<see cref="int"/> is the level of this upgrade that the player has.)</param>
+    public static PlayerUpgrade? RegisterUpgrade(string name, Action<PlayerController, int> upgradeAction)
+    => RegisterUpgrade(name, upgradeAction, upgradeAction);
 }
 
+/// <summary>
+/// An instance of a registered <see cref="PlayerUpgrade"/>.
+/// </summary>
 public class PlayerUpgrade
 {
+    /// <summary>
+    /// The name used to register this upgrade.
+    /// This is used as the upgrade's key.
+    /// </summary>
     public readonly string name;
-    public Dictionary<string, int> playerDictionary {get; internal set;}
+    /// <summary>
+    /// The dictionary of player identifiers and upgrade levels saved to the game file.
+    /// </summary>
+    public readonly Dictionary<string, int> playerDictionary = [];
     private readonly NetworkedEvent upgradeEvent;
     internal readonly Action<PlayerController, int> startAction;
     private readonly Action<PlayerController, int> upgradeAction;
@@ -92,24 +125,36 @@ public class PlayerUpgrade
         upgradeEvent = new NetworkedEvent($"ModdedPlayerUpgrade{name}", UpgradeHandler);
     }
 
+    /// <summary>
+    /// Gets the level of this upgrade for the given player.
+    /// </summary>
     public int GetLevel(PlayerAvatar player) 
     {
         string steamId = SemiFunc.PlayerGetSteamID(player);
         if (player == null || steamId == null) return 0;
         return GetLevel(steamId);
     }
+    /// <summary>
+    /// Gets the level of this upgrade for the given player's steamId.
+    /// </summary>
     public int GetLevel(string steamId)
     {
         if (playerDictionary.TryGetValue(steamId, out int value)) return value;
         return 0;
     }
 
+    /// <summary>
+    /// Triggers using this upgrade for the given player. (Calling this will network this change to other clients)
+    /// </summary>
     public void Upgrade(PlayerAvatar player) 
     {
         string steamId = SemiFunc.PlayerGetSteamID(player);
         if (player == null || steamId == null) return;
         Upgrade(steamId);
     }
+    /// <summary>
+    /// Triggers using this upgrade for the given player's steamId. (Calling this will network this change to other clients)
+    /// </summary>
 	public int Upgrade(string playerId)
 	{
         if (!playerDictionary.TryGetValue(playerId, out int num))
@@ -151,18 +196,26 @@ public class PlayerUpgrade
 	}
 }
 
+/// <summary>
+/// A component for easily triggering a <see cref="PlayerUpgrade"/>.
+/// </summary>
 public class REPOLibUpgrade : MonoBehaviour
 {
+    #pragma warning disable CS8618
     private ItemToggle itemToggle;
+    #pragma warning restore CS8618
 
     void Start()
     {
         itemToggle = GetComponent<ItemToggle>();
     }
 
+    /// <summary>
+    /// Gets the level of this upgrade for the given player's steamId.
+    /// </summary>
     public void Upgrade(string upgradeId)
     {
-        PlayerUpgrade upgrade = Upgrades.GetUpgrade(upgradeId);
+        PlayerUpgrade? upgrade = Upgrades.GetUpgrade(upgradeId);
         upgrade?.Upgrade(SemiFunc.PlayerGetSteamID(SemiFunc.PlayerAvatarGetFromPhotonID(itemToggle.playerTogglePhotonID)));
     }
 }
