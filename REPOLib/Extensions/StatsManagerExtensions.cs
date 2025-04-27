@@ -56,6 +56,7 @@ internal static class StatsManagerExtensions
     public static Item GetItemThatContainsName(this StatsManager statsManager, string name)
     {
         return statsManager.GetItems()
+            .SortByStringLength(x => x.itemName, ListExtensions.StringSortMode.Shortest)
             .FirstOrDefault(x => x.NameContains(name));
     }
 }

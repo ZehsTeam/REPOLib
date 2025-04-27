@@ -101,7 +101,7 @@ internal static class EnemyDirectorExtensions
         enemySetup = enemyDirector.GetEnemyThatContainsName(name);
         return enemySetup != null;
     }
-
+    
     public static EnemySetup GetEnemyThatContainsName(this EnemyDirector enemyDirector, string name)
     {
         return enemyDirector.GetEnemies()

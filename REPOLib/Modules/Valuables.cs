@@ -250,20 +250,10 @@ public static class Valuables
     /// <returns>The <see cref="ValuableObject"/> or null.</returns>
     public static ValuableObject? GetValuableByName(string name)
     {
-        foreach (var gameObject in GetValuables())
-        {
-            if (!gameObject.TryGetComponent(out ValuableObject valuableObject))
-            {
-                continue;
-            }
+        GameObject gameObject = GetValuables()
+            .FirstOrDefault(x => x.name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
-            if (gameObject.name.EqualsAny([name, $"Valuable {name}"], StringComparison.OrdinalIgnoreCase))
-            {
-                return valuableObject;
-            }
-        }
-
-        return default;
+        return gameObject?.GetComponent<ValuableObject>() ?? null;
     }
 
     /// <summary>
@@ -285,20 +275,11 @@ public static class Valuables
     /// <returns>The <see cref="ValuableObject"/> or null.</returns>
     public static ValuableObject? GetValuableThatContainsName(string name)
     {
-        foreach (var gameObject in GetValuables())
-        {
-            if (!gameObject.TryGetComponent(out ValuableObject valuableObject))
-            {
-                continue;
-            }
+        GameObject gameObject = GetValuables()
+            .SortByStringLength(x => x.name, ListExtensions.StringSortMode.Shortest)
+            .FirstOrDefault(x => x.name.Contains(name, StringComparison.OrdinalIgnoreCase));
 
-            if (gameObject.name.Contains(name, StringComparison.OrdinalIgnoreCase))
-            {
-                return valuableObject;
-            }
-        }
-
-        return default;
+        return gameObject?.GetComponent<ValuableObject>() ?? null;
     }
 
     #region Deprecated
