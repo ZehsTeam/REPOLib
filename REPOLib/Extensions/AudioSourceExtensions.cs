@@ -10,7 +10,7 @@ internal static class AudioSourceExtensions
         audioSource.FixAudioMixerGroup(audioSource.gameObject);
     }
 
-    public static void FixAudioMixerGroup(this AudioSource audioSource, GameObject parentObject)
+    public static void FixAudioMixerGroup(this AudioSource audioSource, GameObject rootObject)
     {
         if (audioSource == null)
         {
@@ -19,13 +19,13 @@ internal static class AudioSourceExtensions
 
         string fullGameObjectName;
 
-        if (parentObject == audioSource.gameObject)
+        if (rootObject == audioSource.gameObject)
         {
             fullGameObjectName = audioSource.gameObject.name;
         }
         else
         {
-            fullGameObjectName = $"{parentObject.name}/{audioSource.gameObject.name}";
+            fullGameObjectName = $"{rootObject.name}/{audioSource.gameObject.name}";
         }
 
         if (AudioManager.instance == null)
