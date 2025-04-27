@@ -12,10 +12,7 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Valuables
 {
-    /// <summary>
-    /// Gets all valuables.
-    /// </summary>
-    /// <returns>All valuables.</returns>
+    /// <inheritdoc cref="GetValuables"/>
     public static IReadOnlyList<GameObject> AllValuables => GetValuables();
 
     /// <summary>
@@ -217,7 +214,11 @@ public static class Valuables
         return gameObject;
     }
 
-    private static IReadOnlyList<GameObject> GetValuables()
+    /// <summary>
+    /// Gets all valuables.
+    /// </summary>
+    /// <returns>All valuables.</returns>
+    public static IReadOnlyList<GameObject> GetValuables()
     {
         if (RunManager.instance == null)
         {

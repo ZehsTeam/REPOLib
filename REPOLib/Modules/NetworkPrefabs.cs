@@ -51,19 +51,30 @@ public static class NetworkPrefabs
         Logger.LogInfo($"Finished initializing NetworkPrefabs.");
     }
 
-    /// <inheritdoc cref="CustomPrefabPool.RegisterPrefab(string, GameObject)"/>
+    /// <summary>
+    /// Register a <see cref="GameObject"/> as a network prefab.
+    /// </summary>
+    /// <param name="prefab">The <see cref="GameObject"/> to register.</param>
     public static void RegisterNetworkPrefab(GameObject prefab)
     {
         RegisterNetworkPrefab(prefab?.name!, prefab!);
     }
 
-    /// <inheritdoc cref="CustomPrefabPool.RegisterPrefab(string, GameObject)"/>
+    /// <summary>
+    /// Register a <see cref="GameObject"/> as a network prefab.
+    /// </summary>
+    /// <param name="prefabId">The ID for this <see cref="GameObject"/>.</param>
+    /// <param name="prefab">The <see cref="GameObject"/> to register.</param>
     public static void RegisterNetworkPrefab(string prefabId, GameObject prefab)
     {
         CustomPrefabPool.RegisterPrefab(prefabId, prefab);
     }
 
-    /// <inheritdoc cref="CustomPrefabPool.HasPrefab(string)"/>
+    /// <summary>
+    /// Check if a <see cref="GameObject"/> with the specified ID is a network prefab.
+    /// </summary>
+    /// <param name="prefabId">The <see cref="GameObject"/> ID to check.</param>
+    /// <returns>Whether or not the <see cref="GameObject"/> is a network prefab.</returns>
     public static bool HasNetworkPrefab(string prefabId)
     {
         return CustomPrefabPool.HasPrefab(prefabId);

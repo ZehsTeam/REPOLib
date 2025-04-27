@@ -12,10 +12,7 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Items
 {
-    /// <summary>
-    /// Gets all items.
-    /// </summary>
-    /// <returns>The list of all items.</returns>
+    /// <inheritdoc cref="GetItems"/>
     public static IReadOnlyList<Item> AllItems => GetItems();
 
     /// <summary>
@@ -160,7 +157,11 @@ public static class Items
         return gameObject;
     }
 
-    private static IReadOnlyList<Item> GetItems()
+    /// <summary>
+    /// Gets all items.
+    /// </summary>
+    /// <returns>The list of all items.</returns>
+    public static IReadOnlyList<Item> GetItems()
     {
         if (StatsManager.instance == null)
         {
@@ -169,7 +170,7 @@ public static class Items
 
         return StatsManager.instance.GetItems();
     }
-
+    
     /// <summary>
     /// Tries to get an <see cref="Item"/> by name.
     /// </summary>

@@ -11,10 +11,7 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Enemies
 {
-    /// <summary>
-    /// Gets all <see cref="EnemySetup"/> objects.
-    /// </summary>
-    /// <returns>A list of all <see cref="EnemySetup"/> objects.</returns>
+    /// <inheritdoc cref="GetEnemies"/>
     public static IReadOnlyList<EnemySetup> AllEnemies => GetEnemies();
 
     /// <summary>
@@ -241,7 +238,11 @@ public static class Enemies
         return enemyParents;
     }
 
-    private static IReadOnlyList<EnemySetup> GetEnemies()
+    /// <summary>
+    /// Gets all <see cref="EnemySetup"/> objects.
+    /// </summary>
+    /// <returns>A list of all <see cref="EnemySetup"/> objects.</returns>
+    public static IReadOnlyList<EnemySetup> GetEnemies()
     {
         if (EnemyDirector.instance == null)
         {

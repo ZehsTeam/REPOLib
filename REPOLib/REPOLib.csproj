@@ -32,6 +32,7 @@
     
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
+    
     <!-- Trim the project path in debug symbols -->
     <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
     
@@ -74,10 +75,7 @@
     <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.1.2-ngd.0" PrivateAssets="all" />
     <PackageReference Include="Linkoid.Repo.Plugin.Build" Version="0.2.2" PrivateAssets="all" />
   </ItemGroup>
-    
-  <!-- Import settings from .csproj.user file -->
-  <!--<Import Project="$(MSBuildProjectFile).user" Condition="Exists('$(MSBuildProjectFile).user')" />-->
-    
+  
   <!-- Default values in case the Directory.Repo.props file doesn't exist -->
   <PropertyGroup>
     <GaleProfileName Condition="'$(GaleProfileName)' == ''">Mod Development</GaleProfileName>
@@ -88,10 +86,8 @@
   
   <!-- Validate that DLL is copied tp Gale Zehs-REPOLib plugin folder -->
   <Target Name="ValidateCopiedPlugin" AfterTargets="CopyFilesToPluginOutputDirectory" Condition="$(CI) != 'true'">
-    <Message Condition="Exists('$(PluginOutputDirectory)')"
-             Text="Copied build target to '$(PluginOutputDirectory)'." />
-    <Warning Condition="!Exists('$(PluginOutputDirectory)')"
-             Text="Couldn't copy build target to '$(PluginOutputDirectory)' because the path does not exist. Configure the path in your Directory.Repo.props file." />
+    <Message Condition="Exists('$(PluginOutputDirectory)')" Text="Copied build target to '$(PluginOutputDirectory)'." />
+    <Warning Condition="!Exists('$(PluginOutputDirectory)')" Text="Couldn't copy build target to '$(PluginOutputDirectory)' because the path does not exist. Configure the path in your Directory.Repo.props file." />
   </Target>
 
   <!-- Call with `dotnet build -target:PackThunderstore` -->
