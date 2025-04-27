@@ -1,9 +1,10 @@
 ﻿using REPOLib.Extensions;
-using System.IO;
 using UnityEngine;
 
 namespace REPOLib.Modules;
 
+// TODO: Document this.
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public static class ResourcesHelper
 {
     #region Folder Paths
@@ -11,27 +12,40 @@ public static class ResourcesHelper
     {
         string folder = volumeType switch
         {
-            ValuableVolume.Type.Tiny =>     "01 Tiny/",
-            ValuableVolume.Type.Small =>    "02 Small/",
-            ValuableVolume.Type.Medium =>   "03 Medium/",
-            ValuableVolume.Type.Big =>      "04 Big/",
-            ValuableVolume.Type.Wide =>     "05 Wide/",
-            ValuableVolume.Type.Tall =>     "06 Tall/",
-            ValuableVolume.Type.VeryTall => "07 Very Tall/",
+            ValuableVolume.Type.Tiny =>     "01 Tiny",
+            ValuableVolume.Type.Small =>    "02 Small",
+            ValuableVolume.Type.Medium =>   "03 Medium",
+            ValuableVolume.Type.Big =>      "04 Big",
+            ValuableVolume.Type.Wide =>     "05 Wide",
+            ValuableVolume.Type.Tall =>     "06 Tall",
+            ValuableVolume.Type.VeryTall => "07 Very Tall",
             _ => string.Empty
         };
 
-        return Path.Combine("Valuables/", folder);
+        return $"Valuables/{folder}";
     }
 
     public static string GetItemsFolderPath()
     {
-        return "Items/";
+        return "Items";
     }
 
     public static string GetEnemiesFolderPath()
     {
-        return "Enemies/";
+        return "Enemies";
+    }
+
+    public static string GetLevelPrefabsFolderPath(Level level, LevelPrefabType type)
+    {
+        string folder = type switch
+        {
+            LevelPrefabType.Module => "Modules",
+            LevelPrefabType.Other => "Other",
+            LevelPrefabType.StartRoom => "Start Room",
+            _ => string.Empty
+        };
+
+        return $"Level/{level.ResourcePath}/{folder}";
     }
     #endregion
 
@@ -45,7 +59,7 @@ public static class ResourcesHelper
 
         string folderPath = GetValuablesFolderPath(valuableObject.volumeType);
 
-        return Path.Combine(folderPath, valuableObject.gameObject.name);
+        return $"{folderPath}/{valuableObject.gameObject.name}";
     }
 
     public static string GetValuablePrefabPath(GameObject prefab)
@@ -82,7 +96,7 @@ public static class ResourcesHelper
 
         string folderPath = GetItemsFolderPath();
 
-        return Path.Combine(folderPath, prefab.name);
+        return $"{folderPath}/{prefab.name}";
     }
 
     public static string GetEnemyPrefabPath(EnemySetup enemySetup)
@@ -92,7 +106,7 @@ public static class ResourcesHelper
             return string.Empty;
         }
 
-        GameObject mainSpawnObject = enemySetup.GetMainSpawnObject();
+        GameObject? mainSpawnObject = enemySetup.GetMainSpawnObject();
 
         if (mainSpawnObject == null)
         {
@@ -101,7 +115,7 @@ public static class ResourcesHelper
 
         string folderPath = GetEnemiesFolderPath();
 
-        return Path.Combine(folderPath, mainSpawnObject.name);
+        return $"{folderPath}/{mainSpawnObject.name}";
     }
 
     public static string GetEnemyPrefabPath(GameObject prefab)
@@ -113,7 +127,26 @@ public static class ResourcesHelper
 
         string folderPath = GetEnemiesFolderPath();
 
-        return Path.Combine(folderPath, prefab.name);
+        return $"{folderPath}/{prefab.name}";
+    }
+
+    public enum LevelPrefabType
+    {
+        Module,
+        Other,
+        StartRoom
+    }
+
+    public static string GetLevelPrefabPath(Level level, GameObject prefab, LevelPrefabType type)
+    {
+        if (prefab == null)
+        {
+            return string.Empty;
+        }
+
+        string folderPath = GetLevelPrefabsFolderPath(level, type);
+
+        return $"{folderPath}/{prefab.name}";
     }
     #endregion
 
@@ -171,3 +204,4 @@ public static class ResourcesHelper
         return Resources.Load<GameObject>(prefabId) != null;
     }
 }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

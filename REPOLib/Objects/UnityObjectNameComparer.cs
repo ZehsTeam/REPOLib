@@ -4,7 +4,7 @@ using Object = UnityEngine.Object;
 
 namespace REPOLib.Objects;
 
-public class UnityObjectNameComparer<T> : IEqualityComparer<T> where T : Object
+internal class UnityObjectNameComparer<T> : IEqualityComparer<T> where T : Object
 {
     public StringComparison ComparisonType { get; private set; }
 
@@ -17,7 +17,7 @@ public class UnityObjectNameComparer<T> : IEqualityComparer<T> where T : Object
     {
         if (x == y)
         {
-            return true; 
+            return true;
         }
 
         if (x == null || y == null)

@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace REPOLib.Extensions;
 
-public static class DictionaryExtensions
+internal static class DictionaryExtensions
 {
-    public static bool TryGetKey<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value, out TKey key)
+    public static bool TryGetKey<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value, [NotNullWhen(true)] out TKey? key)
     {
         foreach (var kvp in dictionary)
         {
             if (Equals(kvp.Value, value))
             {
-                key = kvp.Key;
+                key = kvp.Key!;
                 return true;
             }
         }
@@ -20,9 +21,9 @@ public static class DictionaryExtensions
         return false;
     }
 
-    public static TKey GetKeyOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value)
+    public static TKey? GetKeyOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value)
     {
-        if (dictionary.TryGetKey(value, out TKey key))
+        if (dictionary.TryGetKey(value, out TKey? key))
         {
             return key;
         }
@@ -30,9 +31,9 @@ public static class DictionaryExtensions
         return default;
     }
 
-    public static TKey GetKeyOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value, TKey defaultKey)
+    public static TKey? GetKeyOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value, TKey defaultKey)
     {
-        if (dictionary.TryGetKey(value, out TKey key))
+        if (dictionary.TryGetKey(value, out TKey? key))
         {
             return key;
         }
@@ -58,7 +59,7 @@ public static class DictionaryExtensions
         return false;
     }
 
-    public static bool TryGetValue<T>(this Dictionary<string, T> dictionary, string key, out T value, bool ignoreKeyCase)
+    public static bool TryGetValue<T>(this Dictionary<string, T> dictionary, string key, [NotNullWhen(true)] out T? value, bool ignoreKeyCase)
     {
         if (!ignoreKeyCase)
         {
@@ -69,7 +70,7 @@ public static class DictionaryExtensions
         {
             if (string.Equals(kvp.Key, key, StringComparison.OrdinalIgnoreCase))
             {
-                value = kvp.Value;
+                value = kvp.Value!;
                 return true;
             }
         }
@@ -78,9 +79,9 @@ public static class DictionaryExtensions
         return false;
     }
 
-    public static T GetValueOrDefault<T>(this Dictionary<string, T> dictionary, string key, bool ignoreKeyCase)
+    public static T? GetValueOrDefault<T>(this Dictionary<string, T> dictionary, string key, bool ignoreKeyCase)
     {
-        if (dictionary.TryGetValue(key, out T value, ignoreKeyCase))
+        if (dictionary.TryGetValue(key, out T? value, ignoreKeyCase))
         {
             return value;
         }
@@ -88,9 +89,9 @@ public static class DictionaryExtensions
         return default;
     }
 
-    public static T GetValueOrDefault<T>(this Dictionary<string, T> dictionary, string key, T defaultValue, bool ignoreKeyCase)
+    public static T? GetValueOrDefault<T>(this Dictionary<string, T> dictionary, string key, T defaultValue, bool ignoreKeyCase)
     {
-        if (dictionary.TryGetValue(key, out T value, ignoreKeyCase))
+        if (dictionary.TryGetValue(key, out T? value, ignoreKeyCase))
         {
             return value;
         }

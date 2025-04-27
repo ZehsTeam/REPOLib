@@ -1,31 +1,31 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace REPOLib.Objects.Sdk;
 
 /// <summary>
-/// REPOLib EnemyContent class.
+/// REPOLib LevelContent class.
 /// </summary>
-[CreateAssetMenu(menuName = "REPOLib/Enemy", order = 3, fileName = "New Enemy")]
-public class EnemyContent : Content
+[CreateAssetMenu(menuName = "REPOLib/Level", order = 4, fileName = "New Level")]
+public class LevelContent : Content
 {
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
-    private EnemySetup _setup = null!;
+    private Level _level = null!;
     #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     /// <summary>
-    /// The <see cref="EnemySetup"/> of this content.
+    /// The <see cref="global::Level"/> of this content.
     /// </summary>
-    public EnemySetup Setup => _setup;
+    public Level Level => _level;
 
     /// <summary>
-    /// The name of the <see cref="Setup"/>.
+    /// The name of the <see cref="Level"/>
     /// </summary>
-    public override string Name => Setup?.name ?? string.Empty;
+    public override string Name => Level?.name ?? string.Empty;
 
     /// <inheritdoc/>
     public override void Initialize(Mod mod)
     {
-        Modules.Enemies.RegisterEnemy(Setup);
+        Modules.Levels.RegisterLevel(Level);
     }
 }

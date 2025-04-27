@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
 
 namespace REPOLib.Extensions;
 
-public static class LevelValuablesExtensions
+internal static class LevelValuablesExtensions
 {
     public static bool HasValuable(this LevelValuables levelValuables, GameObject prefab)
     {
@@ -13,7 +14,7 @@ public static class LevelValuablesExtensions
             return false;
         }
 
-        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject> list))
+        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject>? list))
         {
             return false;
         }
@@ -28,7 +29,7 @@ public static class LevelValuablesExtensions
             return false;
         }
 
-        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject> list))
+        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject>? list))
         {
             return false;
         }
@@ -41,8 +42,8 @@ public static class LevelValuablesExtensions
         list.Add(prefab);
         return true;
     }
-    
-    public static bool TryGetList(this LevelValuables levelValuables, ValuableVolume.Type volumeType, out List<GameObject> list)
+
+    public static bool TryGetList(this LevelValuables levelValuables, ValuableVolume.Type volumeType, [NotNullWhen(true)] out List<GameObject>? list)
     {
         list = volumeType switch
         {

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib;
+using REPOLib.Extensions;
 
 namespace REPOLib.Commands;
 
@@ -18,17 +20,16 @@ internal static class CommandManager
     {
         Logger.LogInfo($"CommandManager initializing.", extended: true);
 
-        CommandInitializerMethods = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .SelectMany(type => type.GetMethods())
-            .Where(method => method.GetCustomAttribute<CommandInitializerAttribute>() != null)
+        CommandInitializerMethods = AccessTools.AllTypes()
+            .SelectMany(type => type.SafeGetMethods())
+            .Where(method => method.HasCustomAttribute<CommandInitializerAttribute>())
             .ToList();
 
         foreach (var command in CommandInitializerMethods)
         {
             try
             {
-                Logger.LogInfo($"Initializing command initializer on method {command.DeclaringType}.{command.Name}", extended: true);
+                Logger.LogDebug($"Initializing command initializer on method {command.DeclaringType}.{command.Name}", extended: true);
                 if (!command.IsStatic)
                 {
                     Logger.LogWarning($"Command initializer {command.DeclaringType}.{command.Name} is not static!");
@@ -58,10 +59,9 @@ internal static class CommandManager
 
     public static void FindAllCommandMethods()
     {
-        _commandExecutionMethodCache = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .SelectMany(type => type.GetMethods())
-            .Where(method => method.GetCustomAttribute<CommandExecutionAttribute>() != null)
+        _commandExecutionMethodCache = AccessTools.AllTypes()
+            .SelectMany(type => type.SafeGetMethods())
+            .Where(method => method.HasCustomAttribute<CommandExecutionAttribute>())
             .ToList();
 
         foreach (var method in _commandExecutionMethodCache)
@@ -88,7 +88,7 @@ internal static class CommandManager
             {
                 if (CommandExecutionMethods.TryAdd(aliasAttribute.Alias, method))
                 {
-                    Logger.LogInfo($"Registered command alias \"{aliasAttribute.Alias}\" for method \"{method.DeclaringType}.{method.Name}\".", extended: true);
+                    Logger.LogDebug($"Registered command alias \"{aliasAttribute.Alias}\" for method \"{method.DeclaringType}.{method.Name}\".", extended: true);
                     added = true;
                 }
             }
@@ -105,7 +105,7 @@ internal static class CommandManager
         {
             var execAttribute = method.GetCustomAttribute<CommandExecutionAttribute>();
 
-            var bepinPluginClass = method.Module.Assembly.GetTypes()
+            var bepinPluginClass = AccessTools.GetTypesFromAssembly(method.Module.Assembly)
                 .Where(type => type.GetCustomAttribute<BepInPlugin>() != null)
                 .ToList()[0].GetCustomAttribute<BepInPlugin>();
             string sourceModGUID = bepinPluginClass?.GUID ?? "Unknown";
@@ -120,7 +120,7 @@ internal static class CommandManager
             string commandDescription = $"(Alias(es): [{string.Join(", ", aliases)}])" + "\n\n" + (execAttribute.Description ?? "Unknown");
             bool enabled = execAttribute.EnabledByDefault;
 
-            CommandsEnabled[commandName] = ConfigManager.ConfigFile.Bind("Commands."+sourceModGUID, commandName, defaultValue:enabled, commandDescription).Value;
+            CommandsEnabled[commandName] = ConfigManager.ConfigFile.Bind("Commands." + sourceModGUID, commandName, defaultValue: enabled, commandDescription).Value;
         }
     }
 }

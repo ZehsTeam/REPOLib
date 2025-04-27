@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace REPOLib.Extensions;
 
-public static class EnemyDirectorExtensions
+internal static class EnemyDirectorExtensions
 {
     public static bool HasEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
     {
@@ -19,7 +20,7 @@ public static class EnemyDirectorExtensions
                 continue;
             }
 
-            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup> list))
+            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup>? list))
             {
                 continue;
             }
@@ -44,7 +45,7 @@ public static class EnemyDirectorExtensions
                 continue;
             }
 
-            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup> list))
+            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup>? list))
             {
                 continue;
             }
@@ -57,11 +58,11 @@ public static class EnemyDirectorExtensions
             list.Add(enemySetup);
             return true;
         }
-        
+
         return false;
     }
-    
-    public static bool TryGetList(this EnemyDirector enemyDirector, EnemyParent.Difficulty difficultyType, out List<EnemySetup> list)
+
+    public static bool TryGetList(this EnemyDirector enemyDirector, EnemyParent.Difficulty difficultyType, [NotNullWhen(true)] out List<EnemySetup>? list)
     {
         list = difficultyType switch
         {
@@ -83,13 +84,13 @@ public static class EnemyDirectorExtensions
         ];
     }
 
-    public static bool TryGetEnemyByName(this EnemyDirector enemyDirector, string name, out EnemySetup enemySetup)
+    public static bool TryGetEnemyByName(this EnemyDirector enemyDirector, string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
     {
         enemySetup = enemyDirector.GetEnemyByName(name);
         return enemySetup != null;
     }
 
-    public static EnemySetup GetEnemyByName(this EnemyDirector enemyDirector, string name)
+    public static EnemySetup? GetEnemyByName(this EnemyDirector enemyDirector, string name)
     {
         return enemyDirector.GetEnemies()
             .FirstOrDefault(x => x.NameEquals(name));
@@ -100,7 +101,7 @@ public static class EnemyDirectorExtensions
         enemySetup = enemyDirector.GetEnemyThatContainsName(name);
         return enemySetup != null;
     }
-
+    
     public static EnemySetup GetEnemyThatContainsName(this EnemyDirector enemyDirector, string name)
     {
         return enemyDirector.GetEnemies()

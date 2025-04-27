@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace REPOLib.Extensions;
 
-public static class StringExtensions
+internal static class StringExtensions
 {
     public static bool EqualsAny(this string value, IReadOnlyCollection<string> inputs, StringComparison comparisonType = StringComparison.Ordinal)
     {

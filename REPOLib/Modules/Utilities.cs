@@ -1,14 +1,18 @@
 using REPOLib.Extensions;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace REPOLib.Modules;
 
+/// <summary>
+/// Utility methods from REPOLib.
+/// </summary>
 public static class Utilities
 {
     private static readonly List<GameObject> _prefabsToFix = [];
     private static readonly List<GameObject> _fixedPrefabs = [];
-    
+
     internal static void FixAudioMixerGroupsOnPrefabs()
     {
         foreach (var prefab in _prefabsToFix)
@@ -45,5 +49,17 @@ public static class Utilities
 
         prefab.FixAudioMixerGroups();
         _fixedPrefabs.Add(prefab);
+    }
+
+    internal static void SafeInvokeEvent(Action? action)
+    {
+        try
+        {
+            action?.Invoke();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Exception occured while invoking event: {e}");
+        }
     }
 }

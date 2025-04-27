@@ -3,7 +3,7 @@ using UnityEngine.Audio;
 
 namespace REPOLib.Extensions;
 
-public static class AudioSourceExtensions
+internal static class AudioSourceExtensions
 {
     public static void FixAudioMixerGroup(this AudioSource audioSource)
     {
@@ -66,6 +66,6 @@ public static class AudioSourceExtensions
 
         audioSource.outputAudioMixerGroup = audioMixerGroup;
 
-        Logger.LogInfo($"Fixed AudioMixerGroup on GameObject \"{fullGameObjectName}\". AudioMixerGroup \"{audioMixer.name}/{audioMixerGroup.name}\"", extended: true);
+        Logger.LogDebug($"Fixed AudioMixerGroup on GameObject \"{fullGameObjectName}\". AudioMixerGroup \"{audioMixer.name}/{audioMixerGroup.name}\"", extended: true);
     }
 }

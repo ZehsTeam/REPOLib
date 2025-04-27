@@ -1,0 +1,22 @@
+﻿<Project>
+    <!-- COPY THIS FILE AS 'Directory.Repo.props' AND EDIT THESE SETTINGS -->
+    <!-- Place this file next to the example file to only apply it to this repository -->
+    <!-- Place this file in any of the folders above it to apply it to multiple repositories (Recomended) -->
+    <PropertyGroup>
+      
+        <!-- If the game cannot be found automatically, set GameDirectory to the folder that contains REPO.exe -->
+        <GameDirectory></GameDirectory>
+      
+        <!-- Gale profile name -->
+        <GaleProfileName>Mod Development</GaleProfileName>
+        
+        <!-- Gale data folder -->
+        <GaleDataFolder>$(AppData)\com.kesomannen.gale</GaleDataFolder>
+
+        <!-- If not using Gale, change the BepInExDirectory path, otherwise leave it as is -->
+        <!-- If not using a mod manager and BepInEx is installed directly in the game folder, these can be deleted -->
+        <BepInExDirectory>$(GaleDataFolder)\repo\profiles\$(GaleProfile)\BepInEx\</BepInExDirectory>
+        <StartArguments>--doorstop-enable true --doorstop-target "$(BepInExDirectory)\core\BepInEx.Preloader.dll" --gale-profile "$(GaleProfileName)"</StartArguments>
+      
+    </PropertyGroup>
+</Project>

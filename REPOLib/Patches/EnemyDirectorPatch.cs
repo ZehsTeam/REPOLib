@@ -23,7 +23,7 @@ internal static class EnemyDirectorPatch
             return;
         }
         
-        Enemies.RegisterEnemies();
+        Enemies.RegisterInitialEnemies();
         _alreadyRegistered = true;
     }
 }

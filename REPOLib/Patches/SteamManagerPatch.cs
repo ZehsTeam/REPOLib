@@ -14,7 +14,7 @@ internal static class SteamManagerPatch
 
     public static void UpdateDeveloperMode()
     {
-        if (ConfigManager.DeveloperMode == null)
+        if (ConfigManager.VanillaDeveloperMode == null)
         {
             return;
         }
@@ -24,17 +24,17 @@ internal static class SteamManagerPatch
             return;
         }
 
-        bool value = ConfigManager.DeveloperMode.Value;
+        bool value = ConfigManager.VanillaDeveloperMode.Value;
 
         if (SteamManager.instance.developerMode != value)
         {
             if (value)
             {
-                Logger.LogInfo("Enabling developer mode in SteamManager.");
+                Logger.LogInfo("Enabling vanilla developer mode.");
             }
             else
             {
-                Logger.LogInfo("Disabling developer mode in SteamManager.");
+                Logger.LogInfo("Disabling vanilla developer mode.");
             }
         }
 

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace REPOLib.Extensions;
 
-public static class StatsManagerExtensions
+internal static class StatsManagerExtensions
 {
     public static bool HasItem(this StatsManager statsManager, Item item)
     {
@@ -56,6 +56,7 @@ public static class StatsManagerExtensions
     public static Item GetItemThatContainsName(this StatsManager statsManager, string name)
     {
         return statsManager.GetItems()
+            .SortByStringLength(x => x.itemName, ListExtensions.StringSortMode.Shortest)
             .FirstOrDefault(x => x.NameContains(name));
     }
 }
