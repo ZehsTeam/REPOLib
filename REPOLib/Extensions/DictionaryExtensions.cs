@@ -4,9 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace REPOLib.Extensions;
 
-// TODO: Document this.
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-public static class DictionaryExtensions
+internal static class DictionaryExtensions
 {
     public static bool TryGetKey<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value, [NotNullWhen(true)] out TKey? key)
     {
@@ -101,4 +99,3 @@ public static class DictionaryExtensions
         return defaultValue;
     }
 }
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

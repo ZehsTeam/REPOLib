@@ -12,7 +12,10 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Items
 {
-    /// <inheritdoc cref="GetItems"/>
+    /// <summary>
+    /// Gets all items.
+    /// </summary>
+    /// <returns>The list of all items.</returns>
     public static IReadOnlyList<Item> AllItems => GetItems();
 
     /// <summary>
@@ -157,8 +160,7 @@ public static class Items
         return gameObject;
     }
 
-    /// <inheritdoc cref="StatsManagerExtensions.GetItems(StatsManager)"/>
-    public static IReadOnlyList<Item> GetItems()
+    private static IReadOnlyList<Item> GetItems()
     {
         if (StatsManager.instance == null)
         {
@@ -168,27 +170,45 @@ public static class Items
         return StatsManager.instance.GetItems();
     }
 
-    /// <inheritdoc cref="StatsManagerExtensions.TryGetItemByName(StatsManager, string, out Item)"/>
+    /// <summary>
+    /// Tries to get an <see cref="Item"/> by name.
+    /// </summary>
+    /// <param name="name">The <see cref="string"/> to match.</param>
+    /// <param name="item">The found <see cref="Item"/>.</param>
+    /// <returns>Whether or not the <see cref="Item"/> was found.</returns>
     public static bool TryGetItemByName(string name, [NotNullWhen(true)] out Item? item)
     {
         item = GetItemByName(name);
         return item != null;
     }
 
-    /// <inheritdoc cref="StatsManagerExtensions.GetItemByName(StatsManager, string)"/>
+    /// <summary>
+    /// Gets an <see cref="Item"/> by name.
+    /// </summary>
+    /// <param name="name">The <see cref="string"/> to match.</param>
+    /// <returns>The <see cref="Item"/> or null.</returns>
     public static Item? GetItemByName(string name)
     {
         return StatsManager.instance?.GetItemByName(name);
     }
 
-    /// <inheritdoc cref="StatsManagerExtensions.TryGetItemThatContainsName(StatsManager, string, out Item)"/>
+    /// <summary>
+    /// Tries to get an <see cref="Item"/> that contains the name.
+    /// </summary>
+    /// <param name="name">The <see cref="string"/> to compare.</param>
+    /// <param name="item">The found <see cref="Item"/>.</param>
+    /// <returns>Whether or not the <see cref="Item"/> was found.</returns>
     public static bool TryGetItemThatContainsName(string name, [NotNullWhen(true)] out Item? item)
     {
         item = GetItemThatContainsName(name);
         return item != null;
     }
 
-    /// <inheritdoc cref="StatsManagerExtensions.GetItemThatContainsName(StatsManager, string)"/>
+    /// <summary>
+    /// Gets an <see cref="Item"/> that contains the name.
+    /// </summary>
+    /// <param name="name">The <see cref="string"/> to compare.</param>
+    /// <returns>The <see cref="Item"/> or null.</returns>
     public static Item? GetItemThatContainsName(string name)
     {
         return StatsManager.instance?.GetItemThatContainsName(name);

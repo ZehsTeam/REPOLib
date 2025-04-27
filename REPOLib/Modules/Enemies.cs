@@ -11,7 +11,10 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Enemies
 {
-    /// <inheritdoc cref="GetEnemies"/>
+    /// <summary>
+    /// Gets all <see cref="EnemySetup"/> objects.
+    /// </summary>
+    /// <returns>A list of all <see cref="EnemySetup"/> objects.</returns>
     public static IReadOnlyList<EnemySetup> AllEnemies => GetEnemies();
 
     /// <summary>
@@ -238,8 +241,7 @@ public static class Enemies
         return enemyParents;
     }
 
-    /// <inheritdoc cref="EnemyDirectorExtensions.GetEnemies(EnemyDirector)"/>
-    public static IReadOnlyList<EnemySetup> GetEnemies()
+    private static IReadOnlyList<EnemySetup> GetEnemies()
     {
         if (EnemyDirector.instance == null)
         {
@@ -249,27 +251,45 @@ public static class Enemies
         return EnemyDirector.instance.GetEnemies();
     }
 
-    /// <inheritdoc cref="EnemyDirectorExtensions.TryGetEnemyByName(EnemyDirector, string, out EnemySetup?)"/>
+    /// <summary>
+    /// Tries to get an <see cref="EnemySetup"/> by name or by its <see cref="EnemyParent"/> name.
+    /// </summary>
+    /// <param name="name">The <see cref="string"/> to match.</param>
+    /// <param name="enemySetup">The found <see cref="EnemySetup"/>.</param>
+    /// <returns>Whether or not the <see cref="EnemySetup"/> was found.</returns>
     public static bool TryGetEnemyByName(string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
     {
         enemySetup = GetEnemyByName(name);
         return enemySetup != null;
     }
 
-    /// <inheritdoc cref="EnemyDirectorExtensions.GetEnemyByName(EnemyDirector, string)"/>
+    /// <summary>
+    /// Gets an <see cref="EnemySetup"/> by name or by its <see cref="EnemyParent"/> name.
+    /// </summary>
+    /// <param name="name">The <see cref="string"/> to match.</param>
+    /// <returns>The <see cref="EnemySetup"/> or null.</returns>
     public static EnemySetup? GetEnemyByName(string name)
     {
         return EnemyDirector.instance?.GetEnemyByName(name);
     }
 
-    /// <inheritdoc cref="EnemyDirectorExtensions.TryGetEnemyThatContainsName(EnemyDirector, string, out EnemySetup)"/>
+    /// <summary>
+    /// Tries to get an <see cref="EnemySetup"/> that contains the name or by its <see cref="EnemyParent"/> that contains the name.
+    /// </summary>
+    /// <param name="name">The <see cref="string"/> to compare.</param>
+    /// <param name="enemySetup">The found <see cref="EnemySetup"/>.</param>
+    /// <returns>Whether or not the <see cref="EnemySetup"/> was found.</returns>
     public static bool TryGetEnemyThatContainsName(string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
     {
         enemySetup = GetEnemyThatContainsName(name);
         return enemySetup != null;
     }
 
-    /// <inheritdoc cref="EnemyDirectorExtensions.GetEnemyThatContainsName(EnemyDirector, string)"/>
+    /// <summary>
+    /// Gets an <see cref="EnemySetup"/> that contains the name or by its <see cref="EnemyParent"/> that contains the name.
+    /// </summary>
+    /// <param name="name">The <see cref="string"/> to compare.</param>
+    /// <returns>The <see cref="EnemySetup"/> or null.</returns>
     public static EnemySetup? GetEnemyThatContainsName(string name)
     {
         return EnemyDirector.instance?.GetEnemyThatContainsName(name);

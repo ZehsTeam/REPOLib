@@ -12,7 +12,10 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Valuables
 {
-    /// <inheritdoc cref="GetValuables"/>
+    /// <summary>
+    /// Gets all valuables.
+    /// </summary>
+    /// <returns>All valuables.</returns>
     public static IReadOnlyList<GameObject> AllValuables => GetValuables();
 
     /// <summary>
@@ -214,11 +217,7 @@ public static class Valuables
         return gameObject;
     }
 
-    /// <summary>
-    /// Gets all valuables.
-    /// </summary>
-    /// <returns>All valuables.</returns>
-    public static IReadOnlyList<GameObject> GetValuables()
+    private static IReadOnlyList<GameObject> GetValuables()
     {
         if (RunManager.instance == null)
         {
@@ -303,7 +302,6 @@ public static class Valuables
     }
 
     #region Deprecated
-
     /// <summary>Deprecated.</summary>
     [Obsolete("prefabId is no longer supported", true)]
     public static void RegisterValuable(string prefabId, GameObject prefab)

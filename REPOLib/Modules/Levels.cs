@@ -12,7 +12,10 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Levels
 {
-    /// <inheritdoc cref="GetLevels"/>
+    /// <summary>
+    /// Get a <see cref="Level"/> list from <see cref="RunManager"/>.
+    /// </summary>
+    /// <returns>A <see cref="Level"/> list from <see cref="RunManager"/>.</returns>
     public static IReadOnlyList<Level> AllLevels => GetLevels();
 
     /// <summary>
@@ -175,11 +178,7 @@ public static class Levels
         }
     }
 
-    /// <summary>
-    /// Get a <see cref="Level"/> list from <see cref="RunManager"/>.
-    /// </summary>
-    /// <returns>A <see cref="Level"/> list from <see cref="RunManager"/>.</returns>
-    public static IReadOnlyList<Level> GetLevels()
+    private static IReadOnlyList<Level> GetLevels()
     {
         if (RunManager.instance == null)
         {
