@@ -29,7 +29,7 @@ internal static class CommandManager
         {
             try
             {
-                Logger.LogDebug($"Initializing command initializer on method {command.DeclaringType}.{command.Name}", extended: true);
+                Logger.LogDebug($"Initializing command initializer on method {command.DeclaringType}.{command.Name}");
                 if (!command.IsStatic)
                 {
                     Logger.LogWarning($"Command initializer {command.DeclaringType}.{command.Name} is not static!");
@@ -88,7 +88,7 @@ internal static class CommandManager
             {
                 if (CommandExecutionMethods.TryAdd(aliasAttribute.Alias, method))
                 {
-                    Logger.LogDebug($"Registered command alias \"{aliasAttribute.Alias}\" for method \"{method.DeclaringType}.{method.Name}\".", extended: true);
+                    Logger.LogDebug($"Registered command alias \"{aliasAttribute.Alias}\" for method \"{method.DeclaringType}.{method.Name}\".");
                     added = true;
                 }
             }

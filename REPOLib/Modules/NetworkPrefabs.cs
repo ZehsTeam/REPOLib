@@ -33,7 +33,7 @@ public static class NetworkPrefabs
         }
 
         Logger.LogInfo($"Initializing NetworkPrefabs.");
-        Logger.LogDebug($"PhotonNetwork.PrefabPool = {PhotonNetwork.PrefabPool.GetType()}", extended: true);
+        Logger.LogDebug($"PhotonNetwork.PrefabPool = {PhotonNetwork.PrefabPool.GetType()}");
 
         if (PhotonNetwork.PrefabPool is DefaultPool defaultPool)
         {
@@ -47,7 +47,7 @@ public static class NetworkPrefabs
         PhotonNetwork.PrefabPool = CustomPrefabPool;
 
         Logger.LogInfo("Replaced PhotonNetwork.PrefabPool with CustomPrefabPool.");
-        Logger.LogDebug($"PhotonNetwork.PrefabPool = {PhotonNetwork.PrefabPool.GetType()}", extended: true);
+        Logger.LogDebug($"PhotonNetwork.PrefabPool = {PhotonNetwork.PrefabPool.GetType()}");
         Logger.LogInfo($"Finished initializing NetworkPrefabs.");
     }
 

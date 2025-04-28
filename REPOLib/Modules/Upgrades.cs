@@ -1,5 +1,4 @@
 using ExitGames.Client.Photon;
-using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +65,8 @@ public static class Upgrades
             return;
         }
 
+        string username = SemiFunc.PlayerGetName(playerAvatar);
+
         foreach (PlayerUpgrade upgrade in PlayerUpgrades)
         {
             if (upgrade.StartAction == null)
@@ -75,11 +76,15 @@ public static class Upgrades
 
             try
             {
-                upgrade.StartAction.Invoke(playerAvatar, upgrade.GetLevel(steamId));
+                int value = upgrade.GetLevel(steamId);
+
+                upgrade.StartAction.Invoke(playerAvatar, value);
+
+                Logger.LogDebug($"PlayerUpgrade: Invoked start action for upgrade \"{upgrade.UpgradeId}\" on player \"{username}\" at level {value}");
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Upgrades: Failed to invoke start action for upgrade \"{upgrade.UpgradeId}\". {ex}");
+                Logger.LogError($"Upgrades: Failed to invoke start action for upgrade \"{upgrade.UpgradeId}\" on player \"{username}\". {ex}");
             }
         }
     }
@@ -119,7 +124,7 @@ public static class Upgrades
             return;
         }
 
-        playerUpgrade.UpgradeOthers(steamId, value);
+        playerUpgrade.ApplyUpgrade(steamId, value);
     }
 
     /// <summary>
@@ -238,48 +243,42 @@ public class PlayerUpgrade
 
         PlayerDictionary[steamId] = value;
 
-        if (SemiFunc.IsMasterClientOrSingleplayer())
-		{
-            UpdateRightAway(steamId);
-        }
+        ApplyUpgrade(steamId, value);
 
-        if (SemiFunc.IsMasterClient())
-        {
-            Upgrades.RaiseUpgradeEvent(UpgradeId, steamId, value);
-        }
+        Upgrades.RaiseUpgradeEvent(UpgradeId, steamId, value);
 
         return value;
     }
 
-    internal void UpgradeOthers(string steamId, int value)
+    internal void ApplyUpgrade(string steamId, int value)
     {
         PlayerDictionary[steamId] = value;
-        UpdateRightAway(steamId);
-    }
 
-	private void UpdateRightAway(string steamId)
-	{
         if (_upgradeAction == null)
         {
             return;
         }
 
-		PlayerAvatar playerAvatar = SemiFunc.PlayerAvatarGetFromSteamID(steamId);
+        PlayerAvatar playerAvatar = SemiFunc.PlayerAvatarGetFromSteamID(steamId);
 
         if (playerAvatar == null)
         {
             return;
         }
 
+        string username = SemiFunc.PlayerGetName(playerAvatar);
+
         try
         {
             _upgradeAction.Invoke(playerAvatar, GetLevel(steamId));
+
+            Logger.LogDebug($"PlayerUpgrade: Invoked upgrade action for upgrade \"{UpgradeId}\" on player \"{username}\" at level {value}");
         }
         catch (Exception ex)
         {
-            Logger.LogError($"PlayerUpgrade: Failed to invoke upgrade action for upgrade \"{UpgradeId}\". {ex}");
+            Logger.LogError($"PlayerUpgrade: Failed to invoke upgrade action for upgrade \"{UpgradeId}\" on player \"{username}\". {ex}");
         }
-	}
+    }
 }
 
 /// <summary>
@@ -315,14 +314,6 @@ public class REPOLibItemUpgrade : MonoBehaviour
             return;
         }
 
-        PlayerUpgrade? upgrade = Upgrades.GetUpgrade(UpgradeId);
-
-        if (upgrade == null)
-        {
-            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{UpgradeId}\". Could not find PlayerUpgrade from UpgradeId.");
-            return;
-        }
-
         int playerTogglePhotonID = _itemToggle.playerTogglePhotonID;
         PlayerAvatar playerAvatar = SemiFunc.PlayerAvatarGetFromPhotonID(playerTogglePhotonID);
 
@@ -332,14 +323,19 @@ public class REPOLibItemUpgrade : MonoBehaviour
             return;
         }
 
-        string steamId = playerAvatar.steamID;
-
-        if (!steamId.IsValidSteamId())
+        if (!playerAvatar.isLocal)
         {
-            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{UpgradeId}\". Steam ID \"{steamId}\" is invalid.");
             return;
         }
 
-        upgrade.Upgrade(steamId);
+        PlayerUpgrade? upgrade = Upgrades.GetUpgrade(UpgradeId);
+
+        if (upgrade == null)
+        {
+            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{UpgradeId}\". Could not find PlayerUpgrade from UpgradeId.");
+            return;
+        }
+
+        upgrade.Upgrade(playerAvatar.steamID);
     }
 }

@@ -34,7 +34,7 @@ internal static class EnemyBangDirectorPatch
             {
                 // Replace original method call with replacement method call
                 modifiedInstructions.Add(new CodeInstruction(OpCodes.Call, replacementMethod));
-                Logger.LogDebug($"EnemyBangDirectorPatch: AwakeTranspiler replaced {originalMethod.Name} call with {replacementMethod.Name}.", extended: true);
+                Logger.LogDebug($"EnemyBangDirectorPatch: AwakeTranspiler replaced {originalMethod.Name} call with {replacementMethod.Name}.");
                 continue;
             }
 

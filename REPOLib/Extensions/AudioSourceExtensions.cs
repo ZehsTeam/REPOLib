@@ -66,6 +66,6 @@ internal static class AudioSourceExtensions
 
         audioSource.outputAudioMixerGroup = audioMixerGroup;
 
-        Logger.LogDebug($"Fixed AudioMixerGroup on GameObject \"{fullGameObjectName}\". AudioMixerGroup \"{audioMixer.name}/{audioMixerGroup.name}\"", extended: true);
+        Logger.LogDebug($"Fixed AudioMixerGroup on GameObject \"{fullGameObjectName}\". AudioMixerGroup \"{audioMixer.name}/{audioMixerGroup.name}\"");
     }
 }

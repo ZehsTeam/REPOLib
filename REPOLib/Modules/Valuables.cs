@@ -70,7 +70,7 @@ public static class Valuables
             if (ValuablePresets.AllValuablePresets[presetName].AddValuable(valuable))
             {
                 _valuablesRegistered.Add(valuable);
-                Logger.LogDebug($"Added valuable \"{valuable.name}\" to valuable preset \"{presetName}\"", extended: true);
+                Logger.LogDebug($"Added valuable \"{valuable.name}\" to valuable preset \"{presetName}\"");
             }
             else
             {
