@@ -10,6 +10,7 @@
 - **Registering network prefabs.**
 - **Registering valuables.**
 - **Registering items.**
+- **Registering upgrades.**
 - **Registering enemies.**
 - **Registering levels.**
 - ResourcesHelper to help get network prefab IDs.
@@ -34,8 +35,6 @@ Documentation is available on the [R.E.P.O. Modding Wiki](https://repomods.com/r
 | [R.E.P.O. Modding Server](https://discord.com/invite/vPJtKhYAFe) | `#released-mods` | [REPOLib](https://discord.com/channels/1344557689979670578/1346055794533339217) |
 
 - **GitHub Issues Page:** [REPOLib](https://github.com/ZehsTeam/REPOLib/issues)
-- **Email:** crithaxxog@gmail.com
-- **Twitch:** [CritHaxXoG](https://www.twitch.tv/crithaxxog)
-- **YouTube:** [Zehs](https://www.youtube.com/channel/UCb4VEkc-_im0h8DKXlwmIAA)
+- **My Links:** https://solo.to/crithaxxog
 
 [![kofi](https://i.imgur.com/jzwECeF.png)](https://ko-fi.com/zehsteam)
