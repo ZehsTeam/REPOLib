@@ -84,17 +84,7 @@ internal class CustomPrefabPool : IPunPrefabPool
 
     public bool HasPrefab(string prefabId)
     {
-        if (Prefabs.ContainsKey(prefabId, ignoreKeyCase: true))
-        {
-            return true;
-        }
-
-        if (ResourcesHelper.HasPrefab(prefabId))
-        {
-            return true;
-        }
-
-        return false;
+        return GetPrefab(prefabId) != null;
     }
 
     public string? GetPrefabId(GameObject prefab)
@@ -110,7 +100,12 @@ internal class CustomPrefabPool : IPunPrefabPool
 
     public GameObject? GetPrefab(string prefabId)
     {
-        return Prefabs.GetValueOrDefault(prefabId, ignoreKeyCase: true);
+        if (Prefabs.TryGetValue(prefabId, out GameObject? prefab, ignoreKeyCase: true))
+        {
+            return prefab;
+        }
+
+        return Resources.Load<GameObject>(prefabId);
     }
 
     public GameObject? Instantiate(string prefabId, Vector3 position, Quaternion rotation)

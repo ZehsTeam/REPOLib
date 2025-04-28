@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using REPOLib.Objects;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -80,40 +81,27 @@ public static class NetworkPrefabs
         return CustomPrefabPool.HasPrefab(prefabId);
     }
 
-    #region Disabled
-    //public static bool HasNetworkPrefab(GameObject prefab)
-    //{
-    //    return CustomPrefabPool.HasPrefab(prefab);
-    //}
+    /// <summary>
+    /// Gets a network prefab.
+    /// </summary>
+    /// <param name="prefabId">The network prefab ID for the <see cref="GameObject"/>.</param>
+    /// <returns>The <see cref="GameObject"/> or null.</returns>
+    public static GameObject? GetNetworkPrefab(string prefabId)
+    {
+        return CustomPrefabPool.GetPrefab(prefabId);
+    }
 
-    //public static string GetNetworkPrefabId(GameObject prefab)
-    //{
-    //    return CustomPrefabPool.GetPrefabId(prefab);
-    //}
-
-    //public static bool TryGetNetworkPrefabId(GameObject prefab, out string prefabId)
-    //{
-    //    prefabId = GetNetworkPrefabId(prefab);
-    //    return !string.IsNullOrEmpty(prefabId);
-    //}
-
-    //public static GameObject SpawnNetworkPrefab(GameObject prefab, Vector3 position, Quaternion rotation, byte group = 0, object[] data = null)
-    //{
-    //    if (prefab == null)
-    //    {
-    //        Logger.LogError("Failed to spawn network prefab. GameObject is null.");
-    //        return null;
-    //    }
-
-    //    if (!TryGetNetworkPrefabId(prefab, out string prefabId))
-    //    {
-    //        Logger.LogError($"Failed to spawn network prefab \"{prefab.name}\". GameObject is not registered as a network prefab.");
-    //        return null;
-    //    }
-
-    //    return SpawnNetworkPrefab(prefabId, position, rotation, group, data);
-    //}
-    #endregion
+    /// <summary>
+    /// Tries to get a network prefab.
+    /// </summary>
+    /// <param name="prefabId">The network prefab ID for the <see cref="GameObject"/>.</param>
+    /// <param name="prefab">The network prefab <see cref="GameObject"/>.</param>
+    /// <returns>Whether or not the <see cref="GameObject"/> was found.</returns>
+    public static bool TryGetNetworkPrefab(string prefabId, [NotNullWhen(true)] out GameObject? prefab)
+    {
+        prefab = GetNetworkPrefab(prefabId);
+        return prefab != null;
+    }
 
     /// <summary>
     /// Spawns a network prefab.
@@ -123,7 +111,7 @@ public static class NetworkPrefabs
     /// <param name="rotation">The rotation of the <see cref="GameObject"/>.</param>
     /// <param name="group">The interest group. See: https://doc.photonengine.com/pun/current/gameplay/interestgroups</param>
     /// <param name="data">Custom instantiation data. See: https://doc.photonengine.com/pun/current/gameplay/instantiation#custom-instantiation-data</param>
-    /// <returns>The <see cref="GameObject"/> or null.</returns>
+    /// <returns>The spawned <see cref="GameObject"/> or null.</returns>
     public static GameObject? SpawnNetworkPrefab(string prefabId, Vector3 position, Quaternion rotation, byte group = 0, object[]? data = null)
     {
         if (string.IsNullOrWhiteSpace(prefabId))
