@@ -1,6 +1,5 @@
 using ExitGames.Client.Photon;
 using REPOLib.Extensions;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -249,15 +248,11 @@ public class PlayerUpgrade
             Upgrades.RaiseUpgradeEvent(UpgradeId, steamId, value);
         }
 
-        Logger.LogInfo($"PlayerUpgrade: Upgrade \"{UpgradeId}\" for player \"{steamId}\". Level: {value}");
-
         return value;
     }
 
     internal void UpgradeOthers(string steamId, int value)
     {
-        Logger.LogInfo($"PlayerUpgrade: UpgradeOthers \"{UpgradeId}\" for player \"{steamId}\". Level: {value}");
-
         PlayerDictionary[steamId] = value;
         UpdateRightAway(steamId);
     }
