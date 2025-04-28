@@ -1,4 +1,11 @@
-# v2.0.1
+# v2.1.0
+
+- Added Upgrades module. (#29)
+- Fixed not being able to spawn vanilla network prefabs in singleplayer.
+- Made all extension methods and a few other non-module things private.
+  - Existing mods using these things should still work, but it is recommended that they switch to another solution.
+
+## v2.0.1
 
 - Fixed BundleLoader causing an infinite loading screen when loading invalid content.
 - Moved documentation to the [R.E.P.O. Modding Wiki](https://repomods.com/repolib/overview.html).
@@ -17,6 +24,8 @@
 - **Breaking changes:**
   - Changed the signature of `BundleLoader.LoadBundle` (due to async loading).
   - Moved `GenericValuablePresetName` and `ValuablePresets` from `Modules.Valuables` to `Modules.ValuablePresets`.
+
+<details><summary>Older Versions</summary>
 
 ## v1.5.0
 
