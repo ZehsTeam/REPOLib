@@ -25,7 +25,7 @@ public static class BundleLoader
     /// </summary>
     public static event Action? OnAllBundlesLoaded;
 
-    private static readonly List<LoadOperation> Operations = [];
+    private static readonly List<LoadOperation> _operations = [];
     internal static void LoadAllBundles(string root, string withExtension)
     {
         Logger.LogInfo($"Loading all bundles with extension {withExtension} from root {root}", extended: true);
@@ -57,7 +57,7 @@ public static class BundleLoader
     public static void LoadBundle(string path, Func<AssetBundle, IEnumerator>? onLoaded = null, bool loadContents = false)
     {
         Logger.LogInfo($"Loading bundle at {path}...");
-        Operations.Add(new LoadOperation(path, onLoaded, loadContents));
+        _operations.Add(new LoadOperation(path, onLoaded, loadContents));
     }
 
     internal static void FinishLoadOperations(MonoBehaviour behaviour)
@@ -67,25 +67,25 @@ public static class BundleLoader
     {
         yield return null;
 
-        foreach (var loadOperation in Operations.ToArray()) // collection might change
+        foreach (var loadOperation in _operations.ToArray()) // collection might change
             behaviour.StartCoroutine(FinishLoadOperation(loadOperation));
 
         var (text, disableLoadingUI) = SetupLoadingUI();
         var lastUpdate = Time.time;
         
-        while (Operations.Count > 0)
+        while (_operations.Count > 0)
         {
             if (!(Time.time - lastUpdate > 1))
                 yield return null;
             
             lastUpdate = Time.time;
-            var bundlesWord = Operations.Count == 1 ? "bundle" : "bundles";
-            text.text = $"REPOLib: Waiting for {Operations.Count} {bundlesWord} to load...";
+            var bundlesWord = _operations.Count == 1 ? "bundle" : "bundles";
+            text.text = $"REPOLib: Waiting for {_operations.Count} {bundlesWord} to load...";
 
             if (ConfigManager.ExtendedLogging?.Value != true) 
                 continue;
 
-            foreach (var operation in Operations)
+            foreach (var operation in _operations)
             {
                 var msg = $"Loading {operation.FileName}: {operation.CurrentState}";
                 float? progress = operation.CurrentState switch
@@ -159,7 +159,7 @@ public static class BundleLoader
         Finish();
         yield break;
 
-        void Finish() => Operations.Remove(operation);
+        void Finish() => _operations.Remove(operation);
     }
 
     private static IEnumerator LoadBundleContent(LoadOperation operation, AssetBundle bundle)
