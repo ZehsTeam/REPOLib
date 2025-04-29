@@ -55,22 +55,18 @@ internal static class SpawnEnemyCommand
             return;
         }
 
-        string name = args;
-
-        if (!EnemyDirector.instance.TryGetEnemyThatContainsName(name, out EnemySetup enemySetup))
+        if (!EnemyDirector.instance.TryGetEnemyThatContainsName(args, out var enemySetup))
         {
-            Logger.LogWarning($"Spawn command failed. Unknown enemy with name \"{name}\"");
+            Logger.LogWarning($"Spawn command failed. Unknown enemy with name \"{args}\"");
             return;
         }
 
-        Vector3 position = PlayerAvatar.instance.transform.position;
-
-        Logger.LogInfo($"Trying to spawn enemy \"{name}\" at {position}...", extended: true);
-
+        var position = PlayerAvatar.instance.transform.position;
+        Logger.LogInfo($"Trying to spawn enemy \"{args}\" at {position}...", extended: true);
         EnemyDirector.instance.StartCoroutine(SpawnEnemyAfterTime(enemySetup, position, TimeSpan.FromSeconds(3f)));
     }
 
-    private static IEnumerator SpawnEnemyAfterTime(EnemySetup enemySetup, Vector3 position, TimeSpan timeSpan)
+    private static IEnumerator SpawnEnemyAfterTime(EnemySetup? enemySetup, Vector3 position, TimeSpan timeSpan)
     {
         yield return new WaitForSeconds((float)timeSpan.TotalSeconds);
         Enemies.SpawnEnemy(enemySetup, position, Quaternion.identity, spawnDespawned: false);

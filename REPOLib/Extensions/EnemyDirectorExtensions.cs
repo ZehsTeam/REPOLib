@@ -1,60 +1,48 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace REPOLib.Extensions;
 
+[PublicAPI]
 internal static class EnemyDirectorExtensions
 {
     public static bool HasEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
     {
         if (enemySetup == null || enemySetup.spawnObjects.Count == 0)
-        {
             return false;
-        }
 
         foreach (var spawnObject in enemySetup.spawnObjects)
         {
             if (!spawnObject.TryGetComponent(out EnemyParent enemyParent))
-            {
                 continue;
-            }
-
-            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup>? list))
-            {
+            
+            if (!TryGetList(enemyDirector, enemyParent.difficulty, out var list))
                 continue;
-            }
-
+            
             return list.Contains(enemySetup);
         }
-
+        
         return false;
     }
 
     internal static bool AddEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
     {
         if (enemySetup == null)
-        {
             return false;
-        }
-
+        
         foreach (var spawnObject in enemySetup.spawnObjects)
         {
             if (!spawnObject.TryGetComponent(out EnemyParent enemyParent))
-            {
                 continue;
-            }
 
             if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup>? list))
-            {
                 continue;
-            }
 
             if (list.Contains(enemySetup))
-            {
                 continue;
-            }
-
+            
             list.Add(enemySetup);
             return true;
         }
@@ -75,36 +63,23 @@ internal static class EnemyDirectorExtensions
         return list != null;
     }
 
-    public static List<EnemySetup> GetEnemies(this EnemyDirector enemyDirector)
-    {
-        return [
-            .. enemyDirector.enemiesDifficulty1,
-            .. enemyDirector.enemiesDifficulty2,
-            .. enemyDirector.enemiesDifficulty3,
-        ];
-    }
+    public static List<EnemySetup> GetEnemies(this EnemyDirector enemyDirector) => [
+        ..enemyDirector.enemiesDifficulty1,
+        ..enemyDirector.enemiesDifficulty2,
+        ..enemyDirector.enemiesDifficulty3,
+    ];
 
-    public static bool TryGetEnemyByName(this EnemyDirector enemyDirector, string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
-    {
-        enemySetup = enemyDirector.GetEnemyByName(name);
-        return enemySetup != null;
-    }
+    public static bool TryGetEnemyByName(this EnemyDirector enemyDirector, string? name, [NotNullWhen(true)] out EnemySetup? enemySetup)
+        => (enemySetup = enemyDirector.GetEnemyByName(name)) != null;
 
-    public static EnemySetup? GetEnemyByName(this EnemyDirector enemyDirector, string name)
-    {
-        return enemyDirector.GetEnemies()
+    public static EnemySetup? GetEnemyByName(this EnemyDirector enemyDirector, string? name)
+        => enemyDirector.GetEnemies()
             .FirstOrDefault(x => x.NameEquals(name));
-    }
 
-    public static bool TryGetEnemyThatContainsName(this EnemyDirector enemyDirector, string name, out EnemySetup enemySetup)
-    {
-        enemySetup = enemyDirector.GetEnemyThatContainsName(name);
-        return enemySetup != null;
-    }
+    public static bool TryGetEnemyThatContainsName(this EnemyDirector enemyDirector, string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
+        => (enemySetup = enemyDirector.GetEnemyThatContainsName(name)) != null;
     
-    public static EnemySetup GetEnemyThatContainsName(this EnemyDirector enemyDirector, string name)
-    {
-        return enemyDirector.GetEnemies()
+    public static EnemySetup? GetEnemyThatContainsName(this EnemyDirector enemyDirector, string name)
+        => enemyDirector.GetEnemies()
             .FirstOrDefault(x => x.NameContains(name));
-    }
 }

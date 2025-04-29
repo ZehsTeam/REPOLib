@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 
 namespace REPOLib.Objects.Sdk;
 
 /// <summary>
 /// A base class for REPOLib Content.
 /// </summary>
+[PublicAPI]
 public abstract class Content : ScriptableObject
 {
     /// <summary>

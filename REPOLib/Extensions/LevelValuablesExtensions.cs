@@ -1,44 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace REPOLib.Extensions;
 
+[PublicAPI]
 internal static class LevelValuablesExtensions
 {
     public static bool HasValuable(this LevelValuables levelValuables, GameObject prefab)
     {
         if (!prefab.TryGetComponent(out ValuableObject valuableObject))
-        {
             return false;
-        }
 
-        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject>? list))
-        {
-            return false;
-        }
-
-        return list.Contains(prefab);
+        return TryGetList(levelValuables, valuableObject.volumeType, out var list) && list.Contains(prefab);
     }
 
     internal static bool AddValuable(this LevelValuables levelValuables, GameObject prefab)
     {
         if (!prefab.TryGetComponent(out ValuableObject valuableObject))
-        {
             return false;
-        }
 
-        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject>? list))
-        {
+        if (!TryGetList(levelValuables, valuableObject.volumeType, out var list))
             return false;
-        }
-
+        
         if (list.Contains(prefab))
-        {
             return false;
-        }
-
+        
         list.Add(prefab);
         return true;
     }
@@ -78,16 +67,9 @@ internal static class LevelValuablesExtensions
             .Distinct()
             .ToList();
 
-        return list != null;
+        return true;
     }
 
     public static List<GameObject> GetCombinedList(this LevelValuables levelValuables)
-    {
-        if (levelValuables.TryGetCombinedList(out List<GameObject> list))
-        {
-            return list;
-        }
-
-        return [];
-    }
+        =>  levelValuables.TryGetCombinedList(out var list) ? list : [];
 }

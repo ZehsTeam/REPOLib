@@ -12,10 +12,9 @@ internal static class ReflectionExtensions
         {
             return type.GetMethods();
         }
-        catch /*(Exception ex)*/
+        catch
         {
-            // Logger.LogWarning($"Error retrieving methods for type {type.FullName}: {ex.Message}");
-            return Array.Empty<MethodInfo>();
+            return [];
         }
     }
 
@@ -25,9 +24,8 @@ internal static class ReflectionExtensions
         {
             return method.GetCustomAttribute<T>();
         }
-        catch /*(Exception ex)*/
+        catch
         {
-            // Logger.LogWarning($"Error retrieving methods for type {type.FullName}: {ex.Message}");
             return null;
         }   
     }
@@ -38,9 +36,8 @@ internal static class ReflectionExtensions
         {
             return method.GetCustomAttribute<T>() != null;
         }
-        catch /*(Exception ex)*/
+        catch
         {
-            // Logger.LogWarning($"Error retrieving methods for type {type.FullName}: {ex.Message}");
             return false;
         }
     }

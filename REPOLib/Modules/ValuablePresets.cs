@@ -1,31 +1,32 @@
 using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 
 namespace REPOLib.Modules;
 
 /// <summary>
 /// ValuablePresets for Valuables.
 /// </summary>
+[PublicAPI]
 public static class ValuablePresets
 {
     /// <summary>
     /// Gets all cached valuable presets. See <see cref="CacheValuablePresets"/>.
     /// </summary>
-    public static IReadOnlyDictionary<string, LevelValuables> AllValuablePresets => _valuablePresets;
+    public static IReadOnlyDictionary<string, LevelValuables> GetAllValuablePresets() => AllValuablePresets;
 
     /// <summary>
     /// Gets the generic valuables preset.
     /// </summary>
-    public static LevelValuables GenericPreset => AllValuablePresets[GenericValuablePresetName];
-
-    private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
-
+    public static LevelValuables GenericPreset => GetAllValuablePresets()[GenericValuablePresetName];
+    
     /// <summary>
     /// The generic valuables preset name.
     /// </summary>
     public const string GenericValuablePresetName = "Valuables - Generic";
 
     /// <summary>
-    /// Caches all valuable presets from levels, for getting with <see cref="AllValuablePresets"/>.
+    /// Caches all valuable presets from levels, for getting with <see cref="GetAllValuablePresets"/>.
     /// </summary>
     public static void CacheValuablePresets()
     {
@@ -35,17 +36,11 @@ public static class ValuablePresets
             return;
         }
 
-        foreach (var level in RunManager.instance.levels)
-        {
-            foreach (var valuablePreset in level.ValuablePresets)
-            {
-                _valuablePresets.TryAdd(valuablePreset.name, valuablePreset);
-            }
-        }
+        foreach (var valuablePreset in RunManager.instance.levels.SelectMany(level => level.ValuablePresets))
+            AllValuablePresets.TryAdd(valuablePreset.name, valuablePreset);
     }
-
+    
+    private static readonly Dictionary<string, LevelValuables> AllValuablePresets = [];
     internal static void RegisterValuablePreset(LevelValuables valuablePreset)
-    {
-        _valuablePresets.Add(valuablePreset.name, valuablePreset);
-    }
+        => AllValuablePresets.Add(valuablePreset.name, valuablePreset);
 }

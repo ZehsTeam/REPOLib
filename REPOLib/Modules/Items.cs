@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -10,6 +11,7 @@ namespace REPOLib.Modules;
 /// <summary>
 /// The Items module of REPOLib.
 /// </summary>
+[PublicAPI]
 public static class Items
 {
     /// <inheritdoc cref="GetItems"/>
@@ -18,11 +20,10 @@ public static class Items
     /// <summary>
     /// Gets all items registered with REPOLib.
     /// </summary>
-    public static IReadOnlyList<Item> RegisteredItems => _itemsRegistered;
+    public static IReadOnlyList<Item> RegisteredItems => ItemsRegistered;
 
-    private static readonly List<Item> _itemsToRegister = [];
-    private static readonly List<Item> _itemsRegistered = [];
-
+    private static readonly List<Item> ItemsToRegister = [];
+    private static readonly List<Item> ItemsRegistered = [];
     private static bool _initialItemsRegistered;
 
     // This will run multiple times because of how the vanilla game registers items.
@@ -35,11 +36,8 @@ public static class Items
         }
 
         Logger.LogInfo($"Adding items.");
-
-        foreach (var item in _itemsToRegister)
-        {
+        foreach (var item in ItemsToRegister)
             RegisterItemWithGame(item);
-        }
 
         _initialItemsRegistered = true;
     }
@@ -47,13 +45,10 @@ public static class Items
     private static void RegisterItemWithGame(Item item)
     {
         Utilities.FixAudioMixerGroups(item.prefab);
-
         if (StatsManager.instance.AddItem(item))
         {
-            if (!_itemsRegistered.Contains(item))
-            {
-                _itemsRegistered.Add(item);
-            }
+            if (!ItemsRegistered.Contains(item))
+                ItemsRegistered.Add(item);
 
             Logger.LogInfo($"Added item \"{item.itemName}\"", extended: true);
         }
@@ -71,10 +66,8 @@ public static class Items
     public static void RegisterItem(Item item)
     {
         if (item == null)
-        {
             throw new ArgumentException("Failed to register item. Item is null.");
-        }
-
+        
         if (item.prefab == null)
         {
             Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab is null.");
@@ -93,27 +86,23 @@ public static class Items
             return;
         }
 
-        if (_itemsToRegister.Any(x => x.itemAssetName == item.itemAssetName))
+        if (ItemsToRegister.Any(x => x.itemAssetName == item.itemAssetName))
         {
             Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab already exists with the same name.");
             return;
         }
 
-        if (_itemsToRegister.Contains(item))
+        if (ItemsToRegister.Contains(item))
         {
             Logger.LogError($"Failed to register item \"{item.itemName}\". Item is already registered!");
             return;
         }
 
-        string prefabId = ResourcesHelper.GetItemPrefabPath(item);
+        var prefabId = ResourcesHelper.GetItemPrefabPath(item);
         NetworkPrefabs.RegisterNetworkPrefab(prefabId, item.prefab);
-
-        _itemsToRegister.Add(item);
-
-        if (_initialItemsRegistered)
-        {
-            RegisterItemWithGame(item);
-        }
+        ItemsToRegister.Add(item);
+        
+        if (_initialItemsRegistered) RegisterItemWithGame(item);
     }
 
     /// <summary>
@@ -143,8 +132,8 @@ public static class Items
             return null;
         }
 
-        string prefabId = ResourcesHelper.GetItemPrefabPath(item);
-        GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
+        var prefabId = ResourcesHelper.GetItemPrefabPath(item);
+        var gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
 
         if (gameObject == null)
         {
@@ -153,7 +142,6 @@ public static class Items
         }
 
         Logger.LogInfo($"Spawned item \"{item.itemName}\" at position {position}, rotation: {rotation.eulerAngles}", extended: true);
-
         return gameObject;
     }
 
@@ -162,48 +150,33 @@ public static class Items
     /// </summary>
     /// <returns>The list of all items.</returns>
     public static IReadOnlyList<Item> GetItems()
-    {
-        if (StatsManager.instance == null)
-        {
-            return [];
-        }
-
-        return StatsManager.instance.GetItems();
-    }
+        => StatsManager.instance == null ? [] : StatsManager.instance.GetItems();
     
     /// <summary>
     /// Tries to get an <see cref="Item"/> by name.
     /// </summary>
     /// <param name="name">The <see cref="string"/> to match.</param>
     /// <param name="item">The found <see cref="Item"/>.</param>
-    /// <returns>Whether or not the <see cref="Item"/> was found.</returns>
-    public static bool TryGetItemByName(string name, [NotNullWhen(true)] out Item? item)
-    {
-        item = GetItemByName(name);
-        return item != null;
-    }
+    /// <returns>Whether the <see cref="Item"/> was found.</returns>
+    public static bool TryGetItemByName(string? name, [NotNullWhen(true)] out Item? item)
+        => (item = GetItemByName(name)) != null;
 
     /// <summary>
     /// Gets an <see cref="Item"/> by name.
     /// </summary>
     /// <param name="name">The <see cref="string"/> to match.</param>
     /// <returns>The <see cref="Item"/> or null.</returns>
-    public static Item? GetItemByName(string name)
-    {
-        return StatsManager.instance?.GetItemByName(name);
-    }
+    public static Item? GetItemByName(string? name)
+        => StatsManager.instance?.GetItemByName(name);
 
     /// <summary>
     /// Tries to get an <see cref="Item"/> that contains the name.
     /// </summary>
     /// <param name="name">The <see cref="string"/> to compare.</param>
     /// <param name="item">The found <see cref="Item"/>.</param>
-    /// <returns>Whether or not the <see cref="Item"/> was found.</returns>
+    /// <returns>Whether the <see cref="Item"/> was found.</returns>
     public static bool TryGetItemThatContainsName(string name, [NotNullWhen(true)] out Item? item)
-    {
-        item = GetItemThatContainsName(name);
-        return item != null;
-    }
+        => (item = GetItemThatContainsName(name)) != null;
 
     /// <summary>
     /// Gets an <see cref="Item"/> that contains the name.
@@ -211,7 +184,5 @@ public static class Items
     /// <param name="name">The <see cref="string"/> to compare.</param>
     /// <returns>The <see cref="Item"/> or null.</returns>
     public static Item? GetItemThatContainsName(string name)
-    {
-        return StatsManager.instance?.GetItemThatContainsName(name);
-    }
+        => StatsManager.instance?.GetItemThatContainsName(name);
 }

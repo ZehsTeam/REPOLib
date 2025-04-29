@@ -1,7 +1,6 @@
 using HarmonyLib;
 using REPOLib.Modules;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Reflection.Emit;
 
 namespace REPOLib.Patches;
@@ -9,20 +8,19 @@ namespace REPOLib.Patches;
 [HarmonyPatch(typeof(PlayerController))]
 internal static class PlayerControllerPatch
 {
-    [HarmonyPatch(nameof(PlayerController.LateStart), MethodType.Enumerator)]
     [HarmonyTranspiler]
+    [HarmonyPatch(nameof(PlayerController.LateStart), MethodType.Enumerator)]
     private static IEnumerable<CodeInstruction> LateStartTranspiler(IEnumerable<CodeInstruction> instructions)
     {
-        FieldInfo playerAvatarScript = AccessTools.Field(typeof(PlayerController), nameof(PlayerController.playerAvatarScript));
-        MethodInfo getPlayerSteamIdCall = AccessTools.Method(typeof(SemiFunc), nameof(SemiFunc.PlayerGetSteamID), [typeof(PlayerAvatar)]);
-        MethodInfo initUpgradesMethod = AccessTools.Method(typeof(Upgrades), nameof(Upgrades.InvokeStartActions), [typeof(string)]);
+        var playerAvatarScript = AccessTools.Field(typeof(PlayerController), nameof(PlayerController.playerAvatarScript));
+        var getPlayerSteamIdCall = AccessTools.Method(typeof(SemiFunc), nameof(SemiFunc.PlayerGetSteamID), [typeof(PlayerAvatar)]);
+        var initUpgradesMethod = AccessTools.Method(typeof(Upgrades), nameof(Upgrades.InvokeStartActions), [typeof(string)]);
 
-        bool found = false;
-        int place = 0;
-
+        var place = 0;
+        var found = false;
         var newInstructions = new List<CodeInstruction>();
 
-        foreach (CodeInstruction instruction in instructions)
+        foreach (var instruction in instructions)
         {
             newInstructions.Add(instruction);
 
@@ -36,15 +34,12 @@ internal static class PlayerControllerPatch
             })
             {
                 place++;
+                if (place <= 3) continue;
                 
-                if (place > 3)
-                {
-                    found = true;
-                    place = 0;
-                    //newInstructions.Add(new CodeInstruction(OpCodes.Ldloc_1));
-                    newInstructions.Add(new CodeInstruction(OpCodes.Ldloc_2));
-                    newInstructions.Add(new CodeInstruction(OpCodes.Call, initUpgradesMethod));
-                }
+                place = 0;
+                found = true;
+                newInstructions.Add(new CodeInstruction(OpCodes.Ldloc_2));
+                newInstructions.Add(new CodeInstruction(OpCodes.Call, initUpgradesMethod));
             }
             else
             {
@@ -52,14 +47,9 @@ internal static class PlayerControllerPatch
             }
         }
 
-        foreach (CodeInstruction instruction in newInstructions)
-        {
+        foreach (var instruction in newInstructions)
             yield return instruction;
-        }
 
-        if (!found)
-        {
-            Logger.LogWarning("Failed to patch PlayerController.LateStart!");
-        }
+        if (!found) Logger.LogWarning("Failed to patch PlayerController.LateStart!");
     }
 }

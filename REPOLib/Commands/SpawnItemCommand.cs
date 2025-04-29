@@ -40,15 +40,12 @@ internal static class SpawnItemCommand
             return;
         }
 
-        string name = args;
+        var position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) + PlayerAvatar.instance.transform.forward * 1f;
+        Logger.LogInfo($"Trying to spawn item \"{args}\" at {position}...", extended: true);
 
-        Vector3 position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) + PlayerAvatar.instance.transform.forward * 1f;
-
-        Logger.LogInfo($"Trying to spawn item \"{name}\" at {position}...", extended: true);
-
-        if (!Items.TryGetItemThatContainsName(name, out Item? item))
+        if (!Items.TryGetItemThatContainsName(args, out Item? item))
         {
-            Logger.LogWarning($"Spawn command failed. Unknown item with name \"{name}\"");
+            Logger.LogWarning($"Spawn command failed. Unknown item with name \"{args}\"");
             return;
         }
 

@@ -1,22 +1,22 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace REPOLib.Objects.Sdk;
 
 /// <summary>
 /// REPOLib EnemyContent class.
 /// </summary>
-[CreateAssetMenu(menuName = "REPOLib/Enemy", order = 3, fileName = "New Enemy")]
+[PublicAPI, CreateAssetMenu(menuName = "REPOLib/Enemy", order = 3, fileName = "New Enemy")]
 public class EnemyContent : Content
 {
-    #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
-    [SerializeField]
-    private EnemySetup _setup = null!;
-    #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
+    [FormerlySerializedAs("_setup"), SerializeField] 
+    private EnemySetup setup = null!;
 
     /// <summary>
     /// The <see cref="EnemySetup"/> of this content.
     /// </summary>
-    public EnemySetup Setup => _setup;
+    public EnemySetup Setup => setup;
 
     /// <summary>
     /// The name of the <see cref="Setup"/>.
@@ -24,8 +24,5 @@ public class EnemyContent : Content
     public override string Name => Setup?.name ?? string.Empty;
 
     /// <inheritdoc/>
-    public override void Initialize(Mod mod)
-    {
-        Modules.Enemies.RegisterEnemy(Setup);
-    }
+    public override void Initialize(Mod mod) => Modules.Enemies.RegisterEnemy(Setup);
 }

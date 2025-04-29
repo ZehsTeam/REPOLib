@@ -1,22 +1,22 @@
+using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace REPOLib.Objects.Sdk;
 
 /// <summary>
 /// REPOLib LevelContent class.
 /// </summary>
-[CreateAssetMenu(menuName = "REPOLib/Level", order = 4, fileName = "New Level")]
+[PublicAPI, CreateAssetMenu(menuName = "REPOLib/Level", order = 4, fileName = "New Level")]
 public class LevelContent : Content
 {
-    #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
-    [SerializeField]
-    private Level _level = null!;
-    #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
+    [FormerlySerializedAs("_level"), SerializeField] 
+    private Level level = null!;
 
     /// <summary>
     /// The <see cref="global::Level"/> of this content.
     /// </summary>
-    public Level Level => _level;
+    public Level Level => level;
 
     /// <summary>
     /// The name of the <see cref="Level"/>
@@ -24,8 +24,5 @@ public class LevelContent : Content
     public override string Name => Level?.name ?? string.Empty;
 
     /// <inheritdoc/>
-    public override void Initialize(Mod mod)
-    {
-        Modules.Levels.RegisterLevel(Level);
-    }
+    public override void Initialize(Mod mod) => Modules.Levels.RegisterLevel(Level);
 }

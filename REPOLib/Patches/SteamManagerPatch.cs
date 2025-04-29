@@ -5,39 +5,20 @@ namespace REPOLib.Patches;
 [HarmonyPatch(typeof(SteamManager))]
 internal static class SteamManagerPatch
 {
-    [HarmonyPatch(nameof(SteamManager.Awake))]
     [HarmonyPostfix]
+    [HarmonyPatch(nameof(SteamManager.Awake))]
     public static void AwakePatch(SteamManager __instance)
+        => UpdateDeveloperMode(__instance);
+
+    public static void UpdateDeveloperMode(SteamManager instance)
     {
-        UpdateDeveloperMode();
-    }
+        if (ConfigManager.VanillaDeveloperMode == null) return;
+        if (instance == null) return;
+        
+        var value = ConfigManager.VanillaDeveloperMode.Value;
+        if (instance.developerMode != value)
+            Logger.LogInfo(value ? "Enabling vanilla developer mode." : "Disabling vanilla developer mode.");
 
-    public static void UpdateDeveloperMode()
-    {
-        if (ConfigManager.VanillaDeveloperMode == null)
-        {
-            return;
-        }
-
-        if (SteamManager.instance == null)
-        {
-            return;
-        }
-
-        bool value = ConfigManager.VanillaDeveloperMode.Value;
-
-        if (SteamManager.instance.developerMode != value)
-        {
-            if (value)
-            {
-                Logger.LogInfo("Enabling vanilla developer mode.");
-            }
-            else
-            {
-                Logger.LogInfo("Disabling vanilla developer mode.");
-            }
-        }
-
-        SteamManager.instance.developerMode = value;
+        instance.developerMode = value;
     }
 }

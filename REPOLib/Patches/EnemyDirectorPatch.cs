@@ -7,23 +7,21 @@ namespace REPOLib.Patches;
 [HarmonyPatch(typeof(EnemyDirector))]
 internal static class EnemyDirectorPatch
 {
-    private static bool _alreadyRegistered = false;
+    private static bool _alreadyRegistered;
 
-    [HarmonyPatch(nameof(EnemyDirector.Awake))]
     [HarmonyPostfix]
+    [HarmonyPatch(nameof(EnemyDirector.Awake))]
     private static void AwakePatch()
     {
         // We have to refill the enemies to the lists on each game load
-        if (_alreadyRegistered)
+        if (!_alreadyRegistered)
         {
-            foreach (var enemy in Enemies.RegisteredEnemies)
-            {
-                EnemyDirector.instance.AddEnemy(enemy);
-            }
+            Enemies.RegisterInitialEnemies();
+            _alreadyRegistered = true;
             return;
         }
         
-        Enemies.RegisterInitialEnemies();
-        _alreadyRegistered = true;
+        foreach (var enemy in Enemies.RegisteredEnemies)
+            EnemyDirector.instance.AddEnemy(enemy);
     }
 }

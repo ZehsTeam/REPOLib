@@ -11,25 +11,23 @@ namespace REPOLib.Patches;
 [HarmonyPatch(typeof(EnemyGnomeDirector))]
 internal static class EnemyGnomeDirectorPatch
 {
-    [HarmonyPatch(nameof(EnemyGnomeDirector.Awake))]
     [HarmonyTranspiler]
+    [HarmonyPatch(nameof(EnemyGnomeDirector.Awake))]
     private static IEnumerable<CodeInstruction> AwakeTranspiler(IEnumerable<CodeInstruction> instructions)
     {
-        MethodInfo originalMethod = AccessTools.Method(typeof(EnemyGnomeDirector), nameof(EnemyGnomeDirector.Setup));
-        MethodInfo replacementMethod = AccessTools.Method(typeof(EnemyGnomeDirectorPatch), nameof(PreSetup));
+        var originalMethod = AccessTools.Method(typeof(EnemyGnomeDirector), nameof(EnemyGnomeDirector.Setup));
+        var replacementMethod = AccessTools.Method(typeof(EnemyGnomeDirectorPatch), nameof(PreSetup));
 
-        if (originalMethod == null || replacementMethod == null)
+        if (originalMethod is null || replacementMethod is null)
         {
             Logger.LogError("EnemyGnomeDirectorPatch: failed to find required methods for AwakeTranspiler.");
             return instructions;
         }
 
         var modifiedInstructions = new List<CodeInstruction>();
-
         foreach (var instruction in instructions)
         {
-            bool isMethodCall = instruction.opcode == OpCodes.Call || instruction.opcode == OpCodes.Callvirt;
-
+            var isMethodCall = instruction.opcode == OpCodes.Call || instruction.opcode == OpCodes.Callvirt;
             if (isMethodCall && instruction.operand is MethodInfo methodInfo && methodInfo == originalMethod)
             {
                 // Replace original method call with replacement method call
@@ -47,10 +45,8 @@ internal static class EnemyGnomeDirectorPatch
     private static IEnumerator PreSetup(EnemyGnomeDirector instance)
     {
         if (LevelGenerator.Instance.Generated)
-        {
             yield return new WaitForSeconds(0.1f);
-        }
-
+        
         yield return instance.Setup();
     }
 }

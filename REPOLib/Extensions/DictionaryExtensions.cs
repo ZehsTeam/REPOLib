@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using JetBrains.Annotations;
 
 namespace REPOLib.Extensions;
 
+[PublicAPI]
 internal static class DictionaryExtensions
 {
     public static bool TryGetKey<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value, [NotNullWhen(true)] out TKey? key)
     {
-        foreach (var kvp in dictionary)
+        foreach (var kvp in dictionary.Where(kvp => Equals(kvp.Value, value)))
         {
-            if (Equals(kvp.Value, value))
-            {
-                key = kvp.Key!;
-                return true;
-            }
+            key = kvp.Key!;
+            return true;
         }
 
         key = default;
@@ -22,57 +22,24 @@ internal static class DictionaryExtensions
     }
 
     public static TKey? GetKeyOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value)
-    {
-        if (dictionary.TryGetKey(value, out TKey? key))
-        {
-            return key;
-        }
-
-        return default;
-    }
+        => dictionary.TryGetKey(value, out var key) ? key : default;
 
     public static TKey? GetKeyOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value, TKey defaultKey)
-    {
-        if (dictionary.TryGetKey(value, out TKey? key))
-        {
-            return key;
-        }
-
-        return defaultKey;
-    }
+        => dictionary.TryGetKey(value, out var key) ? key : defaultKey;
 
     public static bool ContainsKey<T>(this Dictionary<string, T> dictionary, string key, bool ignoreKeyCase)
-    {
-        if (!ignoreKeyCase)
-        {
-            return dictionary.ContainsKey(key);
-        }
-
-        foreach (var kvp in dictionary)
-        {
-            if (string.Equals(kvp.Key, key, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+        => !ignoreKeyCase ? 
+            dictionary.ContainsKey(key) 
+            : dictionary.Any(kvp => string.Equals(kvp.Key, key, StringComparison.OrdinalIgnoreCase));
 
     public static bool TryGetValue<T>(this Dictionary<string, T> dictionary, string key, [NotNullWhen(true)] out T? value, bool ignoreKeyCase)
     {
-        if (!ignoreKeyCase)
-        {
-            return dictionary.TryGetValue(key, out value);
-        }
+        if (!ignoreKeyCase) return dictionary.TryGetValue(key, out value);
 
-        foreach (var kvp in dictionary)
+        foreach (var kvp in dictionary.Where(kvp => string.Equals(kvp.Key, key, StringComparison.OrdinalIgnoreCase)))
         {
-            if (string.Equals(kvp.Key, key, StringComparison.OrdinalIgnoreCase))
-            {
-                value = kvp.Value!;
-                return true;
-            }
+            value = kvp.Value!;
+            return true;
         }
 
         value = default;
@@ -80,22 +47,8 @@ internal static class DictionaryExtensions
     }
 
     public static T? GetValueOrDefault<T>(this Dictionary<string, T> dictionary, string key, bool ignoreKeyCase)
-    {
-        if (dictionary.TryGetValue(key, out T? value, ignoreKeyCase))
-        {
-            return value;
-        }
-
-        return default;
-    }
+        => dictionary.TryGetValue(key, out var value, ignoreKeyCase) ? value : default;
 
     public static T? GetValueOrDefault<T>(this Dictionary<string, T> dictionary, string key, T defaultValue, bool ignoreKeyCase)
-    {
-        if (dictionary.TryGetValue(key, out T? value, ignoreKeyCase))
-        {
-            return value;
-        }
-
-        return defaultValue;
-    }
+        => dictionary.TryGetValue(key, out var value, ignoreKeyCase) ? value : defaultValue;
 }

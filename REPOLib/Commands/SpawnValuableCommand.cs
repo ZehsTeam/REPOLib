@@ -41,15 +41,12 @@ internal static class SpawnValuableCommand
             return;
         }
 
-        string name = args;
+        var position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) + PlayerAvatar.instance.transform.forward * 1f;
+        Logger.LogInfo($"Trying to spawn valuable \"{args}\" at {position}...", extended: true);
 
-        Vector3 position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) + PlayerAvatar.instance.transform.forward * 1f;
-
-        Logger.LogInfo($"Trying to spawn valuable \"{name}\" at {position}...", extended: true);
-
-        if (!Valuables.TryGetValuableThatContainsName(name, out ValuableObject? valuableObject))
+        if (!Valuables.TryGetValuableThatContainsName(args, out var valuableObject))
         {
-            Logger.LogWarning($"Spawn command failed. Unknown valuable with name \"{name}\"");
+            Logger.LogWarning($"Spawn command failed. Unknown valuable with name \"{args}\"");
             return;
         }
 

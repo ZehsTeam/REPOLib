@@ -1,22 +1,22 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace REPOLib.Objects.Sdk;
 
 /// <summary>
 /// REPOLib ItemContent class.
 /// </summary>
-[CreateAssetMenu(menuName = "REPOLib/Item", order = 2, fileName = "New Item")]
+[PublicAPI, CreateAssetMenu(menuName = "REPOLib/Item", order = 2, fileName = "New Item")]
 public class ItemContent : Content
 {
-    #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
-    [SerializeField]
-    private ItemAttributes _prefab = null!;
-    #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
+    [FormerlySerializedAs("_prefab"), SerializeField] 
+    private ItemAttributes prefab = null!;
 
     /// <summary>
     /// The <see cref="ItemAttributes"/> of this content.
     /// </summary>
-    public ItemAttributes Prefab => _prefab;
+    public ItemAttributes Prefab => prefab;
 
     /// <summary>
     /// The name of the <see cref="Prefab"/>.
@@ -26,9 +26,7 @@ public class ItemContent : Content
     /// <inheritdoc/>
     public override void Initialize(Mod mod)
     {
-        // Set prefab on item
-        _prefab.item.prefab = _prefab.gameObject;
-
+        prefab.item.prefab = prefab.gameObject; // Set prefab on item
         Modules.Items.RegisterItem(Prefab.item);
     }
 }

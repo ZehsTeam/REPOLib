@@ -6,10 +6,7 @@ namespace REPOLib.Patches;
 [HarmonyPatch(typeof(AudioManager))]
 internal static class AudioManagerPatch
 {
-    [HarmonyPatch(nameof(AudioManager.Start))]
     [HarmonyPostfix]
-    private static void StartPatch()
-    {
-        Utilities.FixAudioMixerGroupsOnPrefabs();
-    }
+    [HarmonyPatch(nameof(AudioManager.Start))]
+    private static void StartPatch() => Utilities.FixAudioMixerGroupsOnPrefabs();
 }

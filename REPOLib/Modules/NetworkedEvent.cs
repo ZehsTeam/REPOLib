@@ -2,126 +2,50 @@
 using Photon.Pun;
 using Photon.Realtime;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+using JetBrains.Annotations;
 
 namespace REPOLib.Modules;
 
-// TODO: Document this.
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-public static class NetworkingEvents
-{
-    public static IReadOnlyList<NetworkedEvent> CustomEvents => _customEvents;
-
-    /// <summary>
-    /// Reserved event codes by Photon and the base game.
-    /// </summary>
-    public static readonly byte[] ReservedEventCodes = [0, 1, 2];
-
-    private static readonly List<NetworkedEvent> _customEvents = [];
-
-    public static readonly RaiseEventOptions RaiseAll = new()
-    {
-        Receivers = ReceiverGroup.All
-    };
-
-    public static readonly RaiseEventOptions RaiseOthers = new()
-    {
-        Receivers = ReceiverGroup.Others
-    };
-
-    public static readonly RaiseEventOptions RaiseMasterClient = new()
-    {
-        Receivers = ReceiverGroup.MasterClient
-    };
-
-    internal static void Initialize()
-    {
-        PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
-
-        Application.quitting += () =>
-        {
-            PhotonNetwork.NetworkingClient.EventReceived -= OnEvent;
-        };
-    }
-
-    internal static void AddCustomEvent(NetworkedEvent networkedEvent)
-    {
-        if (!_customEvents.Contains(networkedEvent))
-        {
-            _customEvents.Add(networkedEvent);
-        }
-    }
-
-    private static void OnEvent(EventData photonEvent)
-    {
-        NetworkedEvent thisEvent = _customEvents.FirstOrDefault(e => e.EventCode == photonEvent.Code);
-
-        if (thisEvent == null)
-        {
-            return;
-        }
-
-        thisEvent.EventAction?.Invoke(photonEvent);
-    }
-
-    internal static bool TryGetUniqueEventCode(out byte eventCode)
-    {
-        eventCode = 0;
-
-        while (IsEventCodeTaken(eventCode) && eventCode < 200)
-        {
-            eventCode++;
-        }
-
-        if (eventCode > 200 || (eventCode == 200 && IsEventCodeTaken(eventCode)))
-        {
-            eventCode = 0;
-            return false;
-        }
-
-        return true;
-    }
-
-    public static bool IsEventCodeTaken(byte eventCode)
-    {
-        if (ReservedEventCodes.Any(x => x == eventCode))
-        {
-            return true;
-        }
-
-        if (_customEvents.Any(x => x.EventCode == eventCode))
-        {
-            return true;
-        }
-
-        return false;
-    }
-}
-
+/// <summary>
+/// // TODO: Document this.
+/// </summary>
+[PublicAPI]
 public class NetworkedEvent
 {
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
     public string Name { get; private set; }
+    
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
     public byte EventCode { get; private set; }
+    
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
     public Action<EventData> EventAction { get; private set; }
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="eventAction"></param>
     public NetworkedEvent(string name, Action<EventData> eventAction)
     {
         Name = name;
         EventAction = eventAction;
 
-        if (NetworkingEvents.TryGetUniqueEventCode(out byte eventCode))
+        if (NetworkingEvents.TryGetUniqueEventCode(out var eventCode))
         {
             EventCode = eventCode;
             NetworkingEvents.AddCustomEvent(this);
-
             Logger.LogInfo($"Registered NetworkedEvent \"{Name}\" with event code: {EventCode}", extended: true);
+            return;
         }
-        else
-        {
-            Logger.LogError($"Failed to register NetworkedEvent \"{Name}\". Could not get unique event code.");
-        }
+
+        Logger.LogError($"Failed to register NetworkedEvent \"{Name}\". Could not get unique event code.");
     }
 
     /// <summary>
@@ -130,31 +54,19 @@ public class NetworkedEvent
     public void RaiseEvent(object eventContent, RaiseEventOptions raiseEventOptions, SendOptions sendOptions)
     {
         if (SemiFunc.IsMultiplayer())
-        {
             PhotonNetwork.RaiseEvent(EventCode, eventContent, raiseEventOptions, sendOptions);
-        }
         else if (raiseEventOptions.Receivers != ReceiverGroup.Others)
-        {
             RaiseEventSingleplayer(eventContent);
-        }
     }
 
     private void RaiseEventSingleplayer(object eventContent)
     {
         if (SemiFunc.IsMultiplayer())
-        {
             return;
-        }
-
-        EventData eventData = new EventData
-        {
-            Code = EventCode
-        };
-
+        
+        var eventData = new EventData { Code = EventCode };
         eventData.Parameters[eventData.CustomDataKey] = eventContent;
         eventData.Parameters[eventData.SenderKey] = 1;
-
         EventAction?.Invoke(eventData);
     }
 }
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

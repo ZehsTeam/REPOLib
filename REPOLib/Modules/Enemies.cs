@@ -2,6 +2,8 @@ using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -9,6 +11,7 @@ namespace REPOLib.Modules;
 /// <summary>
 /// The Enemies module of REPOLib.
 /// </summary>
+[PublicAPI]
 public static class Enemies
 {
     /// <inheritdoc cref="GetEnemies"/>
@@ -17,52 +20,39 @@ public static class Enemies
     /// <summary>
     /// Gets all enemies registered with REPOLib.
     /// </summary>
-    public static IReadOnlyList<EnemySetup> RegisteredEnemies => _enemiesRegistered;
+    public static IReadOnlyList<EnemySetup> RegisteredEnemies => EnemiesRegistered;
 
     internal static int SpawnNextEnemiesNotDespawned = 0;
-
-    private static readonly List<EnemySetup> _enemiesToRegister = [];
-    private static readonly List<EnemySetup> _enemiesRegistered = [];
-
+    private static readonly List<EnemySetup> EnemiesToRegister = [];
+    private static readonly List<EnemySetup> EnemiesRegistered = [];
     private static bool _initialEnemiesRegistered;
 
     internal static void RegisterInitialEnemies()
     {
-        if (_initialEnemiesRegistered)
-        {
-            return;
-        }
-
-        foreach (var enemy in _enemiesToRegister)
-        {
+        if (_initialEnemiesRegistered) return;
+        foreach (var enemy in EnemiesToRegister)
             RegisterEnemyWithGame(enemy);
-        }
-
-        _enemiesToRegister.Clear();
+        
+        EnemiesToRegister.Clear();
         _initialEnemiesRegistered = true;
     }
 
     private static void RegisterEnemyWithGame(EnemySetup enemy)
     {
-        if (_enemiesRegistered.Contains(enemy))
-        {
+        if (EnemiesRegistered.Contains(enemy)) 
             return;
-        }
 
-        if (!enemy.TryGetEnemyParent(out EnemyParent? enemyParent))
-        {
+        if (!enemy.TryGetEnemyParent(out var enemyParent)) 
             return;
-        }
-
+        
         if (EnemyDirector.instance.AddEnemy(enemy))
         {
-            _enemiesRegistered.Add(enemy);
+            EnemiesRegistered.Add(enemy);
             Logger.LogInfo($"Added enemy \"{enemyParent.enemyName}\" to difficulty {enemyParent.difficulty}", extended: true);
+            return;
         }
-        else
-        {
-            Logger.LogWarning($"Failed to add enemy \"{enemyParent.enemyName}\" to difficulty {enemyParent.difficulty}", extended: true);
-        }
+        
+        Logger.LogWarning($"Failed to add enemy \"{enemyParent.enemyName}\" to difficulty {enemyParent.difficulty}", extended: true);
     }
 
     /// <summary>
@@ -73,22 +63,14 @@ public static class Enemies
     public static void RegisterEnemy(EnemySetup enemySetup)
     {
         if (enemySetup == null || enemySetup.spawnObjects == null || enemySetup.spawnObjects.Count == 0)
-        {
             throw new ArgumentException("Failed to register enemy. EnemySetup or spawnObjects list is empty.");
-        }
 
-        EnemyParent? enemyParent = enemySetup.GetEnemyParent();
-
+        var enemyParent = enemySetup.GetEnemyParent();
         if (enemyParent == null)
         {
             Logger.LogError($"Failed to register enemy \"{enemySetup.name}\". No enemy prefab found in spawnObjects list.");
             return;
         }
-
-        //if (!_initialEnemiesRegistered)
-        //{
-        //    Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". You can only register enemies in awake!");
-        //}
 
         if (ResourcesHelper.HasEnemyPrefab(enemySetup))
         {
@@ -96,7 +78,7 @@ public static class Enemies
             return;
         }
 
-        if (_enemiesToRegister.Contains(enemySetup))
+        if (EnemiesToRegister.Contains(enemySetup))
         {
             Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". Enemy is already registered!");
             return;
@@ -104,37 +86,27 @@ public static class Enemies
 
         foreach (var spawnObject in enemySetup.GetDistinctSpawnObjects())
         {
-            foreach (var previousEnemy in _enemiesToRegister)
+            foreach (var previousEnemy in EnemiesToRegister.Where(previousEnemy => previousEnemy.AnySpawnObjectsNameEqualsAnother(spawnObject)))
             {
-                if (previousEnemy.AnySpawnObjectsNameEqualsThatIsNotTheSameObject(spawnObject))
-                {
-                    Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". Enemy \"{previousEnemy.name}\" already has a spawn object called \"{spawnObject.name}\"");
-                    return;
-                }
+                Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". Enemy \"{previousEnemy.name}\" already has a spawn object called \"{spawnObject.name}\"");
+                return;
             }
         }
 
         // Register all spawn prefabs to the network
         foreach (var spawnObject in enemySetup.GetDistinctSpawnObjects())
         {
-            string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
-
+            var prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
             if (!NetworkPrefabs.HasNetworkPrefab(prefabId))
-            {
                 NetworkPrefabs.RegisterNetworkPrefab(prefabId, spawnObject);
-            }
 
             Utilities.FixAudioMixerGroups(spawnObject);
         }
 
         if (_initialEnemiesRegistered)
-        {
             RegisterEnemyWithGame(enemySetup);
-        }
         else
-        {
-            _enemiesToRegister.Add(enemySetup);
-        }
+            EnemiesToRegister.Add(enemySetup);
     }
 
     /// <summary>
@@ -143,9 +115,9 @@ public static class Enemies
     /// <param name="enemySetup">The <see cref="EnemySetup"/> to spawn the enemy or enemies from.</param>
     /// <param name="position">The position where the enemy will be spawned.</param>
     /// <param name="rotation">The rotation of the enemy.</param>
-    /// <param name="spawnDespawned">Whether or not this enemy will spawn despawned.</param>
+    /// <param name="spawnDespawned">Whether this enemy will spawn despawned.</param>
     /// <returns>The <see cref="EnemyParent"/> objects from spawned enemies.</returns>
-    public static List<EnemyParent>? SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
+    public static List<EnemyParent>? SpawnEnemy(EnemySetup? enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
     {
         if (enemySetup == null)
         {
@@ -178,8 +150,7 @@ public static class Enemies
         }
 
         List<EnemyParent> enemyParents = [];
-
-        foreach (GameObject spawnObject in enemySetup.GetSortedSpawnObjects())
+        foreach (var spawnObject in enemySetup.GetSortedSpawnObjects())
         {
             if (spawnObject == null)
             {
@@ -187,8 +158,8 @@ public static class Enemies
                 continue;
             }
 
-            string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
-            GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
+            var prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
+            var gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
 
             if (gameObject == null)
             {
@@ -197,29 +168,18 @@ public static class Enemies
             }
 
             if (!gameObject.TryGetComponent(out EnemyParent enemyParent))
-            {
                 continue;
-            }
 
             enemyParents.Add(enemyParent);
-
-            if (!spawnDespawned)
-            {
-                SpawnNextEnemiesNotDespawned++;
-            }
+            if (!spawnDespawned) SpawnNextEnemiesNotDespawned++;
 
             enemyParent.SetupDone = true;
-
-            Enemy enemy = gameObject.GetComponentInChildren<Enemy>();
+            var enemy = gameObject.GetComponentInChildren<Enemy>();
 
             if (enemy != null)
-            {
                 enemy.EnemyTeleported(position);
-            }
             else
-            {
                 Logger.LogError($"Enemy \"{prefabEnemyParent.enemyName}\" spawn object \"{spawnObject.name}\" does not have an enemy component.");
-            }
 
             LevelGenerator.Instance.EnemiesSpawnTarget++;
             EnemyDirector.instance.FirstSpawnPointAdd(enemyParent);
@@ -232,9 +192,7 @@ public static class Enemies
         }
 
         Logger.LogInfo($"Spawned enemy \"{prefabEnemyParent.enemyName}\" at position {position}", extended: true);
-
         RunManager.instance.EnemiesSpawnedRemoveEnd();
-
         return enemyParents;
     }
 
@@ -243,48 +201,33 @@ public static class Enemies
     /// </summary>
     /// <returns>A list of all <see cref="EnemySetup"/> objects.</returns>
     public static IReadOnlyList<EnemySetup> GetEnemies()
-    {
-        if (EnemyDirector.instance == null)
-        {
-            return [];
-        }
-
-        return EnemyDirector.instance.GetEnemies();
-    }
+        => EnemyDirector.instance == null ? [] : EnemyDirector.instance.GetEnemies();
 
     /// <summary>
     /// Tries to get an <see cref="EnemySetup"/> by name or by its <see cref="EnemyParent"/> name.
     /// </summary>
     /// <param name="name">The <see cref="string"/> to match.</param>
     /// <param name="enemySetup">The found <see cref="EnemySetup"/>.</param>
-    /// <returns>Whether or not the <see cref="EnemySetup"/> was found.</returns>
-    public static bool TryGetEnemyByName(string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
-    {
-        enemySetup = GetEnemyByName(name);
-        return enemySetup != null;
-    }
+    /// <returns>Whether the <see cref="EnemySetup"/> was found.</returns>
+    public static bool TryGetEnemyByName(string? name, [NotNullWhen(true)] out EnemySetup? enemySetup) 
+        => (enemySetup = GetEnemyByName(name)) != null;
 
     /// <summary>
     /// Gets an <see cref="EnemySetup"/> by name or by its <see cref="EnemyParent"/> name.
     /// </summary>
     /// <param name="name">The <see cref="string"/> to match.</param>
     /// <returns>The <see cref="EnemySetup"/> or null.</returns>
-    public static EnemySetup? GetEnemyByName(string name)
-    {
-        return EnemyDirector.instance?.GetEnemyByName(name);
-    }
+    public static EnemySetup? GetEnemyByName(string? name)
+        => EnemyDirector.instance?.GetEnemyByName(name);
 
     /// <summary>
     /// Tries to get an <see cref="EnemySetup"/> that contains the name or by its <see cref="EnemyParent"/> that contains the name.
     /// </summary>
     /// <param name="name">The <see cref="string"/> to compare.</param>
     /// <param name="enemySetup">The found <see cref="EnemySetup"/>.</param>
-    /// <returns>Whether or not the <see cref="EnemySetup"/> was found.</returns>
+    /// <returns>Whether the <see cref="EnemySetup"/> was found.</returns>
     public static bool TryGetEnemyThatContainsName(string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
-    {
-        enemySetup = GetEnemyThatContainsName(name);
-        return enemySetup != null;
-    }
+        => (enemySetup = GetEnemyThatContainsName(name)) != null;
 
     /// <summary>
     /// Gets an <see cref="EnemySetup"/> that contains the name or by its <see cref="EnemyParent"/> that contains the name.
@@ -292,7 +235,5 @@ public static class Enemies
     /// <param name="name">The <see cref="string"/> to compare.</param>
     /// <returns>The <see cref="EnemySetup"/> or null.</returns>
     public static EnemySetup? GetEnemyThatContainsName(string name)
-    {
-        return EnemyDirector.instance?.GetEnemyThatContainsName(name);
-    }
+        => EnemyDirector.instance?.GetEnemyThatContainsName(name);
 }

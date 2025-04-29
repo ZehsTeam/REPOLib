@@ -1,6 +1,5 @@
 ﻿using BepInEx;
 using HarmonyLib;
-using REPOLib.Modules;
 using REPOLib.Patches;
 
 namespace REPOLib;
@@ -11,16 +10,14 @@ namespace REPOLib;
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 public class Plugin : BaseUnityPlugin
 {
-    private readonly Harmony _harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
+    private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
 
     /// <summary>
     /// The REPOLib plugin instance.
     /// </summary>
     public static Plugin Instance { get; private set; } = null!;
 
-    #pragma warning disable IDE0051 // Remove unused private members
     private void Awake()
-    #pragma warning restore IDE0051 // Remove unused private members
     {
         Instance = this;
 
@@ -38,9 +35,6 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll(typeof(PlayerControllerPatch));
 
         ConfigManager.Initialize(Config);
-
-        Upgrades.Initialize();
-
         BundleLoader.LoadAllBundles(Paths.PluginPath, ".repobundle");
     }
 }

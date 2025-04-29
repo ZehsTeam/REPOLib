@@ -1,16 +1,25 @@
-﻿using REPOLib.Extensions;
+﻿using System.Linq;
+using JetBrains.Annotations;
+using REPOLib.Extensions;
 using UnityEngine;
 
 namespace REPOLib.Modules;
 
-// TODO: Document this.
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+/// <summary>
+/// // TODO: Document this.
+/// </summary>
+[PublicAPI]
 public static class ResourcesHelper
 {
     #region Folder Paths
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="volumeType"></param>
+    /// <returns></returns>
     public static string GetValuablesFolderPath(ValuableVolume.Type volumeType)
     {
-        string folder = volumeType switch
+        var folder = volumeType switch
         {
             ValuableVolume.Type.Tiny =>     "01 Tiny",
             ValuableVolume.Type.Small =>    "02 Small",
@@ -25,19 +34,27 @@ public static class ResourcesHelper
         return $"Valuables/{folder}";
     }
 
-    public static string GetItemsFolderPath()
-    {
-        return "Items";
-    }
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <returns></returns>
+    public static string GetItemsFolderPath() => "Items";
 
-    public static string GetEnemiesFolderPath()
-    {
-        return "Enemies";
-    }
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <returns></returns>
+    public static string GetEnemiesFolderPath() => "Enemies";
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
     public static string GetLevelPrefabsFolderPath(Level level, LevelPrefabType type)
     {
-        string folder = type switch
+        var folder = type switch
         {
             LevelPrefabType.Module => "Modules",
             LevelPrefabType.Other => "Other",
@@ -50,158 +67,172 @@ public static class ResourcesHelper
     #endregion
 
     #region Paths
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="valuableObject"></param>
+    /// <returns></returns>
     public static string GetValuablePrefabPath(ValuableObject valuableObject)
     {
         if (valuableObject == null)
-        {
             return string.Empty;
-        }
 
-        string folderPath = GetValuablesFolderPath(valuableObject.volumeType);
-
+        var folderPath = GetValuablesFolderPath(valuableObject.volumeType);
         return $"{folderPath}/{valuableObject.gameObject.name}";
     }
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <returns></returns>
     public static string GetValuablePrefabPath(GameObject prefab)
     {
-        if (prefab == null)
-        {
-            return string.Empty;
-        }
-
-        if (prefab.TryGetComponent(out ValuableObject valuableObject))
-        {
-            return GetValuablePrefabPath(valuableObject);
-        }
-
-        return string.Empty;
+        if (prefab == null) return string.Empty;
+        return prefab.TryGetComponent(out ValuableObject valuableObject) ? GetValuablePrefabPath(valuableObject) : string.Empty;
     }
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public static string GetItemPrefabPath(Item item)
-    {
-        if (item == null)
-        {
-            return string.Empty;
-        }
+        => item == null ? string.Empty : GetItemPrefabPath(item.prefab);
 
-        return GetItemPrefabPath(item.prefab);
-    }
-
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <returns></returns>
     public static string GetItemPrefabPath(GameObject prefab)
     {
         if (prefab == null)
-        {
             return string.Empty;
-        }
 
-        string folderPath = GetItemsFolderPath();
-
+        var folderPath = GetItemsFolderPath();
         return $"{folderPath}/{prefab.name}";
     }
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="enemySetup"></param>
+    /// <returns></returns>
     public static string GetEnemyPrefabPath(EnemySetup enemySetup)
     {
         if (enemySetup == null || enemySetup.spawnObjects == null)
-        {
             return string.Empty;
-        }
 
-        GameObject? mainSpawnObject = enemySetup.GetMainSpawnObject();
-
+        var mainSpawnObject = enemySetup.GetMainSpawnObject();
         if (mainSpawnObject == null)
-        {
             return string.Empty;
-        }
 
-        string folderPath = GetEnemiesFolderPath();
-
+        var folderPath = GetEnemiesFolderPath();
         return $"{folderPath}/{mainSpawnObject.name}";
     }
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <returns></returns>
     public static string GetEnemyPrefabPath(GameObject prefab)
     {
-        if (prefab == null)
-        {
-            return string.Empty;
-        }
-
-        string folderPath = GetEnemiesFolderPath();
-
+        if (prefab == null) return string.Empty;
+        var folderPath = GetEnemiesFolderPath();
         return $"{folderPath}/{prefab.name}";
     }
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
     public enum LevelPrefabType
     {
+        /// <summary>
+        /// // TODO: Document this.
+        /// </summary>
         Module,
+        /// <summary>
+        /// // TODO: Document this.
+        /// </summary>
         Other,
+        /// <summary>
+        /// // TODO: Document this.
+        /// </summary>
         StartRoom
     }
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="prefab"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
     public static string GetLevelPrefabPath(Level level, GameObject prefab, LevelPrefabType type)
     {
-        if (prefab == null)
-        {
-            return string.Empty;
-        }
-
-        string folderPath = GetLevelPrefabsFolderPath(level, type);
-
+        if (prefab == null) return string.Empty;
+        var folderPath = GetLevelPrefabsFolderPath(level, type);
         return $"{folderPath}/{prefab.name}";
     }
     #endregion
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="valuableObject"></param>
+    /// <returns></returns>
     public static bool HasValuablePrefab(ValuableObject valuableObject)
     {
-        if (valuableObject == null)
-        {
-            return false;
-        }
-
-        string prefabPath = GetValuablePrefabPath(valuableObject);
-
+        if (valuableObject == null) return false;
+        var prefabPath = GetValuablePrefabPath(valuableObject);
         return Resources.Load<GameObject>(prefabPath) != null;
     }
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public static bool HasItemPrefab(Item item)
     {
-        if (item == null)
-        {
-            return false;
-        }
-
-        string prefabPath = GetItemPrefabPath(item);
-
+        if (item == null) return false;
+        var prefabPath = GetItemPrefabPath(item);
         return Resources.Load<GameObject>(prefabPath) != null;
     }
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="enemySetup"></param>
+    /// <returns></returns>
     public static bool HasEnemyPrefab(EnemySetup enemySetup)
     {
         if (enemySetup == null)
-        {
             return false;
-        }
-
-        foreach (var spawnObject in enemySetup.GetDistinctSpawnObjects())
-        {
-            string prefabPath = GetEnemyPrefabPath(spawnObject);
-
+        
+        foreach (var prefabPath in enemySetup.GetDistinctSpawnObjects().Select(GetEnemyPrefabPath))
             if (Resources.Load<GameObject>(prefabPath) != null)
-            {
                 return true;
-            }
-        }
 
         return false;
     }
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <returns></returns>
     public static bool HasPrefab(GameObject prefab)
-    {
-        return Resources.Load<GameObject>(prefab?.name) != null;
-    }
+        => Resources.Load<GameObject>(prefab?.name) != null;
+    
 
+    /// <summary>
+    /// // TODO: Document this.
+    /// </summary>
+    /// <param name="prefabId"></param>
+    /// <returns></returns>
     public static bool HasPrefab(string prefabId)
-    {
-        return Resources.Load<GameObject>(prefabId) != null;
-    }
+        => Resources.Load<GameObject>(prefabId) != null;
 }
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

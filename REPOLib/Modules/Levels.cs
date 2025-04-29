@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -10,6 +11,7 @@ namespace REPOLib.Modules;
 /// <summary>
 /// The Levels module of REPOLib.
 /// </summary>
+[PublicAPI]
 public static class Levels
 {
     /// <inheritdoc cref="GetLevels"/>
@@ -18,39 +20,31 @@ public static class Levels
     /// <summary>
     /// Get all levels registered with REPOLib.
     /// </summary>
-    public static IReadOnlyList<Level> RegisteredLevels => _levelsRegistered;
+    public static IReadOnlyList<Level> RegisteredLevels => LevelsRegistered;
 
-    private static readonly List<Level> _levelsToRegister = [];
-    private static readonly List<Level> _levelsRegistered = [];
-
+    private static readonly List<Level> LevelsToRegister = [];
+    private static readonly List<Level> LevelsRegistered = [];
     private static bool _initialLevelsRegistered;
 
     internal static void RegisterInitialLevels()
     {
         if (_initialLevelsRegistered)
-        {
             return;
-        }
-
+        
         ValuablePresets.CacheValuablePresets();
-
         Logger.LogInfo($"Adding levels.");
 
-        foreach (var level in _levelsToRegister)
-        {
+        foreach (var level in LevelsToRegister)
             RegisterLevelWithGame(level);
-        }
 
-        _levelsToRegister.Clear();
+        LevelsToRegister.Clear();
         _initialLevelsRegistered = true;
     }
 
-    static void RegisterLevelWithGame(Level level)
+    private static void RegisterLevelWithGame(Level level)
     {
-        if (_levelsRegistered.Contains(level))
-        {
+        if (LevelsRegistered.Contains(level))
             return;
-        }
 
         if (level.ValuablePresets.Count == 0)
         {
@@ -58,23 +52,18 @@ public static class Levels
             level.ValuablePresets.Add(ValuablePresets.GenericPreset);
         }
 
-        for (int i = 0; i < level.ValuablePresets.Count; i++)
+        for (var i = 0; i < level.ValuablePresets.Count; i++)
         {
             var valuablePreset = level.ValuablePresets[i];
-
-            if (ValuablePresets.AllValuablePresets.Values.Contains(valuablePreset))
-            {
+            if (ValuablePresets.GetAllValuablePresets().Values.Contains(valuablePreset))
                 continue;
-            }
-
+            
             // This allows custom levels to use vanilla presets, by using a proxy preset with the same name
-            if (ValuablePresets.AllValuablePresets.TryGetValue(valuablePreset.name, out var foundPreset))
+            if (ValuablePresets.GetAllValuablePresets().TryGetValue(valuablePreset.name, out var foundPreset))
             {
                 // Check if the mod author accidentally included a vanilla preset (and all of its valuables) in their bundle
                 if (valuablePreset.GetCombinedList().Count > 0)
-                {
                     Logger.LogWarning($"Proxy preset \"{valuablePreset.name}\" in level \"{level.name}\" contains valuables! This likely caused duplicate valuables to load!");
-                }
 
                 level.ValuablePresets[i] = foundPreset;
                 Logger.LogInfo($"Replaced proxy preset \"{valuablePreset.name}\" in level \"{level.name}\".", extended: true);
@@ -88,8 +77,7 @@ public static class Levels
 
         RunManager.instance.levels.Add(level);
         Logger.LogInfo($"Added level \"{level.name}\"", extended: true);
-
-        _levelsRegistered.Add(level);
+        LevelsRegistered.Add(level);
     }
 
     /// <summary>
@@ -104,13 +92,13 @@ public static class Levels
             return;
         }
 
-        if (_levelsToRegister.Any(x => x.name.Equals(level.name, StringComparison.OrdinalIgnoreCase)))
+        if (LevelsToRegister.Any(x => x.name.Equals(level.name, StringComparison.OrdinalIgnoreCase)))
         {
             Logger.LogError($"Failed to register level \"{level.name}\". Level already exists with the same name.");
             return;
         }
 
-        if (_levelsToRegister.Contains(level))
+        if (LevelsToRegister.Contains(level))
         {
             Logger.LogWarning($"Failed to register level \"{level.name}\". Level is already registered!");
             return;
@@ -135,44 +123,30 @@ public static class Levels
                 .SelectMany(list => list)
                 .Select(prefab => (prefab, ResourcesHelper.LevelPrefabType.Module))
                 .ToList();
-
-        foreach (var prefab in level.StartRooms)
-        {
-            modules.Add((prefab, ResourcesHelper.LevelPrefabType.StartRoom));
-        }
-
+        
+        modules.AddRange(level.StartRooms.Select(prefab => (prefab, ResourcesHelper.LevelPrefabType.StartRoom)));
         if (level.ConnectObject != null)
-        {
             modules.Add((level.ConnectObject, ResourcesHelper.LevelPrefabType.Other));
-        }
 
         if (level.BlockObject != null)
-        {
             modules.Add((level.BlockObject, ResourcesHelper.LevelPrefabType.Other));
-        }
 
         foreach (var (prefab, type) in modules)
         {
-            string prefabId = ResourcesHelper.GetLevelPrefabPath(level, prefab, type);
+            var prefabId = ResourcesHelper.GetLevelPrefabPath(level, prefab, type);
 
+            // allow duplicate prefabs
             if (ResourcesHelper.HasPrefab(prefabId))
-            {
-                // allow duplicate prefabs
                 continue;
-            }
 
             NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
             Utilities.FixAudioMixerGroups(prefab);
         }
 
         if (_initialLevelsRegistered)
-        {
             RegisterLevelWithGame(level);
-        }
         else
-        {
-            _levelsToRegister.Add(level);
-        }
+            LevelsToRegister.Add(level);
     }
 
     /// <summary>
@@ -180,56 +154,33 @@ public static class Levels
     /// </summary>
     /// <returns>A <see cref="Level"/> list from <see cref="RunManager"/>.</returns>
     public static IReadOnlyList<Level> GetLevels()
-    {
-        if (RunManager.instance == null)
-        {
-            return [];
-        }
-
-        return RunManager.instance.levels;
-    }
+        => RunManager.instance == null ? [] : RunManager.instance.levels;
 
     /// <summary>
     /// Tries to get a <see cref="Level"/> by name.
     /// </summary>
     /// <param name="name">The <see cref="string"/> to match.</param>
     /// <param name="level">The found <see cref="Level"/>.</param>
-    /// <returns>Whether or not the <see cref="Level"/> was found.</returns>
-    public static bool TryGetLevelByName(string name, [NotNullWhen(true)] out Level? level)
-    {
-        level = GetLevelByName(name);
-        return level != null;
-    }
+    /// <returns>Whether the <see cref="Level"/> was found.</returns>
+    public static bool TryGetLevelByName(string? name, [NotNullWhen(true)] out Level? level)
+        => (level = GetLevelByName(name)) != null;
 
     /// <summary>
     /// Get a <see cref="Level"/> by name.
     /// </summary>
     /// <param name="name">The <see cref="string"/> to match.</param>
     /// <returns>The <see cref="Level"/> or null.</returns>
-    public static Level? GetLevelByName(string name)
-    {
-        foreach (var level in GetLevels())
-        {
-            if (level.name.EqualsAny([name, $"Level - {name}"], StringComparison.OrdinalIgnoreCase))
-            {
-                return level;
-            }
-        }
-
-        return null;
-    }
+    public static Level? GetLevelByName(string? name)
+        => GetLevels().FirstOrDefault(level => level.name.EqualsAny([name, $"Level - {name}"], StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// Tries to get a <see cref="Level"/> that contains the specified name.
     /// </summary>
     /// <param name="name">The <see cref="string"/> to compare.</param>
     /// <param name="level">The found <see cref="Level"/>.</param>
-    /// <returns>Whether or not the <see cref="Level"/> was found.</returns>
+    /// <returns>Whether the <see cref="Level"/> was found.</returns>
     public static bool TryGetLevelThatContainsName(string name, [NotNullWhen(true)] out Level? level)
-    {
-        level = GetLevelThatContainsName(name);
-        return level != null;
-    }
+        => (level = GetLevelThatContainsName(name)) != null;
 
     /// <summary>
     /// Gets a <see cref="Level"/> that contains the specified name.
@@ -237,15 +188,5 @@ public static class Levels
     /// <param name="name">The <see cref="string"/> to compare.</param>
     /// <returns>The <see cref="Level"/> or null.</returns>
     public static Level? GetLevelThatContainsName(string name)
-    {
-        foreach (var level in GetLevels())
-        {
-            if (level.name.Contains(name, StringComparison.OrdinalIgnoreCase))
-            {
-                return level;
-            }
-        }
-
-        return null;
-    }
+        => GetLevels().FirstOrDefault(level => level.name.Contains(name, StringComparison.OrdinalIgnoreCase));
 }

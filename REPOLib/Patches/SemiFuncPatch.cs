@@ -1,89 +1,65 @@
 ﻿using HarmonyLib;
 using REPOLib.Commands;
 using REPOLib.Modules;
-using System;
 using System.Reflection;
+using System;
 
 namespace REPOLib.Patches;
 
 [HarmonyPatch(typeof(SemiFunc))]
 internal static class SemiFuncPatch
 {
+    [HarmonyPrefix]
     [HarmonyPatch(nameof(SemiFunc.Command))]
+    private static bool CommandPatch(string _command) 
+        => !_command.StartsWith("/") || Command(_command);
+
     [HarmonyPrefix]
-    private static bool CommandPatch(string _command)
-    {
-        if (_command.StartsWith("/"))
-        {
-            return Command(_command);
-        }
-
-        return true;
-    }
-
-    private static bool Command(string message)
-    {
-        var text = message.ToLower();
-
-        var command = text.Split(' ')[0].Substring(1);
-        string args = "";
-        if (text.Length > command.Length)
-        {
-            args = text.Substring(command.Length + 1).Trim();
-        }
-
-        MethodInfo commandMethod;
-        CommandManager.CommandExecutionMethods.TryGetValue(command, out commandMethod);
-        if (commandMethod != null)
-        {
-            var execAttribute = commandMethod.GetCustomAttribute<CommandExecutionAttribute>();
-            if (CommandManager.CommandsEnabled.TryGetValue(execAttribute.Name, out bool enabled))
-            {
-                if (!enabled)
-                {
-                    return false;
-                }
-            }
-            if (execAttribute != null &&  execAttribute.RequiresDeveloperMode && !ConfigManager.DeveloperMode.Value)
-            {
-                Logger.LogWarning($"Command {command} requires developer mode to be enabled. Enable it in REPOLib.cfg");
-                return false;
-            }
-            try
-            {
-                var methodParams = commandMethod.GetParameters();
-                if (methodParams.Length == 0)
-                {
-                    commandMethod.Invoke(null, null);
-                }
-                else
-                {
-                    commandMethod.Invoke(null, [args]);
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogError($"Error executing command: {e}");
-            }
-
-            return false;
-        }
-
-        return true;
-    }
-
     [HarmonyPatch(nameof(SemiFunc.EnemySpawn))]
-    [HarmonyPrefix]
     private static bool EnemySpawnPatch(ref bool __result)
     {
-        if (Enemies.SpawnNextEnemiesNotDespawned > 0)
-        {
-            Enemies.SpawnNextEnemiesNotDespawned--;
+        if (Enemies.SpawnNextEnemiesNotDespawned <= 0) return true;
+        Enemies.SpawnNextEnemiesNotDespawned--;
 
-            __result = true;
+        __result = true;
+        return false;
+    }
+    
+    private static bool Command(string message)
+    {
+        var args = "";
+        var text = message.ToLower();
+        var command = text.Split(' ')[0][1..];
+        
+        if (text.Length > command.Length)
+            args = text[(command.Length + 1)..].Trim();
+
+        CommandManager.CommandExecutionMethods.TryGetValue(command, out var commandMethod);
+        if (commandMethod == null) return true;
+        
+        var execAttribute = commandMethod.GetCustomAttribute<CommandExecutionAttribute>();
+        if (CommandManager.CommandsEnabled.TryGetValue(execAttribute.Name, out var enabled) 
+            && !enabled) return false;
+        
+        if (execAttribute.RequiresDeveloperMode && ConfigManager.DeveloperMode is not null && !ConfigManager.DeveloperMode.Value)
+        {
+            Logger.LogWarning($"Command {command} requires developer mode to be enabled. Enable it in REPOLib.cfg");
             return false;
         }
+        
+        try
+        {
+            if (commandMethod.GetParameters().Length <= 0)
+                commandMethod.Invoke(null, null);
+            else
+                commandMethod.Invoke(null, [args]);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError($"Error executing command: {e}");
+        }
 
-        return true;
+        return false;
+
     }
 }

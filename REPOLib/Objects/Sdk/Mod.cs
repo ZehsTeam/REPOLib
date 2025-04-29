@@ -1,89 +1,89 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace REPOLib.Objects.Sdk;
 
 /// <summary>
 /// A REPOLib mod.
 /// </summary>
-[CreateAssetMenu(menuName = "REPOLib/Mod", order = 0, fileName = "New Mod")]
+[PublicAPI, CreateAssetMenu(menuName = "REPOLib/Mod", order = 0, fileName = "New Mod")]
 public class Mod : ScriptableObject
 {
-    #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
-    [SerializeField]
-    private string _name = null!;
+    [FormerlySerializedAs("_name"), SerializeField] 
+    private string modName = null!;
 
-    [SerializeField]
-    private string _author = null!;
+    [FormerlySerializedAs("_author"), SerializeField] 
+    private string author = null!;
 
-    [SerializeField]
-    private string _version = "1.0.0";
+    [FormerlySerializedAs("_version"), SerializeField] 
+    private string version = "1.0.0";
 
-    [SerializeField]
-    private string _description = null!;
+    [FormerlySerializedAs("_description"), SerializeField] 
+    private string description = null!;
 
-    [SerializeField]
-    private string _websiteUrl = null!;
+    [FormerlySerializedAs("_websiteUrl"), SerializeField] 
+    private string websiteUrl = null!;
 
-    [SerializeField]
-    private string[] _dependencies = [$"Zehs-REPOLib-{MyPluginInfo.PLUGIN_VERSION}"];
+    [FormerlySerializedAs("_dependencies"), SerializeField] 
+    private string[] dependencies = [$"Zehs-REPOLib-{MyPluginInfo.PLUGIN_VERSION}"];
 
-    [SerializeField]
-    private Sprite _icon = null!;
+    [FormerlySerializedAs("_icon"), SerializeField] 
+    private Sprite icon = null!;
 
-    [SerializeField]
-    private TextAsset _readme = null!;
-    #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
+    [FormerlySerializedAs("_readme"), SerializeField] 
+    private TextAsset readme = null!;
 
     /// <summary>
     /// The name of this mod.
     /// </summary>
-    public string Name => _name;
+    public string ModName => modName;
 
     /// <summary>
     /// The author of this mod.
     /// </summary>
-    public string Author => _author;
+    public string Author => author;
 
     /// <summary>
     /// The version of this mod.
     /// </summary>
-    public string Version => _version;
+    public string Version => version;
 
     /// <summary>
     /// The description of this mod.
     /// </summary>
-    public string Description => _description;
+    public string Description => description;
 
     /// <summary>
     /// The website URL of this mod.
     /// </summary>
-    public string WebsiteUrl => _websiteUrl;
+    public string WebsiteUrl => websiteUrl;
 
     /// <summary>
     /// The dependencies of this mod.
     /// </summary>
-    public IReadOnlyList<string> Dependencies => _dependencies;
+    public IReadOnlyList<string> Dependencies => dependencies;
 
     /// <summary>
     /// The icon of this mod.
     /// </summary>
-    public Sprite Icon => _icon;
+    public Sprite Icon => icon;
 
     /// <summary>
     /// The readme of this mod.
     /// </summary>
-    public TextAsset Readme => _readme;
+    public TextAsset Readme => readme;
 
     /// <summary>
     /// The full name of this mod.<br/>
-    /// Format is $"{<see cref="Author"/>}-{<see cref="Name"/>}".
+    /// Format is $"{<see cref="Author"/>}-{<see cref="ModName"/>}".
     /// </summary>
-    public string FullName => $"{Author}-{Name}";
+    public string FullName => $"{Author}-{ModName}";
 
     /// <summary>
     /// The Thunderstore identifier of this mod, also known as dependency string.<br/>
-    /// Format is $"{<see cref="Author"/>}-{<see cref="Name"/>}-{<see cref="Version"/>}".
+    /// Format is $"{<see cref="Author"/>}-{<see cref="ModName"/>}-{<see cref="Version"/>}".
     /// </summary>
-    public string Identifier => $"{Author}-{Name}-{Version}";
+    public string Identifier => $"{Author}-{ModName}-{Version}";
 }

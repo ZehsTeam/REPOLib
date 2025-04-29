@@ -9,11 +9,11 @@ namespace REPOLib.Patches;
 [HarmonyPatch(typeof(RunManager))]
 internal static class RunManagerPatch
 {
-    private static bool _patchedAwake = false;
+    private static bool _patchedAwake;
 
-    [HarmonyPatch(nameof(RunManager.Awake))]
     [HarmonyPostfix]
     [HarmonyPriority(Priority.Last)]
+    [HarmonyPatch(nameof(RunManager.Awake))]
     private static void AwakePatch(RunManager __instance)
     {
         if (_patchedAwake) return;
