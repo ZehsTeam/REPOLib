@@ -176,10 +176,8 @@ public static class Enemies
             enemyParent.SetupDone = true;
             var enemy = gameObject.GetComponentInChildren<Enemy>();
 
-            if (enemy != null)
-                enemy.EnemyTeleported(position);
-            else
-                Logger.LogError($"Enemy \"{prefabEnemyParent.enemyName}\" spawn object \"{spawnObject.name}\" does not have an enemy component.");
+            if (enemy != null) enemy.EnemyTeleported(position);
+            else Logger.LogError($"Enemy \"{prefabEnemyParent.enemyName}\" spawn object \"{spawnObject.name}\" does not have an enemy component.");
 
             LevelGenerator.Instance.EnemiesSpawnTarget++;
             EnemyDirector.instance.FirstSpawnPointAdd(enemyParent);
