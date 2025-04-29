@@ -20,10 +20,10 @@ public static class Valuables
     /// <summary>
     /// Gets all valuables registered with REPOLib.
     /// </summary>
-    public static IReadOnlyList<GameObject> RegisteredValuables => ValuablesRegistered;
-    private static IEnumerable<GameObject> PendingAndRegisteredValuables => ValuablesToRegister.Keys.Concat(ValuablesRegistered);
-    private static readonly Dictionary<GameObject, List<string>> ValuablesToRegister = [];
-    private static readonly List<GameObject> ValuablesRegistered = [];
+    public static IReadOnlyList<GameObject> RegisteredValuables => _valuablesRegistered;
+    private static IEnumerable<GameObject> PendingAndRegisteredValuables => _valuablesToRegister.Keys.Concat(_valuablesRegistered);
+    private static readonly Dictionary<GameObject, List<string>> _valuablesToRegister = [];
+    private static readonly List<GameObject> _valuablesRegistered = [];
     private static bool _initialValuablesRegistered;
 
     internal static void RegisterInitialValuables()
@@ -32,20 +32,20 @@ public static class Valuables
             return;
         
         Logger.LogInfo($"Adding valuables to valuable presets.");
-        foreach (var valuable in ValuablesToRegister.Keys)
+        foreach (var valuable in _valuablesToRegister.Keys)
             RegisterValuableWithGame(valuable);
         
-        ValuablesToRegister.Clear();
+        _valuablesToRegister.Clear();
         _initialValuablesRegistered = true;
     }
 
     private static void RegisterValuableWithGame(GameObject valuable)
     {
-        if (ValuablesRegistered.Contains(valuable))
+        if (_valuablesRegistered.Contains(valuable))
             return;
 
-        var presetNames = ValuablesToRegister[valuable];
-        if (!presetNames.Any(x => ValuablePresets.GetAllValuablePresets().Keys.Any(y => x == y)))
+        var presetNames = _valuablesToRegister[valuable];
+        if (!presetNames.Any(x => ValuablePresets.AllValuablePresets.Keys.Any(y => x == y)))
         {
             Logger.LogWarning($"Valuable \"{valuable.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
             presetNames.Add(ValuablePresets.GenericValuablePresetName);
@@ -53,15 +53,15 @@ public static class Valuables
 
         foreach (var presetName in presetNames)
         {
-            if (presetName == null || !ValuablePresets.GetAllValuablePresets().ContainsKey(presetName))
+            if (presetName == null || !ValuablePresets.AllValuablePresets.ContainsKey(presetName))
             {
                 Logger.LogWarning($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\". The valuable preset does not exist.");
                 continue;
             }
 
-            if (ValuablePresets.GetAllValuablePresets()[presetName].AddValuable(valuable))
+            if (ValuablePresets.AllValuablePresets[presetName].AddValuable(valuable))
             {
-                ValuablesRegistered.Add(valuable);
+                _valuablesRegistered.Add(valuable);
                 Logger.LogDebug($"Added valuable \"{valuable.name}\" to valuable preset \"{presetName}\"");
             }
             else
@@ -153,7 +153,7 @@ public static class Valuables
         NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
         Utilities.FixAudioMixerGroups(prefab);
 
-        ValuablesToRegister.Add(prefab, presetNames);
+        _valuablesToRegister.Add(prefab, presetNames);
         if (_initialValuablesRegistered)
             RegisterValuableWithGame(valuableObject.gameObject);
     }
@@ -201,7 +201,7 @@ public static class Valuables
         if (RunManager.instance == null)
             return [];
 
-        return ValuablePresets.GetAllValuablePresets().Values
+        return ValuablePresets.AllValuablePresets.Values
             .Select(levelValuables => levelValuables.GetCombinedList())
             .SelectMany(list => list)
             .Distinct()

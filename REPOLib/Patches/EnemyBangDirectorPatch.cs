@@ -25,7 +25,6 @@ internal static class EnemyBangDirectorPatch
         }
 
         var modifiedInstructions = new List<CodeInstruction>();
-
         foreach (var instruction in instructions)
         {
             var isMethodCall = instruction.opcode == OpCodes.Call || instruction.opcode == OpCodes.Callvirt;

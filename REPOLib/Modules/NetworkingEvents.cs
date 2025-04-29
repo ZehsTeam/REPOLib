@@ -17,7 +17,7 @@ public static class NetworkingEvents
     /// <summary>
     /// // TODO: Document this.
     /// </summary>
-    public static IReadOnlyList<NetworkedEvent> GetCustomEvents() => CustomEvents;
+    public static IReadOnlyList<NetworkedEvent> GetCustomEvents() => _customEvents;
 
     /// <summary>
     /// Reserved event codes by Photon and the base game.
@@ -39,7 +39,7 @@ public static class NetworkingEvents
     /// </summary>
     public static readonly RaiseEventOptions RaiseMasterClient = new() { Receivers = ReceiverGroup.MasterClient };
     
-    private static readonly List<NetworkedEvent> CustomEvents = [];
+    private static readonly List<NetworkedEvent> _customEvents = [];
     internal static void Initialize()
     {
         PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
@@ -48,12 +48,12 @@ public static class NetworkingEvents
 
     internal static void AddCustomEvent(NetworkedEvent networkedEvent)
     {
-        if (!CustomEvents.Contains(networkedEvent))
-            CustomEvents.Add(networkedEvent);
+        if (!_customEvents.Contains(networkedEvent))
+            _customEvents.Add(networkedEvent);
     }
 
     private static void OnEvent(EventData photonEvent)
-        => CustomEvents.FirstOrDefault(e => e.EventCode == photonEvent.Code)?.EventAction?.Invoke(photonEvent);
+        => _customEvents.FirstOrDefault(e => e.EventCode == photonEvent.Code)?.EventAction?.Invoke(photonEvent);
 
     internal static bool TryGetUniqueEventCode(out byte eventCode)
     {
@@ -74,5 +74,5 @@ public static class NetworkingEvents
     /// <param name="eventCode"></param>
     /// <returns></returns>
     public static bool IsEventCodeTaken(byte eventCode)
-        => ReservedEventCodes.Any(x => x == eventCode) || CustomEvents.Any(x => x.EventCode == eventCode);
+        => ReservedEventCodes.Any(x => x == eventCode) || _customEvents.Any(x => x.EventCode == eventCode);
 }

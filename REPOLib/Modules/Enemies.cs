@@ -20,26 +20,26 @@ public static class Enemies
     /// <summary>
     /// Gets all enemies registered with REPOLib.
     /// </summary>
-    public static IReadOnlyList<EnemySetup> RegisteredEnemies => EnemiesRegistered;
+    public static IReadOnlyList<EnemySetup> RegisteredEnemies => _enemiesRegistered;
 
     internal static int SpawnNextEnemiesNotDespawned = 0;
-    private static readonly List<EnemySetup> EnemiesToRegister = [];
-    private static readonly List<EnemySetup> EnemiesRegistered = [];
+    private static readonly List<EnemySetup> _enemiesToRegister = [];
+    private static readonly List<EnemySetup> _enemiesRegistered = [];
     private static bool _initialEnemiesRegistered;
 
     internal static void RegisterInitialEnemies()
     {
         if (_initialEnemiesRegistered) return;
-        foreach (var enemy in EnemiesToRegister)
+        foreach (var enemy in _enemiesToRegister)
             RegisterEnemyWithGame(enemy);
         
-        EnemiesToRegister.Clear();
+        _enemiesToRegister.Clear();
         _initialEnemiesRegistered = true;
     }
 
     private static void RegisterEnemyWithGame(EnemySetup enemy)
     {
-        if (EnemiesRegistered.Contains(enemy)) 
+        if (_enemiesRegistered.Contains(enemy)) 
             return;
 
         if (!enemy.TryGetEnemyParent(out var enemyParent)) 
@@ -47,7 +47,7 @@ public static class Enemies
         
         if (EnemyDirector.instance.AddEnemy(enemy))
         {
-            EnemiesRegistered.Add(enemy);
+            _enemiesRegistered.Add(enemy);
             Logger.LogInfo($"Added enemy \"{enemyParent.enemyName}\" to difficulty {enemyParent.difficulty}", extended: true);
             return;
         }
@@ -78,7 +78,7 @@ public static class Enemies
             return;
         }
 
-        if (EnemiesToRegister.Contains(enemySetup))
+        if (_enemiesToRegister.Contains(enemySetup))
         {
             Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". Enemy is already registered!");
             return;
@@ -86,7 +86,7 @@ public static class Enemies
 
         foreach (var spawnObject in enemySetup.GetDistinctSpawnObjects())
         {
-            foreach (var previousEnemy in EnemiesToRegister.Where(previousEnemy => previousEnemy.AnySpawnObjectsNameEqualsAnother(spawnObject)))
+            foreach (var previousEnemy in _enemiesToRegister.Where(previousEnemy => previousEnemy.AnySpawnObjectsNameEqualsAnother(spawnObject)))
             {
                 Logger.LogError($"Failed to register enemy \"{enemyParent.enemyName}\". Enemy \"{previousEnemy.name}\" already has a spawn object called \"{spawnObject.name}\"");
                 return;
@@ -106,7 +106,7 @@ public static class Enemies
         if (_initialEnemiesRegistered)
             RegisterEnemyWithGame(enemySetup);
         else
-            EnemiesToRegister.Add(enemySetup);
+            _enemiesToRegister.Add(enemySetup);
     }
 
     /// <summary>

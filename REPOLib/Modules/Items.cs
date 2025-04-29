@@ -20,10 +20,10 @@ public static class Items
     /// <summary>
     /// Gets all items registered with REPOLib.
     /// </summary>
-    public static IReadOnlyList<Item> RegisteredItems => ItemsRegistered;
+    public static IReadOnlyList<Item> RegisteredItems => _itemsRegistered;
 
-    private static readonly List<Item> ItemsToRegister = [];
-    private static readonly List<Item> ItemsRegistered = [];
+    private static readonly List<Item> _itemsToRegister = [];
+    private static readonly List<Item> _itemsRegistered = [];
     private static bool _initialItemsRegistered;
 
     // This will run multiple times because of how the vanilla game registers items.
@@ -36,7 +36,7 @@ public static class Items
         }
 
         Logger.LogInfo($"Adding items.");
-        foreach (var item in ItemsToRegister)
+        foreach (var item in _itemsToRegister)
             RegisterItemWithGame(item);
 
         _initialItemsRegistered = true;
@@ -51,8 +51,8 @@ public static class Items
             return;
         }
 
-        if (!ItemsRegistered.Contains(item))
-            ItemsRegistered.Add(item);
+        if (!_itemsRegistered.Contains(item))
+            _itemsRegistered.Add(item);
 
         Logger.LogInfo($"Added item \"{item.itemName}\"", extended: true);
     }
@@ -85,13 +85,13 @@ public static class Items
             return;
         }
 
-        if (ItemsToRegister.Any(x => x.itemAssetName == item.itemAssetName))
+        if (_itemsToRegister.Any(x => x.itemAssetName == item.itemAssetName))
         {
             Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab already exists with the same name.");
             return;
         }
 
-        if (ItemsToRegister.Contains(item))
+        if (_itemsToRegister.Contains(item))
         {
             Logger.LogError($"Failed to register item \"{item.itemName}\". Item is already registered!");
             return;
@@ -99,7 +99,7 @@ public static class Items
 
         var prefabId = ResourcesHelper.GetItemPrefabPath(item);
         NetworkPrefabs.RegisterNetworkPrefab(prefabId, item.prefab);
-        ItemsToRegister.Add(item);
+        _itemsToRegister.Add(item);
         
         if (_initialItemsRegistered) RegisterItemWithGame(item);
     }

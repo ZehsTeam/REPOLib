@@ -13,12 +13,12 @@ public static class ValuablePresets
     /// <summary>
     /// Gets all cached valuable presets. See <see cref="CacheValuablePresets"/>.
     /// </summary>
-    public static IReadOnlyDictionary<string, LevelValuables> GetAllValuablePresets() => AllValuablePresets;
+    public static IReadOnlyDictionary<string, LevelValuables> AllValuablePresets => _valuablePresets;
 
     /// <summary>
     /// Gets the generic valuables preset.
     /// </summary>
-    public static LevelValuables GenericPreset => GetAllValuablePresets()[GenericValuablePresetName];
+    public static LevelValuables GenericPreset => AllValuablePresets[GenericValuablePresetName];
     
     /// <summary>
     /// The generic valuables preset name.
@@ -26,7 +26,7 @@ public static class ValuablePresets
     public const string GenericValuablePresetName = "Valuables - Generic";
 
     /// <summary>
-    /// Caches all valuable presets from levels, for getting with <see cref="GetAllValuablePresets"/>.
+    /// Caches all valuable presets from levels, for getting with <see cref="AllValuablePresets"/>.
     /// </summary>
     public static void CacheValuablePresets()
     {
@@ -37,10 +37,10 @@ public static class ValuablePresets
         }
 
         foreach (var valuablePreset in RunManager.instance.levels.SelectMany(level => level.ValuablePresets))
-            AllValuablePresets.TryAdd(valuablePreset.name, valuablePreset);
+            _valuablePresets.TryAdd(valuablePreset.name, valuablePreset);
     }
     
-    private static readonly Dictionary<string, LevelValuables> AllValuablePresets = [];
+    private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
     internal static void RegisterValuablePreset(LevelValuables valuablePreset)
-        => AllValuablePresets.Add(valuablePreset.name, valuablePreset);
+        => _valuablePresets.Add(valuablePreset.name, valuablePreset);
 }

@@ -20,10 +20,10 @@ public static class Levels
     /// <summary>
     /// Get all levels registered with REPOLib.
     /// </summary>
-    public static IReadOnlyList<Level> RegisteredLevels => LevelsRegistered;
+    public static IReadOnlyList<Level> RegisteredLevels => _levelsRegistered;
 
-    private static readonly List<Level> LevelsToRegister = [];
-    private static readonly List<Level> LevelsRegistered = [];
+    private static readonly List<Level> _levelsToRegister = [];
+    private static readonly List<Level> _levelsRegistered = [];
     private static bool _initialLevelsRegistered;
 
     internal static void RegisterInitialLevels()
@@ -34,16 +34,16 @@ public static class Levels
         ValuablePresets.CacheValuablePresets();
         Logger.LogInfo($"Adding levels.");
 
-        foreach (var level in LevelsToRegister)
+        foreach (var level in _levelsToRegister)
             RegisterLevelWithGame(level);
 
-        LevelsToRegister.Clear();
+        _levelsToRegister.Clear();
         _initialLevelsRegistered = true;
     }
 
     private static void RegisterLevelWithGame(Level level)
     {
-        if (LevelsRegistered.Contains(level))
+        if (_levelsRegistered.Contains(level))
             return;
 
         if (level.ValuablePresets.Count == 0)
@@ -55,11 +55,11 @@ public static class Levels
         for (var i = 0; i < level.ValuablePresets.Count; i++)
         {
             var valuablePreset = level.ValuablePresets[i];
-            if (ValuablePresets.GetAllValuablePresets().Values.Contains(valuablePreset))
+            if (ValuablePresets.AllValuablePresets.Values.Contains(valuablePreset))
                 continue;
             
             // This allows custom levels to use vanilla presets, by using a proxy preset with the same name
-            if (ValuablePresets.GetAllValuablePresets().TryGetValue(valuablePreset.name, out var foundPreset))
+            if (ValuablePresets.AllValuablePresets.TryGetValue(valuablePreset.name, out var foundPreset))
             {
                 // Check if the mod author accidentally included a vanilla preset (and all of its valuables) in their bundle
                 if (valuablePreset.GetCombinedList().Count > 0)
@@ -77,7 +77,7 @@ public static class Levels
 
         RunManager.instance.levels.Add(level);
         Logger.LogInfo($"Added level \"{level.name}\"", extended: true);
-        LevelsRegistered.Add(level);
+        _levelsRegistered.Add(level);
     }
 
     /// <summary>
@@ -92,13 +92,13 @@ public static class Levels
             return;
         }
 
-        if (LevelsToRegister.Any(x => x.name.Equals(level.name, StringComparison.OrdinalIgnoreCase)))
+        if (_levelsToRegister.Any(x => x.name.Equals(level.name, StringComparison.OrdinalIgnoreCase)))
         {
             Logger.LogError($"Failed to register level \"{level.name}\". Level already exists with the same name.");
             return;
         }
 
-        if (LevelsToRegister.Contains(level))
+        if (_levelsToRegister.Contains(level))
         {
             Logger.LogWarning($"Failed to register level \"{level.name}\". Level is already registered!");
             return;
@@ -146,7 +146,7 @@ public static class Levels
         if (_initialLevelsRegistered)
             RegisterLevelWithGame(level);
         else
-            LevelsToRegister.Add(level);
+            _levelsToRegister.Add(level);
     }
 
     /// <summary>

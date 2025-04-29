@@ -16,10 +16,10 @@ public static class Upgrades
     /// <summary>
     /// Gets all <see cref="PlayerUpgrade"/>s registered with REPOLib.
     /// </summary>
-    public static IEnumerable<PlayerUpgrade> GetPlayerUpgrades() => PlayerUpgrades.Values;
+    public static IEnumerable<PlayerUpgrade> GetPlayerUpgrades() => _playerUpgrades.Values;
 
-    private static readonly Dictionary<string, PlayerUpgrade> PlayerUpgrades = [];
-    private static readonly NetworkedEvent? UpgradeEvent = new("REPOLib Upgrade", HandleUpgradeEvent);
+    private static readonly Dictionary<string, PlayerUpgrade> _playerUpgrades = [];
+    private static readonly NetworkedEvent? _upgradeEvent = new("REPOLib Upgrade", HandleUpgradeEvent);
     
     // This will run multiple times
     internal static void RegisterUpgrades(StatsManager instance)
@@ -30,7 +30,7 @@ public static class Upgrades
             return;
         }
 
-        foreach (var pair in PlayerUpgrades)
+        foreach (var pair in _playerUpgrades)
         {
             var key = $"playerUpgrade{pair.Key}";
             var playerDictionary = pair.Value.PlayerDictionary;
@@ -73,7 +73,7 @@ public static class Upgrades
 
     internal static void RaiseUpgradeEvent(string upgradeId, string steamId, int level)
     {
-        if (UpgradeEvent is null) return;
+        if (_upgradeEvent is null) return;
 
         var data = new Hashtable
         {
@@ -82,7 +82,7 @@ public static class Upgrades
             { "Level", level }
         };
 
-        UpgradeEvent.RaiseEvent(data, NetworkingEvents.RaiseOthers, SendOptions.SendReliable);
+        _upgradeEvent.RaiseEvent(data, NetworkingEvents.RaiseOthers, SendOptions.SendReliable);
     }
 
     private static void HandleUpgradeEvent(EventData eventData)
@@ -107,14 +107,14 @@ public static class Upgrades
     /// <returns>The newly registered <see cref="PlayerUpgrade"/> or null.</returns>
     public static PlayerUpgrade? RegisterUpgrade(string upgradeId, Item? item, Action<PlayerAvatar, int>? startAction, Action<PlayerAvatar, int>? upgradeAction)
     {
-        if (PlayerUpgrades.ContainsKey(upgradeId))
+        if (_playerUpgrades.ContainsKey(upgradeId))
         {
             Logger.LogError($"Failed to register upgrade \"{upgradeId}\". An upgrade with this UpgradeId has already been registered.");
             return null;
         }
 
         var upgrade = new PlayerUpgrade(upgradeId, item, startAction, upgradeAction);
-        PlayerUpgrades.Add(upgradeId, upgrade);
+        _playerUpgrades.Add(upgradeId, upgrade);
         return upgrade;
     }
 
@@ -124,7 +124,7 @@ public static class Upgrades
     /// <param name="upgradeId">The ID of the upgrade.</param>
     /// <returns>The <see cref="PlayerUpgrade"/> or null.</returns>
     public static PlayerUpgrade? GetUpgrade(string upgradeId) 
-        => PlayerUpgrades.GetValueOrDefault(upgradeId);
+        => _playerUpgrades.GetValueOrDefault(upgradeId);
 
     /// <summary>
     /// Tries to retrieve a registered <see cref="PlayerUpgrade"/> by it's identifier.

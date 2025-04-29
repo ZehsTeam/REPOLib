@@ -12,18 +12,18 @@ namespace REPOLib.Modules;
 [PublicAPI]
 public static class Utilities
 {
-    private static readonly List<GameObject> PrefabsToFix = [];
-    private static readonly List<GameObject> FixedPrefabs = [];
+    private static readonly List<GameObject> _prefabsToFix = [];
+    private static readonly List<GameObject> _fixedPrefabs = [];
 
     internal static void FixAudioMixerGroupsOnPrefabs()
     {
-        foreach (var prefab in PrefabsToFix)
+        foreach (var prefab in _prefabsToFix)
         {
             prefab.FixAudioMixerGroups();
-            FixedPrefabs.Add(prefab);
+            _fixedPrefabs.Add(prefab);
         }
 
-        PrefabsToFix.Clear();
+        _prefabsToFix.Clear();
     }
 
     /// <summary>
@@ -33,17 +33,17 @@ public static class Utilities
     /// </summary>
     public static void FixAudioMixerGroups(GameObject prefab)
     {
-        if (prefab == null || PrefabsToFix.Contains(prefab) || FixedPrefabs.Contains(prefab))
+        if (prefab == null || _prefabsToFix.Contains(prefab) || _fixedPrefabs.Contains(prefab))
             return;
         
         if (AudioManager.instance == null)
         {
-            PrefabsToFix.Add(prefab);
+            _prefabsToFix.Add(prefab);
             return;
         }
 
         prefab.FixAudioMixerGroups();
-        FixedPrefabs.Add(prefab);
+        _fixedPrefabs.Add(prefab);
     }
 
     internal static void SafeInvokeEvent(Action? action)

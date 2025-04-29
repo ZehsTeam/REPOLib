@@ -74,9 +74,7 @@ internal class CustomPrefabPool : IPunPrefabPool
         {
             result = DefaultPool?.Instantiate(prefabId, position, rotation);
             
-            if (result == null)
-                Logger.LogError($"CustomPrefabPool: failed to spawn network prefab \"{prefabId}\". GameObject is null.");
-
+            if (result == null) Logger.LogError($"CustomPrefabPool: failed to spawn network prefab \"{prefabId}\". GameObject is null.");
             return result;
         }
 
