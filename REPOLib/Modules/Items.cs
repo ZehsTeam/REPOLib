@@ -45,17 +45,16 @@ public static class Items
     private static void RegisterItemWithGame(Item item)
     {
         Utilities.FixAudioMixerGroups(item.prefab);
-        if (StatsManager.instance.AddItem(item))
-        {
-            if (!ItemsRegistered.Contains(item))
-                ItemsRegistered.Add(item);
-
-            Logger.LogInfo($"Added item \"{item.itemName}\"", extended: true);
-        }
-        else
+        if (!StatsManager.instance.AddItem(item))
         {
             Logger.LogWarning($"Failed to add item \"{item.itemName}\"", extended: true);
+            return;
         }
+
+        if (!ItemsRegistered.Contains(item))
+            ItemsRegistered.Add(item);
+
+        Logger.LogInfo($"Added item \"{item.itemName}\"", extended: true);
     }
 
     /// <summary>
