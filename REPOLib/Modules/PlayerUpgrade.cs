@@ -123,8 +123,7 @@ public class PlayerUpgrade
     internal void ApplyUpgrade(string steamId, int level)
     {
         PlayerDictionary[steamId] = level;
-        if (_upgradeAction == null)
-            return;
+        if (_upgradeAction == null) return;
 
         var playerAvatar = SemiFunc.PlayerAvatarGetFromSteamID(steamId);
         if (playerAvatar == null) return;

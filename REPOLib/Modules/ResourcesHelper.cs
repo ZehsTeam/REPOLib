@@ -74,9 +74,7 @@ public static class ResourcesHelper
     /// <returns></returns>
     public static string GetValuablePrefabPath(ValuableObject valuableObject)
     {
-        if (valuableObject == null)
-            return string.Empty;
-
+        if (valuableObject == null) return string.Empty;
         var folderPath = GetValuablesFolderPath(valuableObject.volumeType);
         return $"{folderPath}/{valuableObject.gameObject.name}";
     }
@@ -107,9 +105,7 @@ public static class ResourcesHelper
     /// <returns></returns>
     public static string GetItemPrefabPath(GameObject prefab)
     {
-        if (prefab == null)
-            return string.Empty;
-
+        if (prefab == null) return string.Empty;
         var folderPath = GetItemsFolderPath();
         return $"{folderPath}/{prefab.name}";
     }
@@ -209,8 +205,7 @@ public static class ResourcesHelper
     /// <returns></returns>
     public static bool HasEnemyPrefab(EnemySetup enemySetup)
     {
-        if (enemySetup == null)
-            return false;
+        if (enemySetup == null) return false;
         
         foreach (var prefabPath in enemySetup.GetDistinctSpawnObjects().Select(GetEnemyPrefabPath))
             if (Resources.Load<GameObject>(prefabPath) != null)
