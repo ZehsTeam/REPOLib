@@ -1,4 +1,5 @@
 # REPOLib
+
 [![GitHub](https://img.shields.io/badge/GitHub-REPOLib-brightgreen?style=for-the-badge&logo=GitHub)](https://github.com/ZehsTeam/REPOLib)
 [![Thunderstore Version](https://img.shields.io/thunderstore/v/Zehs/REPOLib?style=for-the-badge&logo=thunderstore&logoColor=white)](https://thunderstore.io/c/repo/p/Zehs/REPOLib/)
 [![Thunderstore Downloads](https://img.shields.io/thunderstore/dt/Zehs/REPOLib?style=for-the-badge&logo=thunderstore&logoColor=white)](https://thunderstore.io/c/repo/p/Zehs/REPOLib/)
@@ -7,6 +8,7 @@
 **Library for adding content to R.E.P.O.**
 
 ## Features
+
 - **Registering network prefabs.**
 - **Registering valuables.**
 - **Registering items.**
@@ -25,13 +27,15 @@
 - **Registering features without code using the [REPOLib-Sdk](https://github.com/ZehsTeam/REPOLib-Sdk).**
 
 ## Documentation
+
 Documentation is available on the [R.E.P.O. Modding Wiki](https://repomods.com/repolib/overview.html).
 
 ## Developer Contact
+
 **Report bugs, suggest features, or provide feedback:**
 
-| **Discord Server** | **Forum** | **Post** |  
-|--------------------|-----------|----------|  
+| **Discord Server**                                               | **Forum**        | **Post**                                                                        |  
+|------------------------------------------------------------------|------------------|---------------------------------------------------------------------------------|  
 | [R.E.P.O. Modding Server](https://discord.com/invite/vPJtKhYAFe) | `#released-mods` | [REPOLib](https://discord.com/channels/1344557689979670578/1346055794533339217) |
 
 - **GitHub Issues Page:** [REPOLib](https://github.com/ZehsTeam/REPOLib/issues)

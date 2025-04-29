@@ -1,40 +1,46 @@
-﻿using REPOLib.Modules;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using REPOLib.Modules;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace REPOLib.Objects.Sdk;
 
 /// <summary>
-/// REPOLib ValuableContent class.
+///     REPOLib ValuableContent class.
 /// </summary>
-[PublicAPI, CreateAssetMenu(menuName = "REPOLib/Valuable", order = 1, fileName = "New Valuable")]
+[PublicAPI]
+[CreateAssetMenu(menuName = "REPOLib/Valuable", order = 1, fileName = "New Valuable")]
 public class ValuableContent : Content
 {
-    [FormerlySerializedAs("_prefab"), SerializeField] 
-    private ValuableObject prefab = null!;
+    [SerializeField]
+    private ValuableObject _prefab = null!;
 
-    [FormerlySerializedAs("_valuablePresets"), SerializeField] 
-    private string[] valuablePresets = [Modules.ValuablePresets.GenericValuablePresetName];
-
-    /// <summary>
-    /// The <see cref="ValuableObject"/> of this content.
-    /// </summary>
-    public ValuableObject Prefab => prefab;
+    [SerializeField]
+    private string[] _valuablePresets = 
+    [ 
+        Modules.ValuablePresets.GenericValuablePresetName 
+    ];
 
     /// <summary>
-    /// The list of valuable presets for this content.
+    ///     The <see cref="ValuableObject" /> of this content.
     /// </summary>
-    public IReadOnlyList<string> ValuablePresets => valuablePresets;
+    public ValuableObject Prefab
+        => this._prefab;
 
     /// <summary>
-    /// The name of the <see cref="Prefab"/>.
+    ///     The list of valuable presets for this content.
     /// </summary>
-    public override string Name => Prefab?.name ?? string.Empty;
+    public IReadOnlyList<string> ValuablePresets
+        => this._valuablePresets;
 
-    /// <inheritdoc/>
-    public override void Initialize(Mod mod) 
-        => Valuables.RegisterValuable(Prefab.gameObject, ValuablePresets.ToList());
+    /// <summary>
+    ///     The name of the <see cref="Prefab" />.
+    /// </summary>
+    public override string Name
+        => this.Prefab?.name ?? string.Empty;
+
+    /// <inheritdoc />
+    public override void Initialize(Mod mod)
+        => Valuables.RegisterValuable(this.Prefab.gameObject, this.ValuablePresets.ToList());
 }

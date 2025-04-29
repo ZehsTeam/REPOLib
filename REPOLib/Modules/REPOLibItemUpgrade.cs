@@ -1,51 +1,54 @@
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace REPOLib.Modules;
 
 /// <summary>
-/// A component for easily triggering a <see cref="PlayerUpgrade"/>.
+///     A component for easily triggering a <see cref="PlayerUpgrade" />.
 /// </summary>
 [PublicAPI]
 public class REPOLibItemUpgrade : MonoBehaviour
 {
     [SerializeField]
-    [FormerlySerializedAs("_upgradeId")] 
-    private string upgradeId = string.Empty;
-
-    /// <summary>
-    /// The ID of your PlayerUpgrade.
-    /// </summary>
-    public string UpgradeId => upgradeId;
-
+    private string _upgradeId = string.Empty;
+    
     private ItemToggle _itemToggle = null!;
-    private void Start() => _itemToggle = GetComponent<ItemToggle>();
 
     /// <summary>
-    /// Add the upgrade to the player that that triggered the <see cref="ItemToggle"/>.
+    ///     The ID of your PlayerUpgrade.
+    /// </summary>
+    public string UpgradeId
+        => this._upgradeId;
+
+    private void Start()
+        => this._itemToggle = this.GetComponent<ItemToggle>();
+
+    /// <summary>
+    ///     Add the upgrade to the player that that triggered the <see cref="ItemToggle" />.
     /// </summary>
     public void Upgrade()
     {
-        if (_itemToggle == null)
+        if (this._itemToggle == null)
         {
-            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{UpgradeId}\". ItemToggle is null.");
+            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{this.UpgradeId}\". ItemToggle is null.");
             return;
         }
 
-        var playerTogglePhotonID = _itemToggle.playerTogglePhotonID;
-        var playerAvatar = SemiFunc.PlayerAvatarGetFromPhotonID(playerTogglePhotonID);
+        int playerTogglePhotonID = this._itemToggle.playerTogglePhotonID;
+        PlayerAvatar? playerAvatar = SemiFunc.PlayerAvatarGetFromPhotonID(playerTogglePhotonID);
 
         if (playerAvatar == null)
         {
-            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{UpgradeId}\". Could not find PlayerAvatar from ItemToggle's playerTogglePhotonID {playerTogglePhotonID}.");
+            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{this.UpgradeId}\". Could not find PlayerAvatar from ItemToggle's playerTogglePhotonID {playerTogglePhotonID}.");
             return;
         }
 
-        if (!playerAvatar.isLocal) return;
-        if (!Upgrades.TryGetUpgrade(UpgradeId, out var playerUpgrade))
+        if (!playerAvatar.isLocal)
+            return;
+
+        if (!Upgrades.TryGetUpgrade(this.UpgradeId, out PlayerUpgrade? playerUpgrade))
         {
-            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{UpgradeId}\". Could not find PlayerUpgrade from UpgradeId.");
+            Logger.LogError($"REPOLibItemUpgrade: Failed to upgrade \"{this.UpgradeId}\". Could not find PlayerUpgrade from UpgradeId.");
             return;
         }
 

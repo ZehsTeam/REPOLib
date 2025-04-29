@@ -1,9 +1,9 @@
-﻿using HarmonyLib;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using HarmonyLib;
 using UnityEngine;
 
 namespace REPOLib.Patches;
@@ -15,8 +15,8 @@ internal static class EnemyBangDirectorPatch
     [HarmonyPatch(nameof(EnemyBangDirector.Awake))]
     private static IEnumerable<CodeInstruction> AwakeTranspiler(IEnumerable<CodeInstruction> instructions)
     {
-        var originalMethod = AccessTools.Method(typeof(EnemyBangDirector), nameof(EnemyBangDirector.Setup));
-        var replacementMethod = AccessTools.Method(typeof(EnemyBangDirectorPatch), nameof(PreSetup));
+        MethodInfo? originalMethod = AccessTools.Method(typeof(EnemyBangDirector), nameof(EnemyBangDirector.Setup));
+        MethodInfo? replacementMethod = AccessTools.Method(typeof(EnemyBangDirectorPatch), nameof(PreSetup));
 
         if (originalMethod is null || replacementMethod is null)
         {
@@ -24,15 +24,16 @@ internal static class EnemyBangDirectorPatch
             return instructions;
         }
 
-        var modifiedInstructions = new List<CodeInstruction>();
-        foreach (var instruction in instructions)
+        List<CodeInstruction> modifiedInstructions = [];
+        foreach (CodeInstruction? instruction in instructions)
         {
-            var isMethodCall = instruction.opcode == OpCodes.Call || instruction.opcode == OpCodes.Callvirt;
+            bool isMethodCall = instruction.opcode == OpCodes.Call || instruction.opcode == OpCodes.Callvirt;
             if (isMethodCall && instruction.operand is MethodInfo methodInfo && methodInfo == originalMethod)
             {
                 // Replace original method call with replacement method call
                 modifiedInstructions.Add(new CodeInstruction(OpCodes.Call, replacementMethod));
-                Logger.LogDebug($"EnemyBangDirectorPatch: AwakeTranspiler replaced {originalMethod.Name} call with {replacementMethod.Name}.");
+                Logger.LogDebug(
+                    $"EnemyBangDirectorPatch: AwakeTranspiler replaced {originalMethod.Name} call with {replacementMethod.Name}.");
                 continue;
             }
 

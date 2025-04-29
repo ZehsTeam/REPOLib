@@ -1,13 +1,13 @@
-using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using REPOLib.Extensions;
 using UnityEngine;
 
 namespace REPOLib.Modules;
 
 /// <summary>
-/// Utility methods from REPOLib.
+///     Utility methods from REPOLib.
 /// </summary>
 [PublicAPI]
 public static class Utilities
@@ -17,7 +17,7 @@ public static class Utilities
 
     internal static void FixAudioMixerGroupsOnPrefabs()
     {
-        foreach (var prefab in _prefabsToFix)
+        foreach (GameObject? prefab in _prefabsToFix)
         {
             prefab.FixAudioMixerGroups();
             _fixedPrefabs.Add(prefab);
@@ -27,15 +27,15 @@ public static class Utilities
     }
 
     /// <summary>
-    /// Fixes the audio mixer groups of all audio sources in the game object and its children.
-    /// Assigns the audio mixer group based on the audio group found assigned in the prefab.
-    /// - Vyrus + Zehs
+    ///     Fixes the audio mixer groups of all audio sources in the game object and its children.
+    ///     Assigns the audio mixer group based on the audio group found assigned in the prefab.
+    ///     - Vyrus + Zehs
     /// </summary>
     public static void FixAudioMixerGroups(GameObject prefab)
     {
         if (prefab == null || _prefabsToFix.Contains(prefab) || _fixedPrefabs.Contains(prefab))
             return;
-        
+
         if (AudioManager.instance == null)
         {
             _prefabsToFix.Add(prefab);

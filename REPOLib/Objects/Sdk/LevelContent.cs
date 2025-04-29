@@ -1,28 +1,32 @@
 using JetBrains.Annotations;
+using REPOLib.Modules;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace REPOLib.Objects.Sdk;
 
 /// <summary>
-/// REPOLib LevelContent class.
+///     REPOLib LevelContent class.
 /// </summary>
-[PublicAPI, CreateAssetMenu(menuName = "REPOLib/Level", order = 4, fileName = "New Level")]
+[PublicAPI]
+[CreateAssetMenu(menuName = "REPOLib/Level", order = 4, fileName = "New Level")]
 public class LevelContent : Content
 {
-    [FormerlySerializedAs("_level"), SerializeField] 
-    private Level level = null!;
+    [SerializeField]
+    private Level _level = null!;
 
     /// <summary>
-    /// The <see cref="global::Level"/> of this content.
+    ///     The <see cref="global::Level" /> of this content.
     /// </summary>
-    public Level Level => level;
+    public Level Level
+        => this._level;
 
     /// <summary>
-    /// The name of the <see cref="Level"/>
+    ///     The name of the <see cref="Level" />
     /// </summary>
-    public override string Name => Level?.name ?? string.Empty;
+    public override string Name
+        => this.Level?.name ?? string.Empty;
 
-    /// <inheritdoc/>
-    public override void Initialize(Mod mod) => Modules.Levels.RegisterLevel(Level);
+    /// <inheritdoc />
+    public override void Initialize(Mod mod)
+        => Levels.RegisterLevel(this.Level);
 }

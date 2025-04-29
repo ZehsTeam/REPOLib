@@ -16,13 +16,13 @@ internal static class Logger
 
     public static void LogInfo(object data, bool extended = false)
         => Log(LogLevel.Info, data, extended);
-    
+
     public static void LogWarning(object data, bool extended = false)
         => Log(LogLevel.Warning, data, extended);
 
-    public static void LogError(object data, bool extended = false) 
+    public static void LogError(object data, bool extended = false)
         => Log(LogLevel.Error, data, extended);
-    
+
     public static void LogFatal(object data, bool extended = false)
         => Log(LogLevel.Fatal, data, extended);
 
@@ -32,6 +32,6 @@ internal static class Logger
         ManualLogSource?.Log(logLevel, data);
     }
 
-    public static bool IsExtendedLoggingEnabled() 
-        => ConfigManager.ExtendedLogging?.Value == true;
+    public static bool IsExtendedLoggingEnabled()
+        => ConfigManager.ExtendedLogging.Value;
 }

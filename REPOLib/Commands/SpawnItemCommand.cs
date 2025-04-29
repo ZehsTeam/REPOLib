@@ -14,7 +14,7 @@ internal static class SpawnItemCommand
     [CommandAlias("si")]
     public static void Execute(string args)
     {
-        Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
+        Logger.LogInfo($"Running spawn command with args \"{args}\"", true);
 
         if (string.IsNullOrWhiteSpace(args))
         {
@@ -40,9 +40,10 @@ internal static class SpawnItemCommand
             return;
         }
 
-        var position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) + PlayerAvatar.instance.transform.forward * 1f;
-        Logger.LogInfo($"Trying to spawn item \"{args}\" at {position}...", extended: true);
+        Vector3 position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) +
+                           PlayerAvatar.instance.transform.forward * 1f;
 
+        Logger.LogInfo($"Trying to spawn item \"{args}\" at {position}...", true);
         if (!Items.TryGetItemThatContainsName(args, out Item? item))
         {
             Logger.LogWarning($"Spawn command failed. Unknown item with name \"{args}\"");

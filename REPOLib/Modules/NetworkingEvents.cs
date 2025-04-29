@@ -9,37 +9,38 @@ using UnityEngine;
 namespace REPOLib.Modules;
 
 /// <summary>
-/// // TODO: Document this.
+///     // TODO: Document this.
 /// </summary>
 [PublicAPI]
 public static class NetworkingEvents
 {
     /// <summary>
-    /// // TODO: Document this.
+    ///     Reserved event codes by Photon and the base game.
     /// </summary>
-    public static IReadOnlyList<NetworkedEvent> GetCustomEvents() => _customEvents;
+    public static readonly byte[] ReservedEventCodes = [ 0, 1, 2 ];
 
     /// <summary>
-    /// Reserved event codes by Photon and the base game.
-    /// </summary>
-    public static readonly byte[] ReservedEventCodes = [0, 1, 2];
-
-    /// <summary>
-    /// // TODO: Document this.
+    ///     // TODO: Document this.
     /// </summary>
     public static readonly RaiseEventOptions RaiseAll = new() { Receivers = ReceiverGroup.All };
 
     /// <summary>
-    /// // TODO: Document this.
+    ///     // TODO: Document this.
     /// </summary>
     public static readonly RaiseEventOptions RaiseOthers = new() { Receivers = ReceiverGroup.Others };
 
     /// <summary>
-    /// // TODO: Document this.
+    ///     // TODO: Document this.
     /// </summary>
     public static readonly RaiseEventOptions RaiseMasterClient = new() { Receivers = ReceiverGroup.MasterClient };
-    
+
     private static readonly List<NetworkedEvent> _customEvents = [];
+
+    /// <summary>
+    ///     // TODO: Document this.
+    /// </summary>
+    public static IReadOnlyList<NetworkedEvent> GetCustomEvents()
+        => _customEvents;
     internal static void Initialize()
     {
         PhotonNetwork.NetworkingClient.EventReceived += OnEvent;
@@ -53,7 +54,9 @@ public static class NetworkingEvents
     }
 
     private static void OnEvent(EventData photonEvent)
-        => _customEvents.FirstOrDefault(e => e.EventCode == photonEvent.Code)?.EventAction?.Invoke(photonEvent);
+    {
+        _customEvents.FirstOrDefault(e => e.EventCode == photonEvent.Code)?.EventAction.Invoke(photonEvent);
+    }
 
     internal static bool TryGetUniqueEventCode(out byte eventCode)
     {
@@ -61,15 +64,15 @@ public static class NetworkingEvents
         while (IsEventCodeTaken(eventCode) && eventCode < 200)
             eventCode++;
 
-        if (eventCode <= 200 && (eventCode != 200 || !IsEventCodeTaken(eventCode))) 
+        if (eventCode <= 200 && (eventCode != 200 || !IsEventCodeTaken(eventCode)))
             return true;
-        
+
         eventCode = 0;
         return false;
     }
 
     /// <summary>
-    /// // TODO: Document this.
+    ///     // TODO: Document this.
     /// </summary>
     /// <param name="eventCode"></param>
     /// <returns></returns>

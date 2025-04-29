@@ -15,7 +15,7 @@ internal static class SpawnValuableCommand
     [CommandAlias("sv")]
     public static void Execute(string args)
     {
-        Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
+        Logger.LogInfo($"Running spawn command with args \"{args}\"", true);
 
         if (string.IsNullOrWhiteSpace(args))
         {
@@ -41,10 +41,11 @@ internal static class SpawnValuableCommand
             return;
         }
 
-        var position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) + PlayerAvatar.instance.transform.forward * 1f;
-        Logger.LogInfo($"Trying to spawn valuable \"{args}\" at {position}...", extended: true);
+        Vector3 position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) +
+                           PlayerAvatar.instance.transform.forward * 1f;
 
-        if (!Valuables.TryGetValuableThatContainsName(args, out var valuableObject))
+        Logger.LogInfo($"Trying to spawn valuable \"{args}\" at {position}...", true);
+        if (!Valuables.TryGetValuableThatContainsName(args, out ValuableObject? valuableObject))
         {
             Logger.LogWarning($"Spawn command failed. Unknown valuable with name \"{args}\"");
             return;

@@ -1,7 +1,7 @@
-﻿using REPOLib.Extensions;
-using REPOLib.Modules;
-using System;
+﻿using System;
 using System.Collections;
+using REPOLib.Extensions;
+using REPOLib.Modules;
 using UnityEngine;
 
 namespace REPOLib.Commands;
@@ -17,7 +17,7 @@ internal static class SpawnEnemyCommand
     [CommandAlias("se")]
     public static void Execute(string args)
     {
-        Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
+        Logger.LogInfo($"Running spawn command with args \"{args}\"", true);
 
         if (string.IsNullOrWhiteSpace(args))
         {
@@ -55,20 +55,20 @@ internal static class SpawnEnemyCommand
             return;
         }
 
-        if (!EnemyDirector.instance.TryGetEnemyThatContainsName(args, out var enemySetup))
+        if (!EnemyDirector.instance.TryGetEnemyThatContainsName(args, out EnemySetup? enemySetup))
         {
             Logger.LogWarning($"Spawn command failed. Unknown enemy with name \"{args}\"");
             return;
         }
 
-        var position = PlayerAvatar.instance.transform.position;
-        Logger.LogInfo($"Trying to spawn enemy \"{args}\" at {position}...", extended: true);
+        Vector3 position = PlayerAvatar.instance.transform.position;
+        Logger.LogInfo($"Trying to spawn enemy \"{args}\" at {position}...", true);
         EnemyDirector.instance.StartCoroutine(SpawnEnemyAfterTime(enemySetup, position, TimeSpan.FromSeconds(3f)));
     }
 
     private static IEnumerator SpawnEnemyAfterTime(EnemySetup? enemySetup, Vector3 position, TimeSpan timeSpan)
     {
         yield return new WaitForSeconds((float)timeSpan.TotalSeconds);
-        Enemies.SpawnEnemy(enemySetup, position, Quaternion.identity, spawnDespawned: false);
+        Enemies.SpawnEnemy(enemySetup, position, Quaternion.identity, false);
     }
 }

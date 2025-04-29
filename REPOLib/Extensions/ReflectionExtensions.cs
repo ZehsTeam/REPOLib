@@ -27,7 +27,7 @@ internal static class ReflectionExtensions
         catch
         {
             return null;
-        }   
+        }
     }
 
     public static bool HasCustomAttribute<T>(this MethodInfo method) where T : Attribute

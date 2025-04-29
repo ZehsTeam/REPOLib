@@ -8,5 +8,6 @@ internal static class AudioManagerPatch
 {
     [HarmonyPostfix]
     [HarmonyPatch(nameof(AudioManager.Start))]
-    private static void StartPatch() => Utilities.FixAudioMixerGroupsOnPrefabs();
+    private static void StartPatch()
+        => Utilities.FixAudioMixerGroupsOnPrefabs();
 }

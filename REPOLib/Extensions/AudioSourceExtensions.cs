@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using JetBrains.Annotations;
+using UnityEngine;
 using UnityEngine.Audio;
 
 namespace REPOLib.Extensions;
 
+[PublicAPI]
 internal static class AudioSourceExtensions
 {
     public static void FixAudioMixerGroup(this AudioSource audioSource)
@@ -13,7 +15,10 @@ internal static class AudioSourceExtensions
         if (audioSource == null)
             return;
 
-        var fullGameObjectName = rootObject == audioSource.gameObject ? audioSource.gameObject.name : $"{rootObject.name}/{audioSource.gameObject.name}";
+        string fullGameObjectName = rootObject == audioSource.gameObject
+            ? audioSource.gameObject.name
+            : $"{rootObject.name}/{audioSource.gameObject.name}";
+
         if (AudioManager.instance == null)
         {
             Logger.LogWarning($"Failed to fix AudioMixerGroup on GameObject \"{fullGameObjectName}\". AudioManager instance is null.");
@@ -26,13 +31,13 @@ internal static class AudioSourceExtensions
             return;
         }
 
-        var audioMixer = audioSource.outputAudioMixerGroup.audioMixer.name switch
-        {
+        AudioMixer? audioMixer = audioSource.outputAudioMixerGroup.audioMixer.name switch
+        { 
             "Master" => AudioManager.instance.MasterMixer,
             "Music" => AudioManager.instance.MusicMasterGroup.audioMixer,
             "Sound" => AudioManager.instance.SoundMasterGroup.audioMixer,
             "Spectate" => AudioManager.instance.MicrophoneSpectateGroup.audioMixer,
-            _ => AudioManager.instance.SoundMasterGroup.audioMixer,
+            _ => AudioManager.instance.SoundMasterGroup.audioMixer 
         };
 
         AudioMixerGroup audioMixerGroup;
@@ -42,7 +47,9 @@ internal static class AudioSourceExtensions
         {
             audioMixer = AudioManager.instance.SoundMasterGroup.audioMixer;
             audioMixerGroup = audioMixer.FindMatchingGroups("Sound Effects")[0];
-            Logger.LogWarning($"Could not find matching AudioMixerGroup for GameObject \"{fullGameObjectName}\". Using default AudioMixerGroup \"{audioMixer.name}/{audioMixerGroup.name}\"", extended: true);
+            Logger.LogWarning(
+                $"Could not find matching AudioMixerGroup for GameObject \"{fullGameObjectName}\". Using default AudioMixerGroup \"{audioMixer.name}/{audioMixerGroup.name}\"",
+                true);
         }
         else
         {

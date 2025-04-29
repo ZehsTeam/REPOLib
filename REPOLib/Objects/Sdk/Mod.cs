@@ -1,89 +1,99 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace REPOLib.Objects.Sdk;
 
 /// <summary>
-/// A REPOLib mod.
+///     A REPOLib mod.
 /// </summary>
-[PublicAPI, CreateAssetMenu(menuName = "REPOLib/Mod", order = 0, fileName = "New Mod")]
+[PublicAPI]
+[CreateAssetMenu(menuName = "REPOLib/Mod", order = 0, fileName = "New Mod")]
 public class Mod : ScriptableObject
 {
-    [FormerlySerializedAs("_name"), SerializeField] 
-    private string modName = null!;
+    [SerializeField]
+    private string _name = null!;
 
-    [FormerlySerializedAs("_author"), SerializeField] 
-    private string author = null!;
+    [SerializeField]
+    private string _author = null!;
 
-    [FormerlySerializedAs("_version"), SerializeField] 
-    private string version = "1.0.0";
+    [SerializeField]
+    private string _version = "1.0.0";
 
-    [FormerlySerializedAs("_description"), SerializeField] 
-    private string description = null!;
+    [SerializeField]
+    private string _description = null!;
 
-    [FormerlySerializedAs("_websiteUrl"), SerializeField] 
-    private string websiteUrl = null!;
+    [SerializeField]
+    private string _websiteUrl = null!;
 
-    [FormerlySerializedAs("_dependencies"), SerializeField] 
-    private string[] dependencies = [$"Zehs-REPOLib-{MyPluginInfo.PLUGIN_VERSION}"];
+    [SerializeField]
+    private string[] _dependencies = [ $"Zehs-REPOLib-{MyPluginInfo.PLUGIN_VERSION}" ];
 
-    [FormerlySerializedAs("_icon"), SerializeField] 
-    private Sprite icon = null!;
+    [SerializeField]
+    private Sprite _icon = null!;
 
-    [FormerlySerializedAs("_readme"), SerializeField] 
-    private TextAsset readme = null!;
-
-    /// <summary>
-    /// The name of this mod.
-    /// </summary>
-    public string ModName => modName;
+    [SerializeField]
+    private TextAsset _readme = null!;
 
     /// <summary>
-    /// The author of this mod.
+    ///     The name of this mod.
     /// </summary>
-    public string Author => author;
+    public string ModName
+        => this._name;
 
     /// <summary>
-    /// The version of this mod.
+    ///     The author of this mod.
     /// </summary>
-    public string Version => version;
+    public string Author
+        => this._author;
 
     /// <summary>
-    /// The description of this mod.
+    ///     The version of this mod.
     /// </summary>
-    public string Description => description;
+    public string Version
+        => this._version;
 
     /// <summary>
-    /// The website URL of this mod.
+    ///     The description of this mod.
     /// </summary>
-    public string WebsiteUrl => websiteUrl;
+    public string Description
+        => this._description;
 
     /// <summary>
-    /// The dependencies of this mod.
+    ///     The website URL of this mod.
     /// </summary>
-    public IReadOnlyList<string> Dependencies => dependencies;
+    public string WebsiteUrl
+        => this._websiteUrl;
 
     /// <summary>
-    /// The icon of this mod.
+    ///     The dependencies of this mod.
     /// </summary>
-    public Sprite Icon => icon;
+    public IReadOnlyList<string> Dependencies
+        => this._dependencies;
 
     /// <summary>
-    /// The readme of this mod.
+    ///     The icon of this mod.
     /// </summary>
-    public TextAsset Readme => readme;
+    public Sprite Icon
+        => this._icon;
 
     /// <summary>
-    /// The full name of this mod.<br/>
-    /// Format is $"{<see cref="Author"/>}-{<see cref="ModName"/>}".
+    ///     The readme of this mod.
     /// </summary>
-    public string FullName => $"{Author}-{ModName}";
+    public TextAsset Readme
+        => this._readme;
 
     /// <summary>
-    /// The Thunderstore identifier of this mod, also known as dependency string.<br/>
-    /// Format is $"{<see cref="Author"/>}-{<see cref="ModName"/>}-{<see cref="Version"/>}".
+    ///     The full name of this mod.<br />
+    ///     Format is $"{<see cref="Author" />}-{<see cref="ModName" />}".
     /// </summary>
-    public string Identifier => $"{Author}-{ModName}-{Version}";
+    public string FullName
+        => $"{this.Author}-{this.ModName}";
+
+    /// <summary>
+    ///     The Thunderstore identifier of this mod, also known as dependency string.<br />
+    ///     Format is $"{<see cref="Author" />}-{<see cref="ModName" />}-{<see cref="Version" />}".
+    /// </summary>
+    public string Identifier
+        => $"{this.Author}-{this.ModName}-{this.Version}";
 }

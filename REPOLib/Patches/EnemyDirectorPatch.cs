@@ -20,8 +20,8 @@ internal static class EnemyDirectorPatch
             _alreadyRegistered = true;
             return;
         }
-        
-        foreach (var enemy in Enemies.RegisteredEnemies)
+
+        foreach (EnemySetup? enemy in Enemies.RegisteredEnemies)
             EnemyDirector.instance.AddEnemy(enemy);
     }
 }
