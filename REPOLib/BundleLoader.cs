@@ -79,8 +79,8 @@ public static class BundleLoader
 
         while (_operations.Count > 0)
         {
-            if (!(Time.time - lastUpdate > 1)) 
-                yield return null;
+            if (Time.time - lastUpdate <= 1) 
+                continue;
 
             lastUpdate = Time.time;
             string bundlesWord = _operations.Count == 1 ? "bundle" : "bundles";
