@@ -33,5 +33,5 @@ internal static class Logger
     }
 
     public static bool IsExtendedLoggingEnabled() 
-        => ConfigManager.ExtendedLogging.Value;
+        => ConfigManager.ExtendedLogging?.Value == true;
 }
