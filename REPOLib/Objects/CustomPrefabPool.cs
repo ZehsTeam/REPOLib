@@ -69,8 +69,7 @@ internal class CustomPrefabPool : IPunPrefabPool
         if (this._prefabs.TryGetValue(prefabId, out GameObject? value, true))
         {
             LogLevel logLevel = value == prefab ? LogLevel.Warning : LogLevel.Error;
-            Logger.Log(logLevel,
-                $"CustomPrefabPool: failed to register network prefab \"{prefabId}\". There is already a prefab registered with the same prefab id.");
+            Logger.Log(logLevel, $"CustomPrefabPool: failed to register network prefab \"{prefabId}\". There is already a prefab registered with the same prefab id.");
             return false;
         }
 

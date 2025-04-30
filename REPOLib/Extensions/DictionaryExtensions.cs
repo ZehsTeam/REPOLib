@@ -8,8 +8,7 @@ namespace REPOLib.Extensions;
 
 internal static class DictionaryExtensions
 {
-    private static bool TryGetKey<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value,
-        [NotNullWhen(true)] out TKey? key)
+    private static bool TryGetKey<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value, [NotNullWhen(true)] out TKey? key)
     {
         foreach (KeyValuePair<TKey, TValue> kvp in dictionary.Where(kvp => Equals(kvp.Value, value)))
         {
@@ -21,8 +20,8 @@ internal static class DictionaryExtensions
         return false;
     }
 
-    public static TKey? GetKeyOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value) =>
-        dictionary.TryGetKey(value, out TKey? key) ? key : default;
+    public static TKey? GetKeyOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value) 
+        => dictionary.TryGetKey(value, out TKey? key) ? key : default;
 
     public static TKey GetKeyOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value, TKey defaultKey)
         => dictionary.TryGetKey(value, out TKey? key) ? key : defaultKey;
