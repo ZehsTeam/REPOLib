@@ -210,7 +210,6 @@ public static class BundleLoader
 
     #endregion
 
-    [PublicAPI]
     private class LoadOperation(
         string path,
         Func<AssetBundle, IEnumerator>? onBundleLoaded = null,
@@ -222,8 +221,8 @@ public static class BundleLoader
             LoadingContent
         }
 
-        public string Path { get; } = path;
-        public DateTime StartTime { get; } = DateTime.Now;
+        private string Path { get; } = path;
+        private DateTime StartTime { get; } = DateTime.Now;
         public State CurrentState { get; set; } = State.LoadingBundle;
         public bool LoadContents { get; } = loadContents;
         public Func<AssetBundle, IEnumerator>? OnBundleLoaded { get; } = onBundleLoaded;

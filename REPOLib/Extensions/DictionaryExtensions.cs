@@ -6,10 +6,9 @@ using JetBrains.Annotations;
 
 namespace REPOLib.Extensions;
 
-[PublicAPI]
 internal static class DictionaryExtensions
 {
-    public static bool TryGetKey<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value,
+    private static bool TryGetKey<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value,
         [NotNullWhen(true)] out TKey? key)
     {
         foreach (KeyValuePair<TKey, TValue> kvp in dictionary.Where(kvp => Equals(kvp.Value, value)))

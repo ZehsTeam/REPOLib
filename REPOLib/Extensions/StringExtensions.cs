@@ -6,7 +6,6 @@ using Steamworks;
 
 namespace REPOLib.Extensions;
 
-[PublicAPI]
 internal static class StringExtensions
 {
     public static bool EqualsAny(this string? value, IReadOnlyCollection<string?>? inputs,
@@ -18,7 +17,7 @@ internal static class StringExtensions
         return inputs.Contains(value, StringComparer.FromComparison(comparisonType));
     }
 
-    public static SteamId ToSteamId(this string value)
+    private static SteamId ToSteamId(this string value)
         => ulong.TryParse(value, out ulong result) ? result : 0;
 
     public static bool IsValidSteamId(this string value)

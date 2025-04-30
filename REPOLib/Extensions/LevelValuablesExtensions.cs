@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace REPOLib.Extensions;
 
-[PublicAPI]
 internal static class LevelValuablesExtensions
 {
     public static bool HasValuable(this LevelValuables levelValuables, GameObject prefab)

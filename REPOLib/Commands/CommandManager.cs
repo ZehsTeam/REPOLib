@@ -9,12 +9,11 @@ using REPOLib.Extensions;
 
 namespace REPOLib.Commands;
 
-[PublicAPI]
 internal static class CommandManager
 {
     private static List<MethodInfo> _commandExecutionMethodCache = [];
     public static Dictionary<string, MethodInfo> CommandExecutionMethods { get; private set; } = [];
-    public static List<MethodInfo> CommandInitializerMethods { get; private set; } = [];
+    private static List<MethodInfo> CommandInitializerMethods { get; set; } = [];
     public static Dictionary<string, bool> CommandsEnabled { get; private set; } = [];
     public static void Initialize()
     {
@@ -50,7 +49,7 @@ internal static class CommandManager
         Logger.LogInfo("Finished initializing custom commands.");
     }
 
-    public static void FindAllCommandMethods()
+    private static void FindAllCommandMethods()
     {
         _commandExecutionMethodCache = AccessTools.AllTypes()
                                                   .SelectMany(type => type.SafeGetMethods())
@@ -94,7 +93,7 @@ internal static class CommandManager
         }
     }
 
-    public static void BindConfigs()
+    private static void BindConfigs()
     {
         foreach (MethodInfo? method in _commandExecutionMethodCache)
         {

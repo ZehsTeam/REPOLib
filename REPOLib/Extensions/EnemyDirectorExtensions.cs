@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace REPOLib.Extensions;
 
-[PublicAPI]
 internal static class EnemyDirectorExtensions
 {
     public static bool HasEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
@@ -51,7 +50,7 @@ internal static class EnemyDirectorExtensions
         return false;
     }
 
-    public static bool TryGetList(this EnemyDirector enemyDirector, EnemyParent.Difficulty difficultyType,
+    private static bool TryGetList(this EnemyDirector enemyDirector, EnemyParent.Difficulty difficultyType,
         [NotNullWhen(true)] out List<EnemySetup>? list)
     {
         list = difficultyType switch

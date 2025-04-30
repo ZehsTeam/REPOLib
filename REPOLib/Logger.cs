@@ -3,7 +3,6 @@ using JetBrains.Annotations;
 
 namespace REPOLib;
 
-[PublicAPI]
 internal static class Logger
 {
     private static ManualLogSource? ManualLogSource { get; set; }

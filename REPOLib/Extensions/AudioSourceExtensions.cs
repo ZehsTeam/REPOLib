@@ -4,13 +4,12 @@ using UnityEngine.Audio;
 
 namespace REPOLib.Extensions;
 
-[PublicAPI]
 internal static class AudioSourceExtensions
 {
     public static void FixAudioMixerGroup(this AudioSource audioSource)
         => audioSource.FixAudioMixerGroup(audioSource.gameObject);
 
-    public static void FixAudioMixerGroup(this AudioSource audioSource, GameObject rootObject)
+    private static void FixAudioMixerGroup(this AudioSource audioSource, GameObject rootObject)
     {
         if (audioSource == null)
             return;
