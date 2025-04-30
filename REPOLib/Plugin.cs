@@ -13,7 +13,7 @@ public class Plugin : BaseUnityPlugin
     private readonly Harmony _harmony = new(MyPluginInfo.PLUGIN_GUID);
 
     /// <summary>
-    ///     The REPOLib plugin instance.
+    /// The REPOLib plugin instance.
     /// </summary>
     public static Plugin Instance { get; private set; } = null!;
 
