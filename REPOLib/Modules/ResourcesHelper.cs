@@ -35,6 +35,11 @@ public static class ResourcesHelper
         return "Enemies";
     }
 
+    public static string GetModulesFolderPath()
+    {
+        return "MiscModules";
+    }
+    
     public static string GetLevelPrefabsFolderPath(Level level, LevelPrefabType type)
     {
         string folder = type switch
@@ -130,6 +135,18 @@ public static class ResourcesHelper
         return $"{folderPath}/{prefab.name}";
     }
 
+    public static string GetModulePrefabPath(GameObject prefab)
+    {
+        if (prefab == null)
+        {
+            return string.Empty;
+        }
+
+        string folderPath = GetModulesFolderPath();
+
+        return $"{folderPath}/{prefab.name}";
+    }
+    
     public enum LevelPrefabType
     {
         Module,
