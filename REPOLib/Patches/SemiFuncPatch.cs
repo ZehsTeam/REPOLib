@@ -1,71 +1,18 @@
 ﻿using HarmonyLib;
-using REPOLib.Commands;
 using REPOLib.Modules;
-using System;
-using System.Reflection;
 
 namespace REPOLib.Patches;
 
 [HarmonyPatch(typeof(SemiFunc))]
 internal static class SemiFuncPatch
 {
-    [HarmonyPatch(nameof(SemiFunc.Command))]
+    [HarmonyPatch(nameof(SemiFunc.DebugTester))]
     [HarmonyPrefix]
-    private static bool CommandPatch(string _command)
+    private static bool DebugTesterPatch(ref bool __result)
     {
-        if (_command.StartsWith("/"))
+        if (ConfigManager.DeveloperMode.Value)
         {
-            return Command(_command);
-        }
-
-        return true;
-    }
-
-    private static bool Command(string message)
-    {
-        var text = message.ToLower();
-
-        var command = text.Split(' ')[0].Substring(1);
-        string args = "";
-        if (text.Length > command.Length)
-        {
-            args = text.Substring(command.Length + 1).Trim();
-        }
-
-        MethodInfo commandMethod;
-        CommandManager.CommandExecutionMethods.TryGetValue(command, out commandMethod);
-        if (commandMethod != null)
-        {
-            var execAttribute = commandMethod.GetCustomAttribute<CommandExecutionAttribute>();
-            if (CommandManager.CommandsEnabled.TryGetValue(execAttribute.Name, out bool enabled))
-            {
-                if (!enabled)
-                {
-                    return false;
-                }
-            }
-            if (execAttribute != null &&  execAttribute.RequiresDeveloperMode && !ConfigManager.DeveloperMode.Value)
-            {
-                Logger.LogWarning($"Command {command} requires developer mode to be enabled. Enable it in REPOLib.cfg");
-                return false;
-            }
-            try
-            {
-                var methodParams = commandMethod.GetParameters();
-                if (methodParams.Length == 0)
-                {
-                    commandMethod.Invoke(null, null);
-                }
-                else
-                {
-                    commandMethod.Invoke(null, [args]);
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogError($"Error executing command: {e}");
-            }
-
+            __result = true;
             return false;
         }
 

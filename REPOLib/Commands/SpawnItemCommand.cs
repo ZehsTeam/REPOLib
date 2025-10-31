@@ -1,46 +1,42 @@
 ﻿using REPOLib.Modules;
 using UnityEngine;
+using ChatCommand = DebugCommandHandler.ChatCommand;
 
 namespace REPOLib.Commands;
 
 internal static class SpawnItemCommand
 {
-    [CommandExecution(
-        "Spawn Item",
-        "Spawn an instance of an item with the specified (case-insensitive) name. You can optionally leave out \"Item \" from the prefab name.",
-        requiresDeveloperMode: true
-    )]
-    [CommandAlias("spawnitem")]
-    [CommandAlias("si")]
-    public static void Execute(string args)
+    public static void Register()
     {
-        Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
+        Modules.Commands.RegisterCommand(new ChatCommand(
+            "spawnitem",
+            "Spawn an instance of an item with the specified (case-insensitive) name. You can optionally leave out \"Item \" from the prefab name.",
+            Execute,
+            suggest: null,
+            debugOnly: true));
+    }
 
-        if (string.IsNullOrWhiteSpace(args))
-        {
-            Logger.LogWarning("No args provided to spawn command.");
-            return;
-        }
-
+    public static void Execute(bool isDebugConsole, string[] args)
+    {
         if (!SemiFunc.IsMasterClientOrSingleplayer())
         {
             Logger.LogError("Only the host can spawn items!");
             return;
         }
 
-        if (StatsManager.instance == null)
-        {
-            Logger.LogError("Failed spawn item command, StatsManager is not initialized.");
-            return;
-        }
-
         if (PlayerAvatar.instance == null)
         {
-            Logger.LogWarning("Can't spawn anything, player avatar is not initialized.");
+            Logger.LogWarning("Spawn item command failed. PlayerAvatar instance is null.");
             return;
         }
 
-        string name = args;
+        if (StatsManager.instance == null)
+        {
+            Logger.LogError("Spawn item command failed. StatsManager instance is null.");
+            return;
+        }
+
+        string name = string.Join(" ", args);
 
         Vector3 position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) + PlayerAvatar.instance.transform.forward * 1f;
 
@@ -48,7 +44,7 @@ internal static class SpawnItemCommand
 
         if (!Items.TryGetItemThatContainsName(name, out Item? item))
         {
-            Logger.LogWarning($"Spawn command failed. Unknown item with name \"{name}\"");
+            Logger.LogWarning($"Spawn item command failed. Unknown item with name \"{name}\"");
             return;
         }
 

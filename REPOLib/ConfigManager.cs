@@ -20,8 +20,8 @@ internal static class ConfigManager
     private static void BindConfigs()
     {
         ExtendedLogging =      ConfigFile.Bind("General", "ExtendedLogging",      defaultValue: false, "Enable extended logging.");
-        DeveloperMode =        ConfigFile.Bind("General", "DeveloperMode",        defaultValue: false, "Enable developer mode cheats for testing.");
-        VanillaDeveloperMode = ConfigFile.Bind("General", "VanillaDeveloperMode", defaultValue: false, "Enable vanilla developer mode cheats for testing.");
+        DeveloperMode =        ConfigFile.Bind("General", "DeveloperMode",        defaultValue: false, "Enable developer mode chat commands for testing.");
+        VanillaDeveloperMode = ConfigFile.Bind("General", "VanillaDeveloperMode", defaultValue: false, "Enable vanilla developer mode cheats and chat commands for testing.");
 
         VanillaDeveloperMode.SettingChanged += (object sender, System.EventArgs e) => SteamManagerPatch.UpdateDeveloperMode();
     }

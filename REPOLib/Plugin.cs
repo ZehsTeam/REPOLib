@@ -36,10 +36,12 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll(typeof(EnemyGnomeDirectorPatch));
         _harmony.PatchAll(typeof(EnemyBangDirectorPatch));
         _harmony.PatchAll(typeof(PlayerControllerPatch));
+        _harmony.PatchAll(typeof(DebugCommandHandlerPatch));
 
         ConfigManager.Initialize(Config);
 
         Upgrades.Initialize();
+        Modules.Commands.Initialize();
 
         BundleLoader.LoadAllBundles(Paths.PluginPath, ".repobundle");
     }

@@ -4,6 +4,7 @@ namespace REPOLib.Commands;
 
 // TODO: Document this.
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+[Obsolete("Use the Commands module instead", error: true)]
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
 public class CommandExecutionAttribute : Attribute
 {
@@ -21,12 +22,14 @@ public class CommandExecutionAttribute : Attribute
     }
 }
 
+[Obsolete("This feature is no longer supported", error: true)]
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
 public class CommandInitializerAttribute : Attribute
 {
 
 }
 
+[Obsolete("Use the Commands module instead", error: true)]
 [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
 public class  CommandAliasAttribute : Attribute
 {

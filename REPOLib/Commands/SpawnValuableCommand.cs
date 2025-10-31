@@ -1,28 +1,23 @@
 ﻿using REPOLib.Modules;
 using UnityEngine;
+using ChatCommand = DebugCommandHandler.ChatCommand;
 
 namespace REPOLib.Commands;
 
 internal static class SpawnValuableCommand
 {
-    [CommandExecution(
-        "Spawn Valuable",
-        "Spawn an instance of a valuable with the specified (case-insensitive) name. You can optionally leave out \"Valuable \" from the prefab name.",
-        requiresDeveloperMode: true
-    )]
-    [CommandAlias("spawnvaluable")]
-    [CommandAlias("spawnval")]
-    [CommandAlias("sv")]
-    public static void Execute(string args)
+    public static void Register()
     {
-        Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
+        Modules.Commands.RegisterCommand(new ChatCommand(
+            "spawnvaluable",
+            "Spawn an instance of a valuable with the specified (case-insensitive) name. You can optionally leave out \"Valuable \" from the prefab name.",
+            Execute,
+            suggest: null,
+            debugOnly: true));
+    }
 
-        if (string.IsNullOrWhiteSpace(args))
-        {
-            Logger.LogWarning("No args provided to spawn command.");
-            return;
-        }
-
+    public static void Execute(bool isDebugConsole, string[] args)
+    {
         if (!SemiFunc.IsMasterClientOrSingleplayer())
         {
             Logger.LogError("Only the host can spawn valuables!");
@@ -31,17 +26,17 @@ internal static class SpawnValuableCommand
 
         if (PlayerAvatar.instance == null)
         {
-            Logger.LogWarning("Can't spawn anything, player avatar is not initialized.");
+            Logger.LogWarning("Spawn valuable command failed. PlayerAvatar instance is null.");
             return;
         }
 
         if (ValuableDirector.instance == null)
         {
-            Logger.LogError("ValuableDirector not initialized.");
+            Logger.LogError("Spawn valuable command failed. ValuableDirector instance is null.");
             return;
         }
 
-        string name = args;
+        string name = string.Join(" ", args);
 
         Vector3 position = PlayerAvatar.instance.transform.position + new Vector3(0f, 1f, 0f) + PlayerAvatar.instance.transform.forward * 1f;
 
@@ -49,7 +44,7 @@ internal static class SpawnValuableCommand
 
         if (!Valuables.TryGetValuableThatContainsName(name, out ValuableObject? valuableObject))
         {
-            Logger.LogWarning($"Spawn command failed. Unknown valuable with name \"{name}\"");
+            Logger.LogWarning($"Spawn valuable command failed. Unknown valuable with name \"{name}\"");
             return;
         }
 

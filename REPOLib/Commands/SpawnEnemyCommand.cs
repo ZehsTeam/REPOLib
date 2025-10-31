@@ -3,27 +3,25 @@ using REPOLib.Modules;
 using System;
 using System.Collections;
 using UnityEngine;
+using ChatCommand = DebugCommandHandler.ChatCommand;
 
 namespace REPOLib.Commands;
 
 internal static class SpawnEnemyCommand
 {
-    [CommandExecution(
-        "Spawn Enemy",
-        "Spawn an instance of an enemy with the specified (case-insensitive) name. You can optionally leave out \"Enemy - \" from the prefab name.",
-        requiresDeveloperMode: true
-    )]
-    [CommandAlias("spawnenemy")]
-    [CommandAlias("se")]
-    public static void Execute(string args)
+    public static void Register()
+    {
+        Modules.Commands.RegisterCommand(new ChatCommand(
+            "spawnenemy",
+            "Spawn an instance of an enemy with the specified (case-insensitive) name. You can optionally leave out \"Enemy - \" from the prefab name.",
+            Execute,
+            suggest: null,
+            debugOnly: true));
+    }
+
+    public static void Execute(bool isDebugConsole, string[] args)
     {
         Logger.LogInfo($"Running spawn command with args \"{args}\"", extended: true);
-
-        if (string.IsNullOrWhiteSpace(args))
-        {
-            Logger.LogWarning("No args provided to spawn command.");
-            return;
-        }
 
         if (!SemiFunc.IsMasterClientOrSingleplayer())
         {
@@ -31,43 +29,44 @@ internal static class SpawnEnemyCommand
             return;
         }
 
+        if (PlayerAvatar.instance == null)
+        {
+            Logger.LogWarning("Spawn enemy command failed. PlayerAvatar instance is null.");
+            return;
+        }
+
         if (EnemyDirector.instance == null)
         {
-            Logger.LogError("Failed spawn enemy command, EnemyDirector is not initialized.");
+            Logger.LogError("Spawn enemy command failed. EnemyDirector instance is null.");
             return;
         }
 
         if (LevelGenerator.Instance == null)
         {
-            Logger.LogError("Failed spawn enemy command, LevelGenerator is not initialized.");
+            Logger.LogError("Spawn enemy command failed. LevelGenerator instance is null.");
             return;
         }
 
         if (RunManager.instance == null)
         {
-            Logger.LogError("Failed spawn enemy command, RunManager is not initialized.");
+            Logger.LogError("Spawn enemy command failed. RunManager instance is null.");
             return;
         }
 
-        if (PlayerAvatar.instance == null)
-        {
-            Logger.LogWarning("Can't spawn anything, player avatar is not initialized.");
-            return;
-        }
-
-        string name = args;
+        string name = string.Join(" ", args);
 
         if (!EnemyDirector.instance.TryGetEnemyThatContainsName(name, out EnemySetup enemySetup))
         {
-            Logger.LogWarning($"Spawn command failed. Unknown enemy with name \"{name}\"");
+            Logger.LogWarning($"Spawn enemy command failed. Unknown enemy with name \"{name}\"");
             return;
         }
 
         Vector3 position = PlayerAvatar.instance.transform.position;
+        float delaySeconds = 3f;
 
-        Logger.LogInfo($"Trying to spawn enemy \"{name}\" at {position}...", extended: true);
+        Logger.LogInfo($"Trying to spawn enemy \"{name}\" at {position} in {delaySeconds} seconds...", extended: true);
 
-        EnemyDirector.instance.StartCoroutine(SpawnEnemyAfterTime(enemySetup, position, TimeSpan.FromSeconds(3f)));
+        EnemyDirector.instance.StartCoroutine(SpawnEnemyAfterTime(enemySetup, position, TimeSpan.FromSeconds(delaySeconds)));
     }
 
     private static IEnumerator SpawnEnemyAfterTime(EnemySetup enemySetup, Vector3 position, TimeSpan timeSpan)
