@@ -37,6 +37,8 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll(typeof(EnemyBangDirectorPatch));
         _harmony.PatchAll(typeof(PlayerControllerPatch));
         _harmony.PatchAll(typeof(DebugCommandHandlerPatch));
+        _harmony.PatchAll(typeof(DefaultPoolPatch));
+        _harmony.PatchAll(typeof(PrefabRefPatch));
 
         ConfigManager.Initialize(Config);
 

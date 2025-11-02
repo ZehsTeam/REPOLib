@@ -48,11 +48,6 @@ internal static class Logger
 
     public static bool IsExtendedLoggingEnabled()
     {
-        if (ConfigManager.ExtendedLogging == null)
-        {
-            return false;
-        }
-
-        return ConfigManager.ExtendedLogging.Value;
+        return ConfigManager.ExtendedLogging?.Value ?? false;
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Photon.Pun;
-using REPOLib.Objects;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
@@ -10,135 +10,132 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class NetworkPrefabs
 {
-    internal static CustomPrefabPool CustomPrefabPool
-    {
-        get
-        {
-            _customPrefabPool ??= new CustomPrefabPool();
-            return _customPrefabPool;
-        }
-        private set
-        {
-            _customPrefabPool = value;
-        }
-    }
-
-    private static CustomPrefabPool? _customPrefabPool;
-
-    internal static void Initialize()
-    {
-        if (PhotonNetwork.PrefabPool is CustomPrefabPool)
-        {
-            Logger.LogWarning("NetworkPrefabs failed to initialize. PhotonNetwork.PrefabPool is already a CustomPrefabPool.");
-            return;
-        }
-
-        Logger.LogInfo($"Initializing NetworkPrefabs.");
-        Logger.LogDebug($"PhotonNetwork.PrefabPool = {PhotonNetwork.PrefabPool.GetType()}");
-
-        if (PhotonNetwork.PrefabPool is DefaultPool defaultPool)
-        {
-            CustomPrefabPool.DefaultPool = defaultPool;
-        }
-        else if (PhotonNetwork.PrefabPool is not Objects.CustomPrefabPool)
-        {
-            Logger.LogWarning($"PhotonNetwork has an unknown prefab pool assigned. PhotonNetwork.PrefabPool = {PhotonNetwork.PrefabPool.GetType()}");
-        }
-
-        PhotonNetwork.PrefabPool = CustomPrefabPool;
-
-        Logger.LogInfo("Replaced PhotonNetwork.PrefabPool with CustomPrefabPool.");
-        Logger.LogDebug($"PhotonNetwork.PrefabPool = {PhotonNetwork.PrefabPool.GetType()}");
-        Logger.LogInfo($"Finished initializing NetworkPrefabs.");
-    }
+    /// <summary>
+    /// Gets a read-only dictionary mapping network prefab IDs to their corresponding <see cref="GameObject"/>s.
+    /// </summary>
+    public static IReadOnlyDictionary<string, GameObject> Prefabs => _prefabs;
+    private static readonly Dictionary<string, GameObject> _prefabs = [];
 
     /// <summary>
-    /// Register a <see cref="GameObject"/> as a network prefab.
+    /// Gets a read-only dictionary mapping network prefab IDs to their corresponding <see cref="PrefabRef"/> objects.
     /// </summary>
-    /// <param name="prefab">The <see cref="GameObject"/> to register.</param>
-    public static void RegisterNetworkPrefab(GameObject prefab)
-    {
-        RegisterNetworkPrefab(prefab?.name!, prefab!);
-    }
+    public static IReadOnlyDictionary<string, PrefabRef> PrefabRefs => _prefabRefs;
+    private static readonly Dictionary<string, PrefabRef> _prefabRefs = [];
 
     /// <summary>
     /// Register a <see cref="GameObject"/> as a network prefab.
     /// </summary>
     /// <param name="prefabId">The ID for this <see cref="GameObject"/>.</param>
     /// <param name="prefab">The <see cref="GameObject"/> to register.</param>
-    public static void RegisterNetworkPrefab(string prefabId, GameObject prefab)
+    /// <returns>The registered network <see cref="PrefabRef"/> or null.</returns>
+    public static PrefabRef? RegisterNetworkPrefab(string prefabId, GameObject prefab)
     {
-        CustomPrefabPool.RegisterPrefab(prefabId, prefab);
+        if (string.IsNullOrEmpty(prefabId))
+        {
+            Logger.LogError("Failed to register network prefab. PrefabId is null.");
+            return null;
+        }
+
+        if (prefab == null)
+        {
+            Logger.LogError("Failed to register network prefab. Prefab is null.");
+            return null;
+        }
+
+        if (_prefabs.TryGetValue(prefabId, out GameObject otherPrefab))
+        {
+            if (prefab == otherPrefab)
+            {
+                Logger.LogError($"Failed to register network prefab \"{prefabId}\". Prefab is already registered.");
+            }
+            else
+            {
+                Logger.LogError($"Failed to register network prefab \"{prefabId}\". A prefab is already registered with the same ID. (GameObject: \"{otherPrefab.name}\")");
+            }
+
+            return null;
+        }
+
+        var prefabRef = new PrefabRef
+        {
+            prefabName = prefab.name,
+            resourcePath = prefabId
+        };
+
+        _prefabs.Add(prefabId, prefab);
+        _prefabRefs.Add(prefabId, prefabRef);
+
+        return prefabRef;
     }
 
     /// <summary>
-    /// Check if a <see cref="GameObject"/> with the specified ID is a network prefab.
+    /// Check if a network prefab with the specified ID is registered.
     /// </summary>
-    /// <param name="prefabId">The <see cref="GameObject"/> ID to check.</param>
-    /// <returns>Whether or not the <see cref="GameObject"/> is a network prefab.</returns>
+    /// <param name="prefabId">The <see cref="PrefabRef"/> ID to check.</param>
+    /// <returns>Whether or not the network prefab is registered.</returns>
     public static bool HasNetworkPrefab(string prefabId)
     {
-        return CustomPrefabPool.HasPrefab(prefabId);
+        return _prefabs.ContainsKey(prefabId);
     }
 
     /// <summary>
-    /// Gets a network prefab.
+    /// Gets a network <see cref="PrefabRef"/>.
     /// </summary>
-    /// <param name="prefabId">The network prefab ID for the <see cref="GameObject"/>.</param>
-    /// <returns>The <see cref="GameObject"/> or null.</returns>
-    public static GameObject? GetNetworkPrefab(string prefabId)
+    /// <param name="prefabId">The ID for the network <see cref="PrefabRef"/>.</param>
+    /// <returns>The network <see cref="PrefabRef"/> or null.</returns>
+    public static PrefabRef? GetNetworkPrefabRef(string prefabId)
     {
-        return CustomPrefabPool.GetPrefab(prefabId);
+        return _prefabRefs.GetValueOrDefault(prefabId);
     }
 
     /// <summary>
-    /// Tries to get a network prefab.
+    /// Tries to get a network <see cref="PrefabRef"/>.
     /// </summary>
-    /// <param name="prefabId">The network prefab ID for the <see cref="GameObject"/>.</param>
-    /// <param name="prefab">The network prefab <see cref="GameObject"/>.</param>
-    /// <returns>Whether or not the <see cref="GameObject"/> was found.</returns>
-    public static bool TryGetNetworkPrefab(string prefabId, [NotNullWhen(true)] out GameObject? prefab)
+    /// <param name="prefabId">The ID for the network <see cref="PrefabRef"/>.</param>
+    /// <param name="prefabRef">The network <see cref="PrefabRef"/>.</param>
+    /// <returns>Whether or not the network <see cref="PrefabRef"/> was found.</returns>
+    public static bool TryGetNetworkPrefabRef(string prefabId, [NotNullWhen(true)] out PrefabRef? prefabRef)
     {
-        prefab = GetNetworkPrefab(prefabId);
+        prefabRef = GetNetworkPrefabRef(prefabId);
+        return prefabRef != null;
+    }
+
+    internal static bool TryGetNetworkPrefab(string prefabId, [NotNullWhen(true)] out GameObject? prefab)
+    {
+        prefab = _prefabs.GetValueOrDefault(prefabId);
         return prefab != null;
     }
 
     /// <summary>
     /// Spawns a network prefab.
     /// </summary>
-    /// <param name="prefabId">The network prefab ID for the <see cref="GameObject"/> to spawn.</param>
+    /// <param name="prefabRef">The <see cref="PrefabRef"/> for the <see cref="GameObject"/> to spawn.</param>
     /// <param name="position">The position where the <see cref="GameObject"/> will be spawned.</param>
     /// <param name="rotation">The rotation of the <see cref="GameObject"/>.</param>
     /// <param name="group">The interest group. See: https://doc.photonengine.com/pun/current/gameplay/interestgroups</param>
     /// <param name="data">Custom instantiation data. See: https://doc.photonengine.com/pun/current/gameplay/instantiation#custom-instantiation-data</param>
     /// <returns>The spawned <see cref="GameObject"/> or null.</returns>
-    public static GameObject? SpawnNetworkPrefab(string prefabId, Vector3 position, Quaternion rotation, byte group = 0, object[]? data = null)
+    public static GameObject? SpawnNetworkPrefab(PrefabRef prefabRef, Vector3 position, Quaternion rotation, byte group = 0, object[]? data = null)
     {
-        if (string.IsNullOrWhiteSpace(prefabId))
+        if (!prefabRef.IsValid())
         {
-            Logger.LogError("Failed to spawn network prefab. PrefabId is null.");
-            return null;
-        }
-
-        if (!HasNetworkPrefab(prefabId))
-        {
-            Logger.LogError($"Failed to spawn network prefab \"{prefabId}\". PrefabId is not registered as a network prefab.");
+            Logger.LogError("Failed to spawn network prefab. PrefabRef is not valid.");
             return null;
         }
 
         if (!SemiFunc.IsMasterClientOrSingleplayer())
         {
-            Logger.LogError($"Failed to spawn network prefab \"{prefabId}\". You are not the host.");
+            Logger.LogError($"Failed to spawn network prefab \"{prefabRef.PrefabName}\". You are not the host.");
             return null;
         }
 
         if (SemiFunc.IsMultiplayer())
         {
-            return PhotonNetwork.InstantiateRoomObject(prefabId, position, rotation, group, data);
+            return PhotonNetwork.InstantiateRoomObject(prefabRef.ResourcePath, position, rotation, group, data);
         }
         else
         {
-            return Object.Instantiate(CustomPrefabPool.GetPrefab(prefabId), position, rotation);
+            return Object.Instantiate(prefabRef.Prefab, position, rotation);
         }
     }
 }
