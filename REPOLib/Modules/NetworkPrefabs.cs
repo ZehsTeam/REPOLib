@@ -42,7 +42,7 @@ public static class NetworkPrefabs
             return null;
         }
 
-        if (_prefabs.TryGetValue(prefabId, out GameObject otherPrefab))
+        if (TryGetNetworkPrefab(prefabId, out GameObject? otherPrefab))
         {
             if (prefab == otherPrefab)
             {
