@@ -28,22 +28,14 @@ public class Plugin : BaseUnityPlugin
         REPOLib.Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} has awoken!");
 
         _harmony.PatchAll(typeof(RunManagerPatch));
-        _harmony.PatchAll(typeof(EnemyDirectorPatch));
-        _harmony.PatchAll(typeof(StatsManagerPatch));
         _harmony.PatchAll(typeof(SemiFuncPatch));
         _harmony.PatchAll(typeof(AudioManagerPatch));
         _harmony.PatchAll(typeof(SteamManagerPatch));
-        _harmony.PatchAll(typeof(EnemyGnomeDirectorPatch));
-        _harmony.PatchAll(typeof(EnemyBangDirectorPatch));
-        _harmony.PatchAll(typeof(PlayerControllerPatch));
         _harmony.PatchAll(typeof(DebugCommandHandlerPatch));
         _harmony.PatchAll(typeof(DefaultPoolPatch));
         _harmony.PatchAll(typeof(PrefabRefPatch));
 
         ConfigManager.Initialize(Config);
-
-        Upgrades.Initialize();
-        Modules.Commands.Initialize();
 
         BundleLoader.LoadAllBundles(Paths.PluginPath, ".repobundle");
     }

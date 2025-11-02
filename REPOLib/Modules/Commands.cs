@@ -28,8 +28,6 @@ public static class Commands
     internal static void Initialize()
     {
         SpawnValuableCommand.Register();
-        SpawnItemCommand.Register();
-        SpawnEnemyCommand.Register();
     }
 
     // This will run multiple times because of how the vanilla game registers commands.

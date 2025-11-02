@@ -18,19 +18,4 @@ internal static class SemiFuncPatch
 
         return true;
     }
-
-    [HarmonyPatch(nameof(SemiFunc.EnemySpawn))]
-    [HarmonyPrefix]
-    private static bool EnemySpawnPatch(ref bool __result)
-    {
-        if (Enemies.SpawnNextEnemiesNotDespawned > 0)
-        {
-            Enemies.SpawnNextEnemiesNotDespawned--;
-
-            __result = true;
-            return false;
-        }
-
-        return true;
-    }
 }
