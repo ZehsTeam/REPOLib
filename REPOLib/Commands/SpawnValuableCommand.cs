@@ -42,12 +42,12 @@ internal static class SpawnValuableCommand
 
         Logger.LogInfo($"Trying to spawn valuable \"{name}\" at {position}...", extended: true);
 
-        if (!Valuables.TryGetValuableThatContainsName(name, out ValuableObject? valuableObject))
+        if (!Valuables.TryGetValuableThatContainsName(name, out PrefabRef? prefabRef))
         {
             Logger.LogWarning($"Spawn valuable command failed. Unknown valuable with name \"{name}\"");
             return;
         }
 
-        Valuables.SpawnValuable(valuableObject, position, Quaternion.identity);
+        NetworkPrefabs.SpawnNetworkPrefab(prefabRef, position, Quaternion.identity);
     }
 }
