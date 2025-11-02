@@ -12,17 +12,19 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Valuables
 {
-    /// <inheritdoc cref="GetValuables"/>
-    public static IReadOnlyList<GameObject> AllValuables => GetValuables();
+    /// <summary>
+    /// Gets all valuables <see cref="PrefabRef"/>s.
+    /// </summary>
+    /// <returns>All valuables.</returns>
+    public static IReadOnlyList<PrefabRef> AllValuables => GetValuables();
 
     /// <summary>
-    /// Gets all valuables registered with REPOLib.
+    /// Gets all valuables <see cref="PrefabRef"/>s registered with REPOLib.
     /// </summary>
-    public static IReadOnlyList<GameObject> RegisteredValuables => _valuablesRegistered;
-    private static IEnumerable<GameObject> PendingAndRegisteredValuables => _valuablesToRegister.Keys.Concat(_valuablesRegistered);
+    public static IReadOnlyList<PrefabRef> RegisteredValuables => _valuablesRegistered;
 
-    private static readonly Dictionary<GameObject, List<string>> _valuablesToRegister = [];
-    private static readonly List<GameObject> _valuablesRegistered = [];
+    private static readonly Dictionary<PrefabRef, List<string>> _valuablesToRegister = [];
+    private static readonly List<PrefabRef> _valuablesRegistered = [];
 
     private static bool _initialValuablesRegistered;
 
@@ -44,18 +46,18 @@ public static class Valuables
         _initialValuablesRegistered = true;
     }
 
-    private static void RegisterValuableWithGame(GameObject valuable)
+    private static void RegisterValuableWithGame(PrefabRef prefabRef)
     {
-        if (_valuablesRegistered.Contains(valuable))
+        if (_valuablesRegistered.Contains(prefabRef))
         {
             return;
         }
 
-        List<string> presetNames = _valuablesToRegister[valuable];
+        List<string> presetNames = _valuablesToRegister[prefabRef];
 
         if (!presetNames.Any(x => ValuablePresets.AllValuablePresets.Keys.Any(y => x == y)))
         {
-            Logger.LogWarning($"Valuable \"{valuable.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
+            Logger.LogWarning($"Valuable \"{prefabRef.PrefabName}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
             presetNames.Add(ValuablePresets.GenericValuablePresetName);
         }
 
@@ -63,68 +65,68 @@ public static class Valuables
         {
             if (presetName == null || !ValuablePresets.AllValuablePresets.ContainsKey(presetName))
             {
-                Logger.LogWarning($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\". The valuable preset does not exist.");
+                Logger.LogWarning($"Failed to add valuable \"{prefabRef.PrefabName}\" to valuable preset \"{presetName}\". The valuable preset does not exist.");
                 continue;
             }
 
-            if (ValuablePresets.AllValuablePresets[presetName].AddValuable(valuable))
+            if (ValuablePresets.AllValuablePresets[presetName].AddValuable(prefabRef))
             {
-                _valuablesRegistered.Add(valuable);
-                Logger.LogDebug($"Added valuable \"{valuable.name}\" to valuable preset \"{presetName}\"");
+                _valuablesRegistered.Add(prefabRef);
+                Logger.LogDebug($"Added valuable \"{prefabRef.PrefabName}\" to valuable preset \"{presetName}\"");
             }
             else
             {
-                Logger.LogWarning($"Failed to add valuable \"{valuable.name}\" to valuable preset \"{presetName}\"", extended: true);
+                Logger.LogWarning($"Failed to add valuable \"{prefabRef.PrefabName}\" to valuable preset \"{presetName}\"", extended: true);
             }
         }
     }
 
     /// <inheritdoc cref="RegisterValuable(GameObject, List{string})"/>
-    public static void RegisterValuable(GameObject prefab)
+    public static PrefabRef? RegisterValuable(GameObject prefab)
     {
-        RegisterValuable(prefab, new List<string>());
+        return RegisterValuable(prefab, new List<string>());
     }
 
     /// <param name="presets">The list of presets for this <see cref="ValuableObject"/>.</param>
     /// <inheritdoc cref="RegisterValuable(GameObject, List{string})"/>
-    /// <param name="prefab"></param>
-    public static void RegisterValuable(GameObject prefab, List<LevelValuables> presets)
+    /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
+    public static PrefabRef? RegisterValuable(GameObject prefab, List<LevelValuables> presets)
     {
-        RegisterValuable(prefab, (from preset in presets select preset.name).ToList());
+        return RegisterValuable(prefab, (from preset in presets select preset.name).ToList());
     }
 
     /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
     /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
     /// <param name="presetNames"></param>
-    public static void RegisterValuable(GameObject prefab, List<string> presetNames)
+    public static PrefabRef? RegisterValuable(GameObject prefab, List<string> presetNames)
     {
         if (prefab == null)
         {
             Logger.LogError($"Failed to register valuable. Prefab is null.");
-            return;
+            return null;
         }
 
         if (!prefab.TryGetComponent(out ValuableObject valuableObject))
         {
-            Logger.LogError($"Failed to register valuable. Prefab does not have a ValuableObject component.");
-            return;
+            Logger.LogError($"Failed to register valuable \"{prefab.name}\". Prefab does not have a ValuableObject component.");
+            return null;
         }
 
-        RegisterValuable(valuableObject, presetNames);
+        return RegisterValuable(valuableObject, presetNames);
     }
 
     /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
-    public static void RegisterValuable(ValuableObject valuableObject)
+    public static PrefabRef? RegisterValuable(ValuableObject valuableObject)
     {
-        RegisterValuable(valuableObject, new List<string>());
+        return RegisterValuable(valuableObject, new List<string>());
     }
 
+    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
     /// <param name="presets">The list of presets for this <see cref="ValuableObject"/>.</param>
-    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
-    /// <param name="valuableObject"></param>
-    public static void RegisterValuable(ValuableObject valuableObject, List<LevelValuables> presets)
+    /// <param name="valuableObject">The <see cref="ValuableObject"/> to register.</param>
+    public static PrefabRef? RegisterValuable(ValuableObject valuableObject, List<LevelValuables> presets)
     {
-        RegisterValuable(valuableObject, (from preset in presets select preset.name).ToList());
+        return RegisterValuable(valuableObject, (from preset in presets select preset.name).ToList());
     }
 
     /// <summary>
@@ -132,93 +134,62 @@ public static class Valuables
     /// </summary>
     /// <param name="valuableObject">The <see cref="ValuableObject"/> to register.</param>
     /// <param name="presetNames">The list of preset names for this <see cref="ValuableObject"/>.</param>
-    public static void RegisterValuable(ValuableObject valuableObject, List<string> presetNames)
+    /// <returns>The registered valuable <see cref="PrefabRef"/> or null.</returns>
+    public static PrefabRef? RegisterValuable(ValuableObject valuableObject, List<string> presetNames)
     {
         if (valuableObject == null)
         {
             Logger.LogError($"Failed to register valuable. ValuableObject is null.");
-            return;
+            return null;
         }
 
         GameObject prefab = valuableObject.gameObject;
+        string name = prefab.name;
+        string prefabId = $"Valuables/{name}";
 
         if (presetNames == null || presetNames.Count == 0)
         {
-            Logger.LogWarning($"Valuable \"{valuableObject.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.", extended: true);
+            Logger.LogWarning($"Valuable \"{name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.", extended: true);
             presetNames = [ValuablePresets.GenericValuablePresetName];
         }
 
-        if (ResourcesHelper.HasValuablePrefab(valuableObject))
-        {
-            Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable prefab already exists in Resources with the same name.");
-            return;
-        }
+        PrefabRef? existingPrefabRef = NetworkPrefabs.GetNetworkPrefabRef(prefabId);
 
-        if (PendingAndRegisteredValuables.Any(x => x.name.Equals(prefab.name, StringComparison.OrdinalIgnoreCase)))
+        if (existingPrefabRef != null)
         {
-            Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable prefab already exists with the same name.");
-            return;
-        }
+            if (prefab == existingPrefabRef.Prefab)
+            {
+                Logger.LogWarning($"Failed to register valuable \"{name}\". Valuable is already registered!");
+            }
+            else
+            {
+                Logger.LogError($"Failed to register valuable \"{name}\". Valuable prefab already exists with the same name.");
+            }
 
-        if (PendingAndRegisteredValuables.Contains(prefab))
+            return null;
+        }
+        
+        PrefabRef? prefabRef = NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
+
+        if (prefabRef == null)
         {
-            Logger.LogWarning($"Failed to register valuable \"{prefab.name}\". Valuable is already registered!");
-            return;
+            Logger.LogError($"Failed to register valuable \"{name}\". PrefabRef is null.");
+            return null;
         }
-
-        string prefabId = ResourcesHelper.GetValuablePrefabPath(valuableObject);
-        NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
 
         Utilities.FixAudioMixerGroups(prefab);
 
-        _valuablesToRegister.Add(prefab, presetNames);
+        _valuablesToRegister.Add(prefabRef, presetNames);
 
         if (_initialValuablesRegistered)
         {
-            RegisterValuableWithGame(valuableObject.gameObject);
+            RegisterValuableWithGame(prefabRef);
         }
+
+        return prefabRef;
     }
 
-    /// <summary>
-    /// Spawns a <see cref="ValuableObject"/>.
-    /// </summary>
-    /// <param name="valuableObject">The <see cref="ValuableObject"/> to spawn.</param>
-    /// <param name="position">The position where the valuable will be spawned.</param>
-    /// <param name="rotation">The rotation of the valuable.</param>
-    /// <returns>The <see cref="ValuableObject"/> object that was spawned.</returns>
-    public static GameObject? SpawnValuable(ValuableObject valuableObject, Vector3 position, Quaternion rotation)
-    {
-        if (valuableObject == null)
-        {
-            Logger.LogError("Failed to spawn valuable. ValuableObject is null.");
-            return null;
-        }
-
-        if (!SemiFunc.IsMasterClientOrSingleplayer())
-        {
-            Logger.LogError($"Failed to spawn valuable \"{valuableObject.gameObject.name}\". You are not the host.");
-            return null;
-        }
-
-        string prefabId = ResourcesHelper.GetValuablePrefabPath(valuableObject);
-        GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
-
-        if (gameObject == null)
-        {
-            Logger.LogError($"Failed to spawn valuable \"{valuableObject.gameObject.name}\"");
-            return null;
-        }
-
-        Logger.LogInfo($"Spawned valuable \"{gameObject.name}\" at position {position}, rotation: {rotation.eulerAngles}", extended: true);
-
-        return gameObject;
-    }
-
-    /// <summary>
-    /// Gets all valuables.
-    /// </summary>
-    /// <returns>All valuables.</returns>
-    public static IReadOnlyList<GameObject> GetValuables()
+    private static IReadOnlyList<PrefabRef> GetValuables()
     {
         if (RunManager.instance == null)
         {
@@ -233,76 +204,48 @@ public static class Valuables
     }
 
     /// <summary>
-    /// Tries to get a <see cref="ValuableObject"/> by name.
+    /// Tries to get a <see cref="PrefabRef"/> by the prefab name.
     /// </summary>
-    /// <param name="name">The <see cref="string"/> to match.</param>
-    /// <param name="valuableObject">The found <see cref="ValuableObject"/>.</param>
-    /// <returns>Whether or not the <see cref="ValuableObject"/> was found.</returns>
-    public static bool TryGetValuableByName(string name, [NotNullWhen(true)] out ValuableObject? valuableObject)
+    /// <param name="name">The prefab name to match.</param>
+    /// <param name="prefabRef">The found valuable <see cref="PrefabRef"/>.</param>
+    /// <returns>Whether or not the valuable <see cref="PrefabRef"/> was found.</returns>
+    public static bool TryGetValuableByName(string name, [NotNullWhen(true)] out PrefabRef? prefabRef)
     {
-        valuableObject = GetValuableByName(name);
-        return valuableObject != null;
+        prefabRef = GetValuableByName(name);
+        return prefabRef != null;
     }
 
     /// <summary>
-    /// Gets a <see cref="ValuableObject"/> by name.
+    /// Gets a valuable <see cref="PrefabRef"/> by the prefab name.
     /// </summary>
-    /// <param name="name">The <see cref="string"/> to match.</param>
-    /// <returns>The <see cref="ValuableObject"/> or null.</returns>
-    public static ValuableObject? GetValuableByName(string name)
+    /// <param name="name">The prefab name to match.</param>
+    /// <returns>The valuable <see cref="PrefabRef"/> or null.</returns>
+    public static PrefabRef? GetValuableByName(string name)
     {
-        GameObject gameObject = GetValuables()
-            .FirstOrDefault(x => x.name.Equals(name, StringComparison.OrdinalIgnoreCase));
-
-        return gameObject?.GetComponent<ValuableObject>() ?? null;
+        return AllValuables.FirstOrDefault(x => x.PrefabName == name);
     }
 
     /// <summary>
-    /// Tries to get a <see cref="ValuableObject"/> that contains the name.
+    /// Tries to get a valuable <see cref="PrefabRef"/> that contains the prefab name.
     /// </summary>
-    /// <param name="name">The <see cref="string"/> to compare.</param>
-    /// <param name="valuableObject">The found <see cref="ValuableObject"/>.</param>
-    /// <returns>Whether or not the <see cref="ValuableObject"/> was found.</returns>
-    public static bool TryGetValuableThatContainsName(string name, [NotNullWhen(true)] out ValuableObject? valuableObject)
+    /// <param name="name">The prefab name to compare.</param>
+    /// <param name="prefabRef">The found valuable <see cref="PrefabRef"/>.</param>
+    /// <returns>Whether or not the valuable <see cref="PrefabRef"/> was found.</returns>
+    public static bool TryGetValuableThatContainsName(string name, [NotNullWhen(true)] out PrefabRef? prefabRef)
     {
-        valuableObject = GetValuableThatContainsName(name);
-        return valuableObject != null;
+        prefabRef = GetValuableThatContainsName(name);
+        return prefabRef != null;
     }
 
     /// <summary>
-    /// Gets a <see cref="ValuableObject"/> that contains the name.
+    /// Gets a valuable <see cref="PrefabRef"/> that contains the prefab name.
     /// </summary>
-    /// <param name="name">The <see cref="string"/> to compare.</param>
-    /// <returns>The <see cref="ValuableObject"/> or null.</returns>
-    public static ValuableObject? GetValuableThatContainsName(string name)
+    /// <param name="name">The prefab name to compare.</param>
+    /// <returns>The valuable <see cref="ValuableObject"/> or null.</returns>
+    public static PrefabRef? GetValuableThatContainsName(string name)
     {
-        GameObject gameObject = GetValuables()
-            .SortByStringLength(x => x.name, ListExtensions.StringSortMode.Shortest)
-            .FirstOrDefault(x => x.name.Contains(name, StringComparison.OrdinalIgnoreCase));
-
-        return gameObject?.GetComponent<ValuableObject>() ?? null;
+        return AllValuables
+            .SortByStringLength(x => x.PrefabName, ListExtensions.StringSortMode.Shortest)
+            .FirstOrDefault(x => x.PrefabName.Contains(name, StringComparison.OrdinalIgnoreCase));
     }
-
-    #region Deprecated
-    /// <summary>Deprecated.</summary>
-    [Obsolete("prefabId is no longer supported", true)]
-    public static void RegisterValuable(string prefabId, GameObject prefab)
-    {
-        RegisterValuable(prefab);
-    }
-
-    /// <summary>Deprecated.</summary>
-    [Obsolete("prefabId is no longer supported", true)]
-    public static void RegisterValuable(string prefabId, GameObject prefab, List<LevelValuables> presets)
-    {
-        RegisterValuable(prefab, presets);
-    }
-
-    /// <summary>Deprecated.</summary>
-    [Obsolete("prefabId is no longer supported", true)]
-    public static void RegisterValuable(string prefabId, GameObject prefab, List<string> presetNames)
-    {
-        RegisterValuable(prefab, presetNames);
-    }
-    #endregion
 }

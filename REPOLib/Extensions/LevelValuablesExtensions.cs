@@ -7,43 +7,31 @@ namespace REPOLib.Extensions;
 
 internal static class LevelValuablesExtensions
 {
-    public static bool HasValuable(this LevelValuables levelValuables, GameObject prefab)
+    public static bool AddValuable(this LevelValuables levelValuables, PrefabRef prefabRef)
     {
+        GameObject prefab = prefabRef.Prefab;
+        if (prefab == null) return false;
+
         if (!prefab.TryGetComponent(out ValuableObject valuableObject))
         {
             return false;
         }
 
-        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject>? list))
+        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<PrefabRef>? list))
         {
             return false;
         }
 
-        return list.Contains(prefab);
-    }
-
-    internal static bool AddValuable(this LevelValuables levelValuables, GameObject prefab)
-    {
-        if (!prefab.TryGetComponent(out ValuableObject valuableObject))
+        if (list.Contains(prefabRef))
         {
             return false;
         }
 
-        if (!TryGetList(levelValuables, valuableObject.volumeType, out List<GameObject>? list))
-        {
-            return false;
-        }
-
-        if (list.Contains(prefab))
-        {
-            return false;
-        }
-
-        list.Add(prefab);
+        list.Add(prefabRef);
         return true;
     }
 
-    public static bool TryGetList(this LevelValuables levelValuables, ValuableVolume.Type volumeType, [NotNullWhen(true)] out List<GameObject>? list)
+    public static bool TryGetList(this LevelValuables levelValuables, ValuableVolume.Type volumeType, [NotNullWhen(true)] out List<PrefabRef>? list)
     {
         list = volumeType switch
         {
@@ -60,9 +48,9 @@ internal static class LevelValuablesExtensions
         return list != null;
     }
 
-    public static bool TryGetCombinedList(this LevelValuables levelValuables, out List<GameObject> list)
+    public static bool TryGetCombinedList(this LevelValuables levelValuables, out List<PrefabRef> list)
     {
-        var allValuables = new List<List<GameObject>>()
+        var allValuables = new List<List<PrefabRef>>()
         {
             levelValuables.tiny,
             levelValuables.small,
@@ -81,9 +69,9 @@ internal static class LevelValuablesExtensions
         return list != null;
     }
 
-    public static List<GameObject> GetCombinedList(this LevelValuables levelValuables)
+    public static List<PrefabRef> GetCombinedList(this LevelValuables levelValuables)
     {
-        if (levelValuables.TryGetCombinedList(out List<GameObject> list))
+        if (levelValuables.TryGetCombinedList(out List<PrefabRef> list))
         {
             return list;
         }
