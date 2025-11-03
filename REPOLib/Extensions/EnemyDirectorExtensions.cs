@@ -15,7 +15,7 @@ internal static class EnemyDirectorExtensions
 
         foreach (var spawnObject in enemySetup.spawnObjects)
         {
-            if (!spawnObject.TryGetComponent(out EnemyParent enemyParent))
+            if (!spawnObject.Prefab.TryGetComponent(out EnemyParent enemyParent))
             {
                 continue;
             }
@@ -40,7 +40,7 @@ internal static class EnemyDirectorExtensions
 
         foreach (var spawnObject in enemySetup.spawnObjects)
         {
-            if (!spawnObject.TryGetComponent(out EnemyParent enemyParent))
+            if (!spawnObject.Prefab.TryGetComponent(out EnemyParent enemyParent))
             {
                 continue;
             }

@@ -119,18 +119,18 @@ public static class Levels
         List<(GameObject, ResourcesHelper.LevelPrefabType)> modules =
             new[]
             {
-                level.ModulesExtraction1,
-                level.ModulesExtraction2,
-                level.ModulesExtraction3,
-                level.ModulesNormal1,
-                level.ModulesNormal2,
-                level.ModulesNormal3,
-                level.ModulesPassage1,
-                level.ModulesPassage2,
-                level.ModulesPassage3,
-                level.ModulesDeadEnd1,
-                level.ModulesDeadEnd2,
-                level.ModulesDeadEnd3
+                level.ModulesExtraction1.Select(x => x.Prefab).ToList(),
+                [.. level.ModulesExtraction2.Select(x => x.Prefab)],
+                [.. level.ModulesExtraction3.Select(x => x.Prefab)],
+                [.. level.ModulesNormal1.Select(x => x.Prefab)],
+                [.. level.ModulesNormal2.Select(x => x.Prefab)],
+                [.. level.ModulesNormal3.Select(x => x.Prefab)],
+                [.. level.ModulesPassage1.Select(x => x.Prefab)],
+                [.. level.ModulesPassage2.Select(x => x.Prefab)],
+                [.. level.ModulesPassage3.Select(x => x.Prefab)],
+                [.. level.ModulesDeadEnd1.Select(x => x.Prefab)],
+                [.. level.ModulesDeadEnd2.Select(x => x.Prefab)],
+                [.. level.ModulesDeadEnd3.Select(x => x.Prefab)]
             }
                 .SelectMany(list => list)
                 .Select(prefab => (prefab, ResourcesHelper.LevelPrefabType.Module))
@@ -138,7 +138,7 @@ public static class Levels
 
         foreach (var prefab in level.StartRooms)
         {
-            modules.Add((prefab, ResourcesHelper.LevelPrefabType.StartRoom));
+            modules.Add((prefab.Prefab, ResourcesHelper.LevelPrefabType.StartRoom));
         }
 
         if (level.ConnectObject != null)

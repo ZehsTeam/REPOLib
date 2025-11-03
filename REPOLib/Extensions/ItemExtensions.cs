@@ -16,10 +16,10 @@ internal static class ItemExtensions
             return true;
         }
 
-        if (item.itemAssetName.EqualsAny([name, $"Item {name}"], StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
+        // if (item.itemAssetName.EqualsAny([name, $"Item {name}"], StringComparison.OrdinalIgnoreCase))
+        // {
+        //     return true;
+        // }
 
         if (item.itemName.Equals(name, StringComparison.OrdinalIgnoreCase))
         {
@@ -41,10 +41,10 @@ internal static class ItemExtensions
             return true;
         }
 
-        if (item.itemAssetName.Contains(name, StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
+        // if (item.itemAssetName.Contains(name, StringComparison.OrdinalIgnoreCase))
+        // {
+        //     return true;
+        // }
 
         if (item.itemName.Contains(name, StringComparison.OrdinalIgnoreCase))
         {

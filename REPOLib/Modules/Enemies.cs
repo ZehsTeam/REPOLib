@@ -188,7 +188,7 @@ public static class Enemies
             }
 
             string prefabId = ResourcesHelper.GetEnemyPrefabPath(spawnObject);
-            GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
+            GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(NetworkPrefabs.GetNetworkPrefabRef(prefabId)!, position, rotation);
 
             if (gameObject == null)
             {

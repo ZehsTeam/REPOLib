@@ -84,7 +84,7 @@ public static class ResourcesHelper
             return string.Empty;
         }
 
-        return GetItemPrefabPath(item.prefab);
+        return GetItemPrefabPath(item.prefab.Prefab);
     }
 
     public static string GetItemPrefabPath(GameObject prefab)
