@@ -9,7 +9,7 @@ internal static class PrefabRefPatch
 {
     [HarmonyPatch(nameof(PrefabRef.Prefab), MethodType.Getter)]
     [HarmonyPrefix]
-    private static bool PrefabPatch(PrefabRef __instance, ref bool __result)
+    private static bool PrefabPatch(PrefabRef __instance, ref GameObject __result)
     {
         if (NetworkPrefabs.TryGetNetworkPrefab(__instance.resourcePath, out GameObject? prefab))
         {
