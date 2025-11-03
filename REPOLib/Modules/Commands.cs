@@ -1,5 +1,4 @@
-﻿using REPOLib.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using ChatCommand = DebugCommandHandler.ChatCommand;
@@ -24,13 +23,6 @@ public static class Commands
 
     private static readonly List<ChatCommand> _commandsToRegister = [];
     private static readonly List<ChatCommand> _commandsRegistered = [];
-
-    internal static void Initialize()
-    {
-        SpawnValuableCommand.Register();
-        SpawnItemCommand.Register();
-        SpawnEnemyCommand.Register();
-    }
 
     // This will run multiple times because of how the vanilla game registers commands.
     internal static void RegisterCommands()
