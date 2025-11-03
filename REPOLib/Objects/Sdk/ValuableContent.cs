@@ -17,7 +17,7 @@ public class ValuableContent : Content
     #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     [SerializeField]
-    private string[] _valuablePresets = [Modules.ValuablePresets.GenericValuablePresetName];
+    private string[] _valuablePresets = [];
 
     /// <summary>
     /// The <see cref="ValuableObject"/> of this content.

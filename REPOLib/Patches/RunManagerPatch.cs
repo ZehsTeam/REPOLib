@@ -16,6 +16,7 @@ internal static class RunManagerPatch
         if (_patchedAwake) return;
         _patchedAwake = true;
 
+        ValuablePresets.CacheValuablePresets();
         Valuables.RegisterInitialValuables();
         BundleLoader.FinishLoadOperations(__instance);
     }
