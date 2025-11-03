@@ -16,7 +16,22 @@ public static class Valuables
     /// Gets all valuables <see cref="PrefabRef"/>s.
     /// </summary>
     /// <returns>All valuables.</returns>
-    public static IReadOnlyList<PrefabRef> AllValuables => GetValuables();
+    public static IReadOnlyList<PrefabRef> AllValuables
+    {
+        get
+        {
+            if (RunManager.instance == null)
+            {
+                return [];
+            }
+
+            return ValuablePresets.AllValuablePresets.Values
+                .Select(levelValuables => levelValuables.GetCombinedList())
+                .SelectMany(list => list)
+                .Distinct()
+                .ToList();
+        }
+    }
 
     /// <summary>
     /// Gets all valuables <see cref="PrefabRef"/>s registered with REPOLib.
@@ -189,63 +204,35 @@ public static class Valuables
         return prefabRef;
     }
 
-    private static IReadOnlyList<PrefabRef> GetValuables()
-    {
-        if (RunManager.instance == null)
-        {
-            return [];
-        }
-
-        return ValuablePresets.AllValuablePresets.Values
-            .Select(levelValuables => levelValuables.GetCombinedList())
-            .SelectMany(list => list)
-            .Distinct()
-            .ToList();
-    }
-
-    /// <summary>
-    /// Tries to get a <see cref="PrefabRef"/> by the prefab name.
-    /// </summary>
-    /// <param name="name">The prefab name to match.</param>
-    /// <param name="prefabRef">The found valuable <see cref="PrefabRef"/>.</param>
-    /// <returns>Whether or not the valuable <see cref="PrefabRef"/> was found.</returns>
+    #region Deprecated
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
     public static bool TryGetValuableByName(string name, [NotNullWhen(true)] out PrefabRef? prefabRef)
     {
-        prefabRef = GetValuableByName(name);
-        return prefabRef != null;
+        prefabRef = null;
+        return false;
     }
 
-    /// <summary>
-    /// Gets a valuable <see cref="PrefabRef"/> by the prefab name.
-    /// </summary>
-    /// <param name="name">The prefab name to match.</param>
-    /// <returns>The valuable <see cref="PrefabRef"/> or null.</returns>
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
     public static PrefabRef? GetValuableByName(string name)
     {
-        return AllValuables.FirstOrDefault(x => x.PrefabName == name);
+        return null;
     }
 
-    /// <summary>
-    /// Tries to get a valuable <see cref="PrefabRef"/> that contains the prefab name.
-    /// </summary>
-    /// <param name="name">The prefab name to compare.</param>
-    /// <param name="prefabRef">The found valuable <see cref="PrefabRef"/>.</param>
-    /// <returns>Whether or not the valuable <see cref="PrefabRef"/> was found.</returns>
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
     public static bool TryGetValuableThatContainsName(string name, [NotNullWhen(true)] out PrefabRef? prefabRef)
     {
-        prefabRef = GetValuableThatContainsName(name);
-        return prefabRef != null;
+        prefabRef = null;
+        return false;
     }
 
-    /// <summary>
-    /// Gets a valuable <see cref="PrefabRef"/> that contains the prefab name.
-    /// </summary>
-    /// <param name="name">The prefab name to compare.</param>
-    /// <returns>The valuable <see cref="ValuableObject"/> or null.</returns>
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
     public static PrefabRef? GetValuableThatContainsName(string name)
     {
-        return AllValuables
-            .SortByStringLength(x => x.PrefabName, ListExtensions.StringSortMode.Shortest)
-            .FirstOrDefault(x => x.PrefabName.Contains(name, StringComparison.OrdinalIgnoreCase));
+        return null;
     }
+    #endregion
 }
