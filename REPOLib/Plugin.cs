@@ -43,7 +43,6 @@ public class Plugin : BaseUnityPlugin
         ConfigManager.Initialize(Config);
 
         Upgrades.Initialize();
-        Modules.Commands.Initialize();
 
         BundleLoader.LoadAllBundles(Paths.PluginPath, ".repobundle");
     }

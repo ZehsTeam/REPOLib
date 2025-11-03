@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using REPOLib.Modules;
 
 namespace REPOLib.Patches;
 
@@ -9,6 +10,6 @@ internal static class DebugCommandHandlerPatch
     [HarmonyPostfix]
     private static void StartPatch()
     {
-        Modules.Commands.RegisterCommands();
+        Commands.RegisterCommands();
     }
 }
