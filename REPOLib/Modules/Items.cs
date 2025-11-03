@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -12,8 +11,11 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Items
 {
-    /// <inheritdoc cref="GetItems"/>
-    public static IReadOnlyList<Item> AllItems => GetItems();
+    /// <summary>
+    /// Gets all items.
+    /// </summary>
+    /// <returns>The list of all items.</returns>
+    public static IReadOnlyList<Item> AllItems => StatsManager.instance?.GetItems() ?? [];
 
     /// <summary>
     /// Gets all items registered with REPOLib.
@@ -46,7 +48,7 @@ public static class Items
 
     private static void RegisterItemWithGame(Item item)
     {
-        Utilities.FixAudioMixerGroups(item.prefab);
+        //Utilities.FixAudioMixerGroups(item.prefab);   This shouldn't be needed here since it's already called in RegisterItem.
 
         if (StatsManager.instance.AddItem(item))
         {
@@ -55,58 +57,65 @@ public static class Items
                 _itemsRegistered.Add(item);
             }
 
-            Logger.LogInfo($"Added item \"{item.itemName}\"", extended: true);
+            Logger.LogInfo($"Added item \"{item.itemName}\" to StatsManager.", extended: true);
         }
         else
         {
-            Logger.LogWarning($"Failed to add item \"{item.itemName}\"", extended: true);
+            Logger.LogWarning($"Failed to add item \"{item.itemName}\" to StatsManager.", extended: true);
         }
     }
 
     /// <summary>
     /// Registers an <see cref="Item"/>.
     /// </summary>
-    /// <param name="item">The <see cref="Item"/> to register.</param>
-    /// <exception cref="ArgumentException"></exception>
-    public static void RegisterItem(Item item)
+    /// <param name="itemAttributes">The item prefab to register.</param>
+    /// <returns>The registered item <see cref="PrefabRef"/> or null.</returns>
+    public static PrefabRef? RegisterItem(ItemAttributes itemAttributes)
     {
+        if (itemAttributes == null)
+        {
+            Logger.LogError($"Failed to register item. ItemAttributes is null.");
+            return null;
+        }
+
+        Item item = itemAttributes.item;
+
         if (item == null)
         {
-            throw new ArgumentException("Failed to register item. Item is null.");
+            Logger.LogError($"Failed to register item. Item is null.");
+            return null;
         }
 
-        if (item.prefab == null)
+        GameObject prefab = itemAttributes.gameObject;
+        string prefabId = $"Items/{prefab.name}";
+
+        PrefabRef? existingPrefabRef = NetworkPrefabs.GetNetworkPrefabRef(prefabId);
+
+        if (existingPrefabRef != null)
         {
-            Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab is null.");
-            return;
+            if (prefab == existingPrefabRef.Prefab)
+            {
+                Logger.LogWarning($"Failed to register item \"{item.itemName}\". Item is already registered!");
+            }
+            else
+            {
+                Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab already exists with the same name.");
+            }
+
+            return null;
         }
 
-        if (item.itemAssetName != item.prefab.name)
+        PrefabRef? prefabRef = NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
+
+        if (prefabRef == null)
         {
-            Logger.LogError($"Failed to register item \"{item.itemName}\". Item itemAssetName does not match the prefab name.");
-            return;
+            Logger.LogError($"Failed to register item \"{item.itemName}\". PrefabRef is null.");
+            return null;
         }
 
-        if (ResourcesHelper.HasItemPrefab(item))
-        {
-            Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab already exists in Resources with the same name.");
-            return;
-        }
+        item.prefab = prefabRef;
 
-        if (_itemsToRegister.Any(x => x.itemAssetName == item.itemAssetName))
-        {
-            Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab already exists with the same name.");
-            return;
-        }
-
-        if (_itemsToRegister.Contains(item))
-        {
-            Logger.LogError($"Failed to register item \"{item.itemName}\". Item is already registered!");
-            return;
-        }
-
-        string prefabId = ResourcesHelper.GetItemPrefabPath(item);
-        NetworkPrefabs.RegisterNetworkPrefab(prefabId, item.prefab);
+        Utilities.FixAudioMixerGroups(prefab);
 
         _itemsToRegister.Add(item);
 
@@ -114,6 +123,8 @@ public static class Items
         {
             RegisterItemWithGame(item);
         }
+
+        return prefabRef;
     }
 
     /// <summary>
@@ -122,7 +133,7 @@ public static class Items
     /// <param name="item">The <see cref="Item"/> to spawn.</param>
     /// <param name="position">The position where the item will be spawned.</param>
     /// <param name="rotation">The rotation of the item.</param>
-    /// <returns>The <see cref="Item"/> object that was spawned.</returns>
+    /// <returns>The <see cref="Item"/> object that was spawned or null.</returns>
     public static GameObject? SpawnItem(Item item, Vector3 position, Quaternion rotation)
     {
         if (item == null)
@@ -131,9 +142,9 @@ public static class Items
             return null;
         }
 
-        if (item.prefab == null)
+        if (!item.prefab.IsValid())
         {
-            Logger.LogError("Failed to spawn item. Prefab is null.");
+            Logger.LogError($"Failed to spawn item \"{item.itemName}\". Prefab is not valid.");
             return null;
         }
 
@@ -143,12 +154,11 @@ public static class Items
             return null;
         }
 
-        string prefabId = ResourcesHelper.GetItemPrefabPath(item);
-        GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabId, position, rotation);
+        GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(item.prefab, position, rotation);
 
         if (gameObject == null)
         {
-            Logger.LogError($"Failed to spawn item \"{item.itemName}\"");
+            Logger.LogError($"Failed to spawn item \"{item.itemName}\". GameObject is null.");
             return null;
         }
 
@@ -157,61 +167,37 @@ public static class Items
         return gameObject;
     }
 
-    /// <summary>
-    /// Gets all items.
-    /// </summary>
-    /// <returns>The list of all items.</returns>
-    public static IReadOnlyList<Item> GetItems()
-    {
-        if (StatsManager.instance == null)
-        {
-            return [];
-        }
-
-        return StatsManager.instance.GetItems();
-    }
-    
-    /// <summary>
-    /// Tries to get an <see cref="Item"/> by name.
-    /// </summary>
-    /// <param name="name">The <see cref="string"/> to match.</param>
-    /// <param name="item">The found <see cref="Item"/>.</param>
-    /// <returns>Whether or not the <see cref="Item"/> was found.</returns>
+    #region Deprecated
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static bool TryGetItemByName(string name, [NotNullWhen(true)] out Item? item)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
-        item = GetItemByName(name);
-        return item != null;
+        item = null;
+        return false;
     }
 
-    /// <summary>
-    /// Gets an <see cref="Item"/> by name.
-    /// </summary>
-    /// <param name="name">The <see cref="string"/> to match.</param>
-    /// <returns>The <see cref="Item"/> or null.</returns>
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static Item? GetItemByName(string name)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
-        return StatsManager.instance?.GetItemByName(name);
+        return null;
     }
 
-    /// <summary>
-    /// Tries to get an <see cref="Item"/> that contains the name.
-    /// </summary>
-    /// <param name="name">The <see cref="string"/> to compare.</param>
-    /// <param name="item">The found <see cref="Item"/>.</param>
-    /// <returns>Whether or not the <see cref="Item"/> was found.</returns>
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static bool TryGetItemThatContainsName(string name, [NotNullWhen(true)] out Item? item)
     {
-        item = GetItemThatContainsName(name);
-        return item != null;
+        item = null;
+        return false;
     }
 
-    /// <summary>
-    /// Gets an <see cref="Item"/> that contains the name.
-    /// </summary>
-    /// <param name="name">The <see cref="string"/> to compare.</param>
-    /// <returns>The <see cref="Item"/> or null.</returns>
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static Item? GetItemThatContainsName(string name)
     {
-        return StatsManager.instance?.GetItemThatContainsName(name);
+        return null;
     }
+    #endregion
 }

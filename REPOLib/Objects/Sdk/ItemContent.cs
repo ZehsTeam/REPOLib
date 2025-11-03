@@ -26,9 +26,6 @@ public class ItemContent : Content
     /// <inheritdoc/>
     public override void Initialize(Mod mod)
     {
-        // Set prefab on item
-        _prefab.item.prefab = _prefab.gameObject;
-
-        Modules.Items.RegisterItem(Prefab.item);
+        Modules.Items.RegisterItem(_prefab);
     }
 }
