@@ -58,7 +58,7 @@ public static class Valuables
         if (!presetNames.Any(x => ValuablePresets.AllValuablePresets.Keys.Any(y => x == y)))
         {
             Logger.LogWarning($"Valuable \"{prefabRef.PrefabName}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
-            presetNames.Add(ValuablePresets.GenericValuablePresetName);
+            presetNames = ValuablePresets.AllValuablePresetNames;
         }
 
         foreach (var presetName in presetNames)
@@ -150,7 +150,7 @@ public static class Valuables
         if (presetNames == null || presetNames.Count == 0)
         {
             Logger.LogWarning($"Valuable \"{name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.", extended: true);
-            presetNames = [ValuablePresets.GenericValuablePresetName];
+            presetNames = ValuablePresets.AllValuablePresetNames;
         }
 
         PrefabRef? existingPrefabRef = NetworkPrefabs.GetNetworkPrefabRef(prefabId);
@@ -168,7 +168,7 @@ public static class Valuables
 
             return null;
         }
-        
+
         PrefabRef? prefabRef = NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
 
         if (prefabRef == null)

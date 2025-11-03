@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace REPOLib.Modules;
 
@@ -12,17 +14,18 @@ public static class ValuablePresets
     /// </summary>
     public static IReadOnlyDictionary<string, LevelValuables> AllValuablePresets => _valuablePresets;
 
-    /// <summary>
-    /// Gets the generic valuables preset.
-    /// </summary>
-    public static LevelValuables GenericPreset => AllValuablePresets[GenericValuablePresetName];
+    [Obsolete("Levels no longer use a generic valuables preset", error: true)]
+    public static LevelValuables? GenericPreset => null;
 
     private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
 
-    /// <summary>
-    /// The generic valuables preset name.
-    /// </summary>
+    [Obsolete("Levels no longer use a generic valuables preset", error: true)]
     public const string GenericValuablePresetName = "Valuables - Generic";
+
+    /// <summary>
+    /// All of the valuable preset names. Register your valuables to this list if you want them to spawn in all levels.
+    /// </summary>
+    public static List<string> AllValuablePresetNames => AllValuablePresets.Keys.ToList();
 
     /// <summary>
     /// Caches all valuable presets from levels, for getting with <see cref="AllValuablePresets"/>.

@@ -19,12 +19,11 @@ internal static class RunManagerPatch
         if (_patchedAwake) return;
         _patchedAwake = true;
 
-        NetworkPrefabs.Initialize();
+        Modules.Commands.Initialize();
         NetworkingEvents.Initialize();
         Levels.RegisterInitialLevels();
         Valuables.RegisterInitialValuables();
 
-        BundleLoader.OnAllBundlesLoaded += CommandManager.Initialize;
         BundleLoader.FinishLoadOperations(__instance);
     }
 }
