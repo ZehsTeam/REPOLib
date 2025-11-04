@@ -144,7 +144,7 @@ public static class Items
 
         if (!item.prefab.IsValid())
         {
-            Logger.LogError($"Failed to spawn item \"{item.itemName}\". Prefab is not valid.");
+            Logger.LogError($"Failed to spawn item \"{item.itemName}\". PrefabRef is not valid.");
             return null;
         }
 
@@ -158,7 +158,7 @@ public static class Items
 
         if (gameObject == null)
         {
-            Logger.LogError($"Failed to spawn item \"{item.itemName}\". GameObject is null.");
+            Logger.LogError($"Failed to spawn item \"{item.itemName}\". Spawned GameObject is null.");
             return null;
         }
 

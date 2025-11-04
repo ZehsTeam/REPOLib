@@ -22,6 +22,12 @@ public static class NetworkPrefabs
     public static IReadOnlyDictionary<string, PrefabRef> PrefabRefs => _prefabRefs;
     private static readonly Dictionary<string, PrefabRef> _prefabRefs = [];
 
+    /// <inheritdoc cref="RegisterNetworkPrefab(string, GameObject)"/>
+    public static PrefabRef? RegisterNetworkPrefab(GameObject prefab)
+    {
+        return RegisterNetworkPrefab(prefab.name, prefab);
+    }
+
     /// <summary>
     /// Register a <see cref="GameObject"/> as a network prefab.
     /// </summary>
@@ -42,15 +48,15 @@ public static class NetworkPrefabs
             return null;
         }
 
-        if (TryGetNetworkPrefab(prefabId, out GameObject? otherPrefab))
+        if (TryGetNetworkPrefab(prefabId, out GameObject? existingPrefab))
         {
-            if (prefab == otherPrefab)
+            if (prefab == existingPrefab)
             {
                 Logger.LogError($"Failed to register network prefab \"{prefabId}\". Prefab is already registered.");
             }
             else
             {
-                Logger.LogError($"Failed to register network prefab \"{prefabId}\". A prefab is already registered with the same ID. (GameObject: \"{otherPrefab.name}\")");
+                Logger.LogError($"Failed to register network prefab \"{prefabId}\". A prefab is already registered with the same ID. (GameObject: \"{existingPrefab.name}\")");
             }
 
             return null;

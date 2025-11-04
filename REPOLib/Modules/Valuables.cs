@@ -204,8 +204,48 @@ public static class Valuables
         return prefabRef;
     }
 
+    /// <summary>
+    /// Spawns a <see cref="ValuableObject"/>.
+    /// </summary>
+    /// <param name="prefabRef">The <see cref="PrefabRef"/> for the <see cref="ValuableObject"/> to spawn.</param>
+    /// <param name="position">The position where the valuable will be spawned.</param>
+    /// <param name="rotation">The rotation of the valuable.</param>
+    /// <returns>The <see cref="ValuableObject"/> object that was spawned.</returns>
+    public static GameObject? SpawnValuable(PrefabRef prefabRef, Vector3 position, Quaternion rotation)
+    {
+        if (prefabRef == null)
+        {
+            Logger.LogError("Failed to spawn valuable. PrefabRef is null.");
+            return null;
+        }
+
+        if (!prefabRef.IsValid())
+        {
+            Logger.LogError("Failed to spawn valuable. PrefabRef is not valid.");
+            return null;
+        }
+
+        if (!SemiFunc.IsMasterClientOrSingleplayer())
+        {
+            Logger.LogError($"Failed to spawn valuable \"{prefabRef.PrefabName}\". You are not the host.");
+            return null;
+        }
+
+        GameObject? gameObject = NetworkPrefabs.SpawnNetworkPrefab(prefabRef, position, rotation);
+
+        if (gameObject == null)
+        {
+            Logger.LogError($"Failed to spawn valuable \"{prefabRef.prefabName}\". Spawned GameObject is null.");
+            return null;
+        }
+
+        Logger.LogInfo($"Spawned valuable \"{prefabRef.prefabName}\" at position {position}, rotation: {rotation.eulerAngles}", extended: true);
+
+        return gameObject;
+    }
+
     #region Deprecated
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
     public static bool TryGetValuableByName(string name, [NotNullWhen(true)] out PrefabRef? prefabRef)
     {
