@@ -18,6 +18,7 @@ internal static class RunManagerPatch
 
         NetworkingEvents.Initialize();
         Levels.RegisterInitialLevels();
+        Modules.Modules.RegisterInitialModules();
         Valuables.RegisterInitialValuables();
 
         BundleLoader.FinishLoadOperations(__instance);
