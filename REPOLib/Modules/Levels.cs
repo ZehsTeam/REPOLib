@@ -1,4 +1,5 @@
 ﻿using REPOLib.Extensions;
+using REPOLib.Objects.Sdk;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -12,8 +13,11 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Levels
 {
-    /// <inheritdoc cref="GetLevels"/>
-    public static IReadOnlyList<Level> AllLevels => GetLevels();
+    /// <summary>
+    /// Get a <see cref="Level"/> list from <see cref="RunManager"/>.
+    /// </summary>
+    /// <returns>A <see cref="Level"/> list from <see cref="RunManager"/>.</returns>
+    public static IReadOnlyList<Level> AllLevels => RunManager.instance?.levels ?? [];
 
     /// <summary>
     /// Get all levels registered with REPOLib.
@@ -32,7 +36,7 @@ public static class Levels
             return;
         }
 
-        ValuablePresets.CacheValuablePresets();
+        ValuablePresets.Initialize();
 
         Logger.LogInfo($"Adding levels.");
 
@@ -96,7 +100,7 @@ public static class Levels
     /// Registers a <see cref="Level"/>.
     /// </summary>
     /// <param name="level">The <see cref="Level"/> to register.</param>
-    public static void RegisterLevel(Level level)
+    public static void RegisterLevel(LevelContent levelContent)
     {
         if (level == null)
         {
@@ -175,77 +179,39 @@ public static class Levels
         }
     }
 
-    /// <summary>
-    /// Get a <see cref="Level"/> list from <see cref="RunManager"/>.
-    /// </summary>
-    /// <returns>A <see cref="Level"/> list from <see cref="RunManager"/>.</returns>
+    #region Deprecated
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("This is no longer supported. Use AllLevels or RegisteredLevels instead.", error: true)]
     public static IReadOnlyList<Level> GetLevels()
     {
-        if (RunManager.instance == null)
-        {
-            return [];
-        }
-
-        return RunManager.instance.levels;
+        return AllLevels;
     }
 
-    /// <summary>
-    /// Tries to get a <see cref="Level"/> by name.
-    /// </summary>
-    /// <param name="name">The <see cref="string"/> to match.</param>
-    /// <param name="level">The found <see cref="Level"/>.</param>
-    /// <returns>Whether or not the <see cref="Level"/> was found.</returns>
+    [Obsolete("This is no longer supported. Use AllLevels or RegisteredLevels instead.", error: true)]
     public static bool TryGetLevelByName(string name, [NotNullWhen(true)] out Level? level)
     {
-        level = GetLevelByName(name);
-        return level != null;
+        level = null;
+        return false;
     }
 
-    /// <summary>
-    /// Get a <see cref="Level"/> by name.
-    /// </summary>
-    /// <param name="name">The <see cref="string"/> to match.</param>
-    /// <returns>The <see cref="Level"/> or null.</returns>
+    [Obsolete("This is no longer supported. Use AllLevels or RegisteredLevels instead.", error: true)]
     public static Level? GetLevelByName(string name)
     {
-        foreach (var level in GetLevels())
-        {
-            if (level.name.EqualsAny([name, $"Level - {name}"], StringComparison.OrdinalIgnoreCase))
-            {
-                return level;
-            }
-        }
-
         return null;
     }
 
-    /// <summary>
-    /// Tries to get a <see cref="Level"/> that contains the specified name.
-    /// </summary>
-    /// <param name="name">The <see cref="string"/> to compare.</param>
-    /// <param name="level">The found <see cref="Level"/>.</param>
-    /// <returns>Whether or not the <see cref="Level"/> was found.</returns>
+    [Obsolete("This is no longer supported. Use AllLevels or RegisteredLevels instead.", error: true)]
     public static bool TryGetLevelThatContainsName(string name, [NotNullWhen(true)] out Level? level)
     {
-        level = GetLevelThatContainsName(name);
-        return level != null;
+        level = null;
+        return false;
     }
 
-    /// <summary>
-    /// Gets a <see cref="Level"/> that contains the specified name.
-    /// </summary>
-    /// <param name="name">The <see cref="string"/> to compare.</param>
-    /// <returns>The <see cref="Level"/> or null.</returns>
+    [Obsolete("This is no longer supported. Use AllLevels or RegisteredLevels instead.", error: true)]
     public static Level? GetLevelThatContainsName(string name)
     {
-        foreach (var level in GetLevels())
-        {
-            if (level.name.Contains(name, StringComparison.OrdinalIgnoreCase))
-            {
-                return level;
-            }
-        }
-
         return null;
     }
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    #endregion
 }

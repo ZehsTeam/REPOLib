@@ -10,10 +10,9 @@ namespace REPOLib.Modules;
 public static class ValuablePresets
 {
     /// <summary>
-    /// Gets all cached valuable presets. See <see cref="CacheValuablePresets"/>.
+    /// Gets all cached valuable presets. See <see cref="Initialize"/>.
     /// </summary>
     public static IReadOnlyDictionary<string, LevelValuables> AllValuablePresets => _valuablePresets;
-
     private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
 
     /// <summary>
@@ -21,23 +20,29 @@ public static class ValuablePresets
     /// </summary>
     public static List<string> AllValuablePresetNames => AllValuablePresets.Keys.ToList();
 
-    /// <summary>
-    /// Caches all valuable presets from levels, for getting with <see cref="AllValuablePresets"/>.
-    /// </summary>
-    public static void CacheValuablePresets()
+    internal static LevelValuables? GenericPreset => AllValuablePresets.GetValueOrDefault("Valuables - Generic");
+
+    internal static void Initialize()
     {
         if (RunManager.instance == null)
         {
-            Logger.LogError($"Failed to cache LevelValuables. RunManager instance is null.");
+            Logger.LogError($"Failed to initialize ValuablePresets. RunManager instance is null.");
             return;
         }
 
+        AddValuablePresets(RunManager.instance.levelArena.ValuablePresets);
+
         foreach (var level in RunManager.instance.levels)
         {
-            foreach (var valuablePreset in level.ValuablePresets)
-            {
-                _valuablePresets.TryAdd(valuablePreset.name, valuablePreset);
-            }
+            AddValuablePresets(level.ValuablePresets);
+        }
+    }
+
+    private static void AddValuablePresets(List<LevelValuables> valuablePresets)
+    {
+        foreach (var valuablePreset in valuablePresets)
+        {
+            _valuablePresets.TryAdd(valuablePreset.name, valuablePreset);
         }
     }
 
@@ -48,9 +53,6 @@ public static class ValuablePresets
 
     #region Deprecated
     #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    [Obsolete("Levels no longer use a generic valuables preset", error: true)]
-    public static LevelValuables? GenericPreset => null;
-
     [Obsolete("Levels no longer use a generic valuables preset", error: true)]
     public const string GenericValuablePresetName = "Valuables - Generic";
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

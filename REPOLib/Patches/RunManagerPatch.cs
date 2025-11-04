@@ -17,6 +17,7 @@ internal static class RunManagerPatch
         _patchedAwake = true;
 
         NetworkingEvents.Initialize();
+        ValuablePresets.Initialize();
         Levels.RegisterInitialLevels();
         Valuables.RegisterInitialValuables();
 
