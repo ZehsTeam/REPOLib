@@ -34,29 +34,4 @@ internal static class StatsManagerExtensions
     {
         return statsManager.itemDictionary.Values.ToList();
     }
-
-    public static bool TryGetItemByName(this StatsManager statsManager, string name, out Item item)
-    {
-        item = statsManager.GetItemByName(name);
-        return item != null;
-    }
-
-    public static Item GetItemByName(this StatsManager statsManager, string name)
-    {
-        return statsManager.GetItems()
-            .FirstOrDefault(x => x.NameEquals(name));
-    }
-
-    public static bool TryGetItemThatContainsName(this StatsManager statsManager, string name, out Item item)
-    {
-        item = statsManager.GetItemThatContainsName(name);
-        return item != null;
-    }
-
-    public static Item GetItemThatContainsName(this StatsManager statsManager, string name)
-    {
-        return statsManager.GetItems()
-            .SortByStringLength(x => x.itemName, ListExtensions.StringSortMode.Shortest)
-            .FirstOrDefault(x => x.NameContains(name));
-    }
 }

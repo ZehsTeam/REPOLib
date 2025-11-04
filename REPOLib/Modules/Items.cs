@@ -1,4 +1,5 @@
 ﻿using REPOLib.Extensions;
+using REPOLib.Objects.Sdk;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -63,6 +64,19 @@ public static class Items
         {
             Logger.LogWarning($"Failed to add item \"{item.itemName}\" to StatsManager.", extended: true);
         }
+    }
+
+    /// <inheritdoc cref="RegisterItem(ItemAttributes)"/>
+    /// <param name="itemContent">The <see cref="ItemContent"/> to register.</param>
+    public static PrefabRef? RegisterItem(ItemContent itemContent)
+    {
+        if (itemContent == null)
+        {
+            Logger.LogError($"Failed to register item. ItemContent is null.");
+            return null;
+        }
+
+        return RegisterItem(itemContent.Prefab);
     }
 
     /// <summary>
@@ -170,22 +184,24 @@ public static class Items
     #region Deprecated
     #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
+    public static IReadOnlyList<Item> GetItems()
+    {
+        return AllItems;
+    }
+
+    [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static bool TryGetItemByName(string name, [NotNullWhen(true)] out Item? item)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
         item = null;
         return false;
     }
 
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static Item? GetItemByName(string name)
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     {
         return null;
     }
 
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static bool TryGetItemThatContainsName(string name, [NotNullWhen(true)] out Item? item)
     {
@@ -193,11 +209,11 @@ public static class Items
         return false;
     }
 
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static Item? GetItemThatContainsName(string name)
     {
         return null;
     }
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     #endregion
 }

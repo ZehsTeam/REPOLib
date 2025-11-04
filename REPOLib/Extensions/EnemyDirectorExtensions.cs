@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace REPOLib.Extensions;
 
@@ -13,22 +12,17 @@ internal static class EnemyDirectorExtensions
             return false;
         }
 
-        foreach (var spawnObject in enemySetup.spawnObjects)
+        if (!enemySetup.TryGetEnemyParent(out EnemyParent? enemyParent))
         {
-            if (!spawnObject.TryGetComponent(out EnemyParent enemyParent))
-            {
-                continue;
-            }
-
-            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup>? list))
-            {
-                continue;
-            }
-
-            return list.Contains(enemySetup);
+            return false;
         }
 
-        return false;
+        if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup>? list))
+        {
+            return false;
+        }
+
+        return list.Contains(enemySetup);
     }
 
     internal static bool AddEnemy(this EnemyDirector enemyDirector, EnemySetup enemySetup)
@@ -38,28 +32,23 @@ internal static class EnemyDirectorExtensions
             return false;
         }
 
-        foreach (var spawnObject in enemySetup.spawnObjects)
+        if (!enemySetup.TryGetEnemyParent(out EnemyParent? enemyParent))
         {
-            if (!spawnObject.TryGetComponent(out EnemyParent enemyParent))
-            {
-                continue;
-            }
-
-            if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup>? list))
-            {
-                continue;
-            }
-
-            if (list.Contains(enemySetup))
-            {
-                continue;
-            }
-
-            list.Add(enemySetup);
-            return true;
+            return false;
         }
 
-        return false;
+        if (!TryGetList(enemyDirector, enemyParent.difficulty, out List<EnemySetup>? list))
+        {
+            return false;
+        }
+
+        if (list.Contains(enemySetup))
+        {
+            return false;
+        }
+
+        list.Add(enemySetup);
+        return true;
     }
 
     public static bool TryGetList(this EnemyDirector enemyDirector, EnemyParent.Difficulty difficultyType, [NotNullWhen(true)] out List<EnemySetup>? list)
@@ -82,29 +71,5 @@ internal static class EnemyDirectorExtensions
             .. enemyDirector.enemiesDifficulty2,
             .. enemyDirector.enemiesDifficulty3,
         ];
-    }
-
-    public static bool TryGetEnemyByName(this EnemyDirector enemyDirector, string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
-    {
-        enemySetup = enemyDirector.GetEnemyByName(name);
-        return enemySetup != null;
-    }
-
-    public static EnemySetup? GetEnemyByName(this EnemyDirector enemyDirector, string name)
-    {
-        return enemyDirector.GetEnemies()
-            .FirstOrDefault(x => x.NameEquals(name));
-    }
-
-    public static bool TryGetEnemyThatContainsName(this EnemyDirector enemyDirector, string name, out EnemySetup enemySetup)
-    {
-        enemySetup = enemyDirector.GetEnemyThatContainsName(name);
-        return enemySetup != null;
-    }
-    
-    public static EnemySetup GetEnemyThatContainsName(this EnemyDirector enemyDirector, string name)
-    {
-        return enemyDirector.GetEnemies()
-            .FirstOrDefault(x => x.NameContains(name));
     }
 }

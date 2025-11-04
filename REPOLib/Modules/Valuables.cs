@@ -1,4 +1,5 @@
 ﻿using REPOLib.Extensions;
+using REPOLib.Objects.Sdk;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -96,22 +97,35 @@ public static class Valuables
         }
     }
 
+    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
+    /// <param name="valuableContent">The <see cref="ValuableContent"/> to register.</param>
+    public static PrefabRef? RegisterValuable(ValuableContent valuableContent)
+    {
+        if (valuableContent == null)
+        {
+            Logger.LogError($"Failed to register valuable. ValuableContent is null.");
+            return null;
+        }
+
+        return RegisterValuable(valuableContent.Prefab, valuableContent.ValuablePresets.ToList());
+    }
+
     /// <inheritdoc cref="RegisterValuable(GameObject, List{string})"/>
     public static PrefabRef? RegisterValuable(GameObject prefab)
     {
         return RegisterValuable(prefab, new List<string>());
     }
 
-    /// <param name="presets">The list of presets for this <see cref="ValuableObject"/>.</param>
     /// <inheritdoc cref="RegisterValuable(GameObject, List{string})"/>
+    /// <param name="presets">The list of presets for this <see cref="ValuableObject"/>.</param>
     /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
     public static PrefabRef? RegisterValuable(GameObject prefab, List<LevelValuables> presets)
     {
         return RegisterValuable(prefab, (from preset in presets select preset.name).ToList());
     }
 
-    /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
     /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
+    /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
     /// <param name="presetNames"></param>
     public static PrefabRef? RegisterValuable(GameObject prefab, List<string> presetNames)
     {
@@ -245,7 +259,13 @@ public static class Valuables
     }
 
     #region Deprecated
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
+    public static IReadOnlyList<GameObject> GetValuables()
+    {
+        return [];
+    }
+
     [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
     public static bool TryGetValuableByName(string name, [NotNullWhen(true)] out PrefabRef? prefabRef)
     {
@@ -253,14 +273,12 @@ public static class Valuables
         return false;
     }
 
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
     public static PrefabRef? GetValuableByName(string name)
     {
         return null;
     }
 
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
     public static bool TryGetValuableThatContainsName(string name, [NotNullWhen(true)] out PrefabRef? prefabRef)
     {
@@ -268,11 +286,11 @@ public static class Valuables
         return false;
     }
 
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
     public static PrefabRef? GetValuableThatContainsName(string name)
     {
         return null;
     }
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     #endregion
 }

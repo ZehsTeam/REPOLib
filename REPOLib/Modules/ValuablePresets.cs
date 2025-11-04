@@ -14,13 +14,7 @@ public static class ValuablePresets
     /// </summary>
     public static IReadOnlyDictionary<string, LevelValuables> AllValuablePresets => _valuablePresets;
 
-    [Obsolete("Levels no longer use a generic valuables preset", error: true)]
-    public static LevelValuables? GenericPreset => null;
-
     private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
-
-    [Obsolete("Levels no longer use a generic valuables preset", error: true)]
-    public const string GenericValuablePresetName = "Valuables - Generic";
 
     /// <summary>
     /// All of the valuable preset names. Register your valuables to this list if you want them to spawn in all levels.
@@ -51,4 +45,14 @@ public static class ValuablePresets
     {
         _valuablePresets.Add(valuablePreset.name, valuablePreset);
     }
+
+    #region Deprecated
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("Levels no longer use a generic valuables preset", error: true)]
+    public static LevelValuables? GenericPreset => null;
+
+    [Obsolete("Levels no longer use a generic valuables preset", error: true)]
+    public const string GenericValuablePresetName = "Valuables - Generic";
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    #endregion
 }

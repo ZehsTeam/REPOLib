@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using REPOLib.Modules;
+using UnityEngine;
 
 namespace REPOLib.Objects.Sdk;
 
@@ -26,6 +27,6 @@ public class ItemContent : Content
     /// <inheritdoc/>
     public override void Initialize(Mod mod)
     {
-        Modules.Items.RegisterItem(_prefab);
+        Items.RegisterItem(this);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using REPOLib.Modules;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace REPOLib.Objects.Sdk;
@@ -37,6 +36,6 @@ public class ValuableContent : Content
     /// <inheritdoc/>
     public override void Initialize(Mod mod)
     {
-        Valuables.RegisterValuable(Prefab.gameObject, ValuablePresets.ToList());
+        Valuables.RegisterValuable(this);
     }
 }
