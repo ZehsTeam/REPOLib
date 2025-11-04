@@ -69,7 +69,7 @@ public static class Enemies
     /// Registers an <see cref="EnemySetup"/>.
     /// </summary>
     /// <param name="enemyContent">The <see cref="EnemySetup"/> to register.</param>
-    public static void RegisterEnemy(EnemyContent enemyContent)
+    public static void RegisterEnemy(EnemyContent? enemyContent)
     {
         if (enemyContent == null)
         {
@@ -175,7 +175,7 @@ public static class Enemies
     /// <param name="rotation">The rotation of the enemy.</param>
     /// <param name="spawnDespawned">Whether or not this enemy will spawn despawned.</param>
     /// <returns>The <see cref="EnemyParent"/> objects from spawned enemies.</returns>
-    public static List<EnemyParent>? SpawnEnemy(EnemySetup enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
+    public static List<EnemyParent>? SpawnEnemy(EnemySetup? enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
     {
         if (enemySetup == null)
         {

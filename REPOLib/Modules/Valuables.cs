@@ -99,7 +99,7 @@ public static class Valuables
 
     /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
     /// <param name="valuableContent">The <see cref="ValuableContent"/> to register.</param>
-    public static PrefabRef? RegisterValuable(ValuableContent valuableContent)
+    public static PrefabRef? RegisterValuable(ValuableContent? valuableContent)
     {
         if (valuableContent == null)
         {
@@ -111,7 +111,7 @@ public static class Valuables
     }
 
     /// <inheritdoc cref="RegisterValuable(GameObject, List{string})"/>
-    public static PrefabRef? RegisterValuable(GameObject prefab)
+    public static PrefabRef? RegisterValuable(GameObject? prefab)
     {
         return RegisterValuable(prefab, new List<string>());
     }
@@ -119,7 +119,7 @@ public static class Valuables
     /// <inheritdoc cref="RegisterValuable(GameObject, List{string})"/>
     /// <param name="presets">The list of presets for this <see cref="ValuableObject"/>.</param>
     /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
-    public static PrefabRef? RegisterValuable(GameObject prefab, List<LevelValuables> presets)
+    public static PrefabRef? RegisterValuable(GameObject? prefab, List<LevelValuables> presets)
     {
         return RegisterValuable(prefab, (from preset in presets select preset.name).ToList());
     }
@@ -127,7 +127,7 @@ public static class Valuables
     /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
     /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
     /// <param name="presetNames"></param>
-    public static PrefabRef? RegisterValuable(GameObject prefab, List<string> presetNames)
+    public static PrefabRef? RegisterValuable(GameObject? prefab, List<string> presetNames)
     {
         if (prefab == null)
         {
@@ -145,7 +145,7 @@ public static class Valuables
     }
 
     /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
-    public static PrefabRef? RegisterValuable(ValuableObject valuableObject)
+    public static PrefabRef? RegisterValuable(ValuableObject? valuableObject)
     {
         return RegisterValuable(valuableObject, new List<string>());
     }
@@ -153,7 +153,7 @@ public static class Valuables
     /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
     /// <param name="presets">The list of presets for this <see cref="ValuableObject"/>.</param>
     /// <param name="valuableObject">The <see cref="ValuableObject"/> to register.</param>
-    public static PrefabRef? RegisterValuable(ValuableObject valuableObject, List<LevelValuables> presets)
+    public static PrefabRef? RegisterValuable(ValuableObject? valuableObject, List<LevelValuables> presets)
     {
         return RegisterValuable(valuableObject, (from preset in presets select preset.name).ToList());
     }
@@ -164,7 +164,7 @@ public static class Valuables
     /// <param name="valuableObject">The <see cref="ValuableObject"/> to register.</param>
     /// <param name="presetNames">The list of preset names for this <see cref="ValuableObject"/>.</param>
     /// <returns>The registered valuable <see cref="PrefabRef"/> or null.</returns>
-    public static PrefabRef? RegisterValuable(ValuableObject valuableObject, List<string> presetNames)
+    public static PrefabRef? RegisterValuable(ValuableObject? valuableObject, List<string> presetNames)
     {
         if (valuableObject == null)
         {
@@ -225,7 +225,7 @@ public static class Valuables
     /// <param name="position">The position where the valuable will be spawned.</param>
     /// <param name="rotation">The rotation of the valuable.</param>
     /// <returns>The <see cref="ValuableObject"/> object that was spawned.</returns>
-    public static GameObject? SpawnValuable(PrefabRef prefabRef, Vector3 position, Quaternion rotation)
+    public static GameObject? SpawnValuable(PrefabRef? prefabRef, Vector3 position, Quaternion rotation)
     {
         if (prefabRef == null)
         {

@@ -110,7 +110,7 @@ public static class Levels
     /// Registers a <see cref="Level"/>.
     /// </summary>
     /// <param name="levelContent">The <see cref="LevelContent"/> to register.</param>
-    public static void RegisterLevel(LevelContent levelContent)
+    public static void RegisterLevel(LevelContent? levelContent)
     {
         if (levelContent == null)
         {

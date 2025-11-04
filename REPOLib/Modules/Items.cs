@@ -68,7 +68,7 @@ public static class Items
 
     /// <inheritdoc cref="RegisterItem(ItemAttributes)"/>
     /// <param name="itemContent">The <see cref="ItemContent"/> to register.</param>
-    public static PrefabRef? RegisterItem(ItemContent itemContent)
+    public static PrefabRef? RegisterItem(ItemContent? itemContent)
     {
         if (itemContent == null)
         {
@@ -84,7 +84,7 @@ public static class Items
     /// </summary>
     /// <param name="itemAttributes">The item prefab to register.</param>
     /// <returns>The registered item <see cref="PrefabRef"/> or null.</returns>
-    public static PrefabRef? RegisterItem(ItemAttributes itemAttributes)
+    public static PrefabRef? RegisterItem(ItemAttributes? itemAttributes)
     {
         if (itemAttributes == null)
         {
@@ -148,7 +148,7 @@ public static class Items
     /// <param name="position">The position where the item will be spawned.</param>
     /// <param name="rotation">The rotation of the item.</param>
     /// <returns>The <see cref="Item"/> object that was spawned or null.</returns>
-    public static GameObject? SpawnItem(Item item, Vector3 position, Quaternion rotation)
+    public static GameObject? SpawnItem(Item? item, Vector3 position, Quaternion rotation)
     {
         if (item == null)
         {
