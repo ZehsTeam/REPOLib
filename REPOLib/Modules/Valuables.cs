@@ -1,4 +1,5 @@
 ﻿using REPOLib.Extensions;
+using REPOLib.Objects;
 using REPOLib.Objects.Sdk;
 using System;
 using System.Collections.Generic;
@@ -187,23 +188,26 @@ public static class Valuables
             presetNames = ValuablePresets.AllValuablePresetNames;
         }
 
-        PrefabRef? existingPrefabRef = NetworkPrefabs.GetNetworkPrefabRef(prefabId);
+        PrefabRefResponse prefabRefResponse = NetworkPrefabs.RegisterNetworkPrefabInternal(prefabId, prefab);
+        PrefabRef? prefabRef = prefabRefResponse.PrefabRef;
 
-        if (existingPrefabRef != null)
+        if (prefabRefResponse.Result == PrefabRefResult.PrefabAlreadyRegistered)
         {
-            if (prefab == existingPrefabRef.Prefab)
-            {
-                Logger.LogWarning($"Failed to register valuable \"{prefab.name}\". Valuable is already registered!");
-            }
-            else
-            {
-                Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable prefab already exists with the same name.");
-            }
-
+            Logger.LogWarning($"Failed to register valuable \"{prefab.name}\". Valuable is already registered!");
             return null;
         }
 
-        PrefabRef? prefabRef = NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
+        if (prefabRefResponse.Result == PrefabRefResult.DifferentPrefabAlreadyRegistered)
+        {
+            Logger.LogError($"Failed to register valuable \"{prefab.name}\". A valuable prefab is already registered with the same name.");
+            return null;
+        }
+
+        if (prefabRefResponse.Result != PrefabRefResult.Success)
+        {
+            Logger.LogError($"Failed to register valuable \"{prefab.name}\". (Reason: {prefabRefResponse.Result})");
+            return null;
+        }
 
         if (prefabRef == null)
         {

@@ -1,4 +1,5 @@
 ﻿using REPOLib.Extensions;
+using REPOLib.Objects;
 using REPOLib.Objects.Sdk;
 using System;
 using System.Collections.Generic;
@@ -103,27 +104,31 @@ public static class Items
         GameObject prefab = itemAttributes.gameObject;
         string prefabId = $"Items/{prefab.name}";
 
-        PrefabRef? existingPrefabRef = NetworkPrefabs.GetNetworkPrefabRef(prefabId);
 
-        if (existingPrefabRef != null)
+        PrefabRefResponse prefabRefResponse = NetworkPrefabs.RegisterNetworkPrefabInternal(prefabId, prefab);
+        PrefabRef? prefabRef = prefabRefResponse.PrefabRef;
+
+        if (prefabRefResponse.Result == PrefabRefResult.PrefabAlreadyRegistered)
         {
-            if (prefab == existingPrefabRef.Prefab)
-            {
-                Logger.LogWarning($"Failed to register item \"{item.itemName}\". Item is already registered!");
-            }
-            else
-            {
-                Logger.LogError($"Failed to register item \"{item.itemName}\". Item prefab already exists with the same name.");
-            }
-
+            Logger.LogWarning($"Failed to register item \"{item.itemName}\". Item is already registered!");
             return null;
         }
 
-        PrefabRef? prefabRef = NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
+        if (prefabRefResponse.Result == PrefabRefResult.DifferentPrefabAlreadyRegistered)
+        {
+            Logger.LogError($"Failed to register item \"{item.itemName}\". A item prefab is already registered with the same name.");
+            return null;
+        }
+
+        if (prefabRefResponse.Result != PrefabRefResult.Success)
+        {
+            Logger.LogError($"Failed to register item \"{prefab.name}\". (Reason: {prefabRefResponse.Result})");
+            return null;
+        }
 
         if (prefabRef == null)
         {
-            Logger.LogError($"Failed to register item \"{item.itemName}\". PrefabRef is null.");
+            Logger.LogError($"Failed to register item \"{prefab.name}\". PrefabRef is null.");
             return null;
         }
 
