@@ -55,7 +55,6 @@ public static class Levels
             RegisterLevelWithGame(level);
         }
 
-        _levelsToRegister.Clear();
         _initialLevelsRegistered = true;
     }
 
@@ -69,7 +68,7 @@ public static class Levels
         if (level.ValuablePresets.Count == 0)
         {
             Logger.LogWarning($"Level \"{level.name}\" does not have any valuable presets! Adding generic preset.");
-            level.ValuablePresets.Add(ValuablePresets.GenericPreset);
+            level.ValuablePresets.Add(ValuablePresets.GenericValuablePreset);
         }
 
         for (int i = 0; i < level.ValuablePresets.Count; i++)
@@ -171,13 +170,11 @@ public static class Levels
         level.ModulesDeadEnd3 = RegisterLevelModules(level, ModuleType.DeadEnd, levelContent.ModulesDeadEnd3);
         level.ModulesExtraction3 = RegisterLevelModules(level, ModuleType.Extraction, levelContent.ModulesExtraction3);
 
+        _levelsToRegister.Add(level);
+
         if (_initialLevelsRegistered)
         {
             RegisterLevelWithGame(level);
-        }
-        else
-        {
-            _levelsToRegister.Add(level);
         }
     }
 

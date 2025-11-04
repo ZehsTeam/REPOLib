@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +19,8 @@ public static class ValuablePresets
     /// </summary>
     public static List<string> AllValuablePresetNames => AllValuablePresets.Keys.ToList();
 
-    internal static LevelValuables? GenericPreset => AllValuablePresets.GetValueOrDefault("Valuables - Generic");
+    internal static string GenericValuablePresetName => "Valuables - Generic";
+    internal static LevelValuables? GenericValuablePreset => AllValuablePresets.GetValueOrDefault(GenericValuablePresetName);
 
     internal static void Initialize()
     {
@@ -50,11 +50,4 @@ public static class ValuablePresets
     {
         _valuablePresets.Add(valuablePreset.name, valuablePreset);
     }
-
-    #region Deprecated
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    [Obsolete("Levels no longer use a generic valuables preset", error: true)]
-    public const string GenericValuablePresetName = "Valuables - Generic";
-    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-    #endregion
 }

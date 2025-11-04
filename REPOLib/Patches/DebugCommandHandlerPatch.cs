@@ -7,7 +7,7 @@ namespace REPOLib.Patches;
 internal static class DebugCommandHandlerPatch
 {
     [HarmonyPatch(nameof(DebugCommandHandler.Start))]
-    [HarmonyPostfix]
+    [HarmonyPrefix]
     private static void StartPatch()
     {
         Commands.RegisterCommands();

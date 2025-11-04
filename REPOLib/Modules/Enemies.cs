@@ -34,6 +34,11 @@ public static class Enemies
 
     internal static void RegisterEnemies()
     {
+        if (_initialEnemiesRegistered)
+        {
+            return;
+        }
+
         foreach (var enemy in _enemiesToRegister)
         {
             RegisterEnemyWithGame(enemy);
@@ -157,13 +162,11 @@ public static class Enemies
             enemySetup.spawnObjects.Add(prefabRef);
         }
 
+        _enemiesToRegister.Add(enemySetup);
+
         if (_initialEnemiesRegistered)
         {
             RegisterEnemyWithGame(enemySetup);
-        }
-        else
-        {
-            _enemiesToRegister.Add(enemySetup);
         }
     }
 

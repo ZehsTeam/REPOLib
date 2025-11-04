@@ -1,4 +1,5 @@
 ﻿using REPOLib.Modules;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace REPOLib.Objects.Sdk;
@@ -14,7 +15,7 @@ public class EnemyContent : Content
     private EnemySetup? _setup;
 
     [SerializeField]
-    private GameObject[] _spawnObjects = [];
+    private List<GameObject> _spawnObjects = [];
     #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     /// <summary>
@@ -25,7 +26,7 @@ public class EnemyContent : Content
     /// <summary>
     /// The spawn objects of this content.
     /// </summary>
-    public GameObject[] SpawnObjects => _spawnObjects;
+    public List<GameObject> SpawnObjects => _spawnObjects;
 
     /// <summary>
     /// The name of the <see cref="Setup"/>.

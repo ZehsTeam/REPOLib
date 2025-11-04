@@ -173,12 +173,17 @@ public static class Valuables
         }
 
         GameObject prefab = valuableObject.gameObject;
-        string name = prefab.name;
-        string prefabId = $"Valuables/{name}";
+        string prefabId = $"Valuables/{prefab.name}";
 
         if (presetNames == null || presetNames.Count == 0)
         {
-            Logger.LogWarning($"Valuable \"{name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.", extended: true);
+            Logger.LogWarning($"Valuable \"{prefab.name}\" does not have any valid valuable preset names set. Overriding with all valuable presets.", extended: true);
+            presetNames = ValuablePresets.AllValuablePresetNames;
+        }
+
+        if (presetNames.Count == 1 || presetNames[0] == ValuablePresets.GenericValuablePresetName)
+        {
+            Logger.LogWarning($"Valuable \"{prefab.name}\" only targets the \"{ValuablePresets.GenericValuablePresetName}\" valuable preset which is no longer used by vanilla levels. Overriding with all valuable presets.", extended: true);
             presetNames = ValuablePresets.AllValuablePresetNames;
         }
 
@@ -188,11 +193,11 @@ public static class Valuables
         {
             if (prefab == existingPrefabRef.Prefab)
             {
-                Logger.LogWarning($"Failed to register valuable \"{name}\". Valuable is already registered!");
+                Logger.LogWarning($"Failed to register valuable \"{prefab.name}\". Valuable is already registered!");
             }
             else
             {
-                Logger.LogError($"Failed to register valuable \"{name}\". Valuable prefab already exists with the same name.");
+                Logger.LogError($"Failed to register valuable \"{prefab.name}\". Valuable prefab already exists with the same name.");
             }
 
             return null;
@@ -202,7 +207,7 @@ public static class Valuables
 
         if (prefabRef == null)
         {
-            Logger.LogError($"Failed to register valuable \"{name}\". PrefabRef is null.");
+            Logger.LogError($"Failed to register valuable \"{prefab.name}\". PrefabRef is null.");
             return null;
         }
 
