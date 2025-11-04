@@ -29,10 +29,10 @@ public class Mod : ScriptableObject
     private string[] _dependencies = [$"Zehs-REPOLib-{MyPluginInfo.PLUGIN_VERSION}"];
 
     [SerializeField]
-    private Sprite _icon = null!;
+    private Sprite? _icon;
 
     [SerializeField]
-    private TextAsset _readme = null!;
+    private TextAsset? _readme;
     #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     /// <summary>
@@ -68,12 +68,12 @@ public class Mod : ScriptableObject
     /// <summary>
     /// The icon of this mod.
     /// </summary>
-    public Sprite Icon => _icon;
+    public Sprite? Icon => _icon;
 
     /// <summary>
     /// The readme of this mod.
     /// </summary>
-    public TextAsset Readme => _readme;
+    public TextAsset? Readme => _readme;
 
     /// <summary>
     /// The full name of this mod.<br/>

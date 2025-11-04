@@ -11,7 +11,7 @@ public class EnemyContent : Content
 {
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
-    private EnemySetup _setup = null!;
+    private EnemySetup? _setup;
 
     [SerializeField]
     private GameObject[] _spawnObjects = [];
@@ -20,7 +20,7 @@ public class EnemyContent : Content
     /// <summary>
     /// The <see cref="EnemySetup"/> of this content.
     /// </summary>
-    public EnemySetup Setup => _setup;
+    public EnemySetup? Setup => _setup;
 
     /// <summary>
     /// The spawn objects of this content.

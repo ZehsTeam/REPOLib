@@ -32,19 +32,13 @@ public static class Enemies
 
     private static bool _initialEnemiesRegistered;
 
-    internal static void RegisterInitialEnemies()
+    internal static void RegisterEnemies()
     {
-        if (_initialEnemiesRegistered)
-        {
-            return;
-        }
-
         foreach (var enemy in _enemiesToRegister)
         {
             RegisterEnemyWithGame(enemy);
         }
 
-        _enemiesToRegister.Clear();
         _initialEnemiesRegistered = true;
     }
 
@@ -83,7 +77,7 @@ public static class Enemies
             return;
         }
 
-        EnemySetup enemySetup = enemyContent.Setup;
+        EnemySetup? enemySetup = enemyContent.Setup;
         List<GameObject> spawnObjects = enemyContent.SpawnObjects.Where(x => x != null).ToList();
 
         if (enemySetup == null)

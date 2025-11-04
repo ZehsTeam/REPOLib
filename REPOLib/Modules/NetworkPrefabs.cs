@@ -1,4 +1,5 @@
 ﻿using Photon.Pun;
+using REPOLib.Objects;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
@@ -36,30 +37,55 @@ public static class NetworkPrefabs
     /// <returns>The registered network <see cref="PrefabRef"/> or null.</returns>
     public static PrefabRef? RegisterNetworkPrefab(string prefabId, GameObject prefab)
     {
+        PrefabRefResponse response = RegisterNetworkPrefabInternal(prefabId, prefab);
+
+        switch (response.Result)
+        {
+            case PrefabRefResult.Success:
+                return response.PrefabRef;
+            case PrefabRefResult.PrefabIdNullOrEmpty:
+                Logger.LogError("Failed to register network prefab. PrefabId is null.");
+                return null;
+            case PrefabRefResult.PrefabNull:
+                Logger.LogError("Failed to register network prefab. Prefab is null.");
+                return null;
+            case PrefabRefResult.PrefabAlreadyRegistered:
+                Logger.LogWarning($"Failed to register network prefab \"{prefabId}\". Prefab is already registered.");
+                return response.PrefabRef;
+            case PrefabRefResult.DifferentPrefabAlreadyRegistered:
+                Logger.LogError($"Failed to register network prefab \"{prefabId}\". A prefab is already registered with the same ID. (GameObject: \"{response.PrefabRef!.Prefab.name}\")");
+                return null;
+            default:
+                return response.PrefabRef;
+        }
+    }
+
+    internal static PrefabRefResponse RegisterNetworkPrefabInternal(string prefabId, GameObject prefab)
+    {
         if (string.IsNullOrEmpty(prefabId))
         {
-            Logger.LogError("Failed to register network prefab. PrefabId is null.");
-            return null;
+            return new PrefabRefResponse(PrefabRefResult.PrefabIdNullOrEmpty, null);
         }
 
         if (prefab == null)
         {
-            Logger.LogError("Failed to register network prefab. Prefab is null.");
-            return null;
+            return new PrefabRefResponse(PrefabRefResult.PrefabNull, null);
         }
 
-        if (TryGetNetworkPrefab(prefabId, out GameObject? existingPrefab))
+        PrefabRef? existingPrefabRef = GetNetworkPrefabRef(prefabId);
+
+        if (existingPrefabRef != null)
         {
+            GameObject existingPrefab = existingPrefabRef.Prefab;
+
             if (prefab == existingPrefab)
             {
-                Logger.LogError($"Failed to register network prefab \"{prefabId}\". Prefab is already registered.");
+                return new PrefabRefResponse(PrefabRefResult.PrefabAlreadyRegistered, existingPrefabRef);
             }
             else
             {
-                Logger.LogError($"Failed to register network prefab \"{prefabId}\". A prefab is already registered with the same ID. (GameObject: \"{existingPrefab.name}\")");
+                return new PrefabRefResponse(PrefabRefResult.DifferentPrefabAlreadyRegistered, existingPrefabRef);
             }
-
-            return null;
         }
 
         var prefabRef = new PrefabRef
@@ -71,7 +97,7 @@ public static class NetworkPrefabs
         _prefabs.Add(prefabId, prefab);
         _prefabRefs.Add(prefabId, prefabRef);
 
-        return prefabRef;
+        return new PrefabRefResponse(PrefabRefResult.Success, prefabRef);
     }
 
     /// <summary>

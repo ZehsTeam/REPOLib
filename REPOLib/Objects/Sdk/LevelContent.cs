@@ -12,7 +12,13 @@ public class LevelContent : Content
 {
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
-    private Level _level = null!;
+    private Level? _level;
+
+    [SerializeField]
+    private GameObject? _connectObject;
+
+    [SerializeField]
+    private GameObject? _blockObject;
 
     [SerializeField]
     private List<GameObject> _startRooms = [];
@@ -63,14 +69,19 @@ public class LevelContent : Content
     /// <summary>
     /// The <see cref="global::Level"/> of this content.
     /// </summary>
-    public Level Level => _level;
+    public Level? Level => _level;
 
     /// <summary>
     /// The name of the <see cref="Level"/>
     /// </summary>
     public override string Name => Level?.name ?? string.Empty;
 
+    // TODO: Document this.
     #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public GameObject? ConnectObject => _connectObject;
+
+    public GameObject? BlockObject => _blockObject;
+
     public List<GameObject> StartRooms => _startRooms;
 
     public List<GameObject> ModulesNormal1 => _modulesNormal1;

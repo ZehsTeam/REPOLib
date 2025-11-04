@@ -1,4 +1,5 @@
 ﻿using REPOLib.Extensions;
+using REPOLib.Objects;
 using REPOLib.Objects.Sdk;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,15 @@ namespace REPOLib.Modules;
 /// </summary>
 public static class Levels
 {
+    private enum ModuleType
+    {
+        StartRoom,
+        Normal,
+        Passage,
+        DeadEnd,
+        Extraction
+    }
+
     /// <summary>
     /// Get a <see cref="Level"/> list from <see cref="RunManager"/>.
     /// </summary>
@@ -99,18 +109,20 @@ public static class Levels
     /// <summary>
     /// Registers a <see cref="Level"/>.
     /// </summary>
-    /// <param name="level">The <see cref="Level"/> to register.</param>
+    /// <param name="levelContent">The <see cref="LevelContent"/> to register.</param>
     public static void RegisterLevel(LevelContent levelContent)
     {
-        if (level == null)
+        if (levelContent == null)
         {
-            Logger.LogError($"Failed to register level. Level is null.");
+            Logger.LogError($"Failed to register level. LevelContent is null.");
             return;
         }
 
-        if (_levelsToRegister.Any(x => x.name.Equals(level.name, StringComparison.OrdinalIgnoreCase)))
+        Level? level = levelContent.Level;
+
+        if (level == null)
         {
-            Logger.LogError($"Failed to register level \"{level.name}\". Level already exists with the same name.");
+            Logger.LogError($"Failed to register level. Level is null.");
             return;
         }
 
@@ -120,54 +132,44 @@ public static class Levels
             return;
         }
 
-        List<(GameObject, ResourcesHelper.LevelPrefabType)> modules =
-            new[]
-            {
-                level.ModulesExtraction1,
-                level.ModulesExtraction2,
-                level.ModulesExtraction3,
-                level.ModulesNormal1,
-                level.ModulesNormal2,
-                level.ModulesNormal3,
-                level.ModulesPassage1,
-                level.ModulesPassage2,
-                level.ModulesPassage3,
-                level.ModulesDeadEnd1,
-                level.ModulesDeadEnd2,
-                level.ModulesDeadEnd3
-            }
-                .SelectMany(list => list)
-                .Select(prefab => (prefab, ResourcesHelper.LevelPrefabType.Module))
-                .ToList();
-
-        foreach (var prefab in level.StartRooms)
+        if (_levelsToRegister.Any(x => x.name.Equals(level.name, StringComparison.OrdinalIgnoreCase)))
         {
-            modules.Add((prefab, ResourcesHelper.LevelPrefabType.StartRoom));
+            Logger.LogError($"Failed to register level \"{level.name}\". Level already exists with the same name.");
+            return;
         }
 
-        if (level.ConnectObject != null)
+        GameObject? connectObjectPrefab = levelContent.ConnectObject;
+
+        if (connectObjectPrefab != null)
         {
-            modules.Add((level.ConnectObject, ResourcesHelper.LevelPrefabType.Other));
+            RegisterLevelPrefab($"Level/{level.ResourcePath}/Other/{connectObjectPrefab.name}", connectObjectPrefab);
+            level.ConnectObject = connectObjectPrefab;
         }
 
-        if (level.BlockObject != null)
+        GameObject? blockObjectPrefab = levelContent.BlockObject;
+
+        if (blockObjectPrefab != null)
         {
-            modules.Add((level.BlockObject, ResourcesHelper.LevelPrefabType.Other));
+            RegisterLevelPrefab($"Level/{level.ResourcePath}/Other/{blockObjectPrefab.name}", blockObjectPrefab);
+            level.BlockObject = blockObjectPrefab;
         }
 
-        foreach (var (prefab, type) in modules)
-        {
-            string prefabId = ResourcesHelper.GetLevelPrefabPath(level, prefab, type);
+        level.StartRooms = RegisterLevelModules(level, ModuleType.StartRoom, levelContent.StartRooms);
 
-            if (ResourcesHelper.HasPrefab(prefabId))
-            {
-                // allow duplicate prefabs
-                continue;
-            }
+        level.ModulesNormal1 = RegisterLevelModules(level, ModuleType.Normal, levelContent.ModulesNormal1);
+        level.ModulesPassage1 = RegisterLevelModules(level, ModuleType.Passage, levelContent.ModulesPassage1);
+        level.ModulesDeadEnd1 = RegisterLevelModules(level, ModuleType.DeadEnd, levelContent.ModulesDeadEnd1);
+        level.ModulesExtraction1 = RegisterLevelModules(level, ModuleType.Extraction, levelContent.ModulesExtraction1);
 
-            NetworkPrefabs.RegisterNetworkPrefab(prefabId, prefab);
-            Utilities.FixAudioMixerGroups(prefab);
-        }
+        level.ModulesNormal2 = RegisterLevelModules(level, ModuleType.Normal, levelContent.ModulesNormal2);
+        level.ModulesPassage2 = RegisterLevelModules(level, ModuleType.Passage, levelContent.ModulesPassage2);
+        level.ModulesDeadEnd2 = RegisterLevelModules(level, ModuleType.DeadEnd, levelContent.ModulesDeadEnd2);
+        level.ModulesExtraction2 = RegisterLevelModules(level, ModuleType.Extraction, levelContent.ModulesExtraction2);
+
+        level.ModulesNormal3 = RegisterLevelModules(level, ModuleType.Normal, levelContent.ModulesNormal3);
+        level.ModulesPassage3 = RegisterLevelModules(level, ModuleType.Passage, levelContent.ModulesPassage3);
+        level.ModulesDeadEnd3 = RegisterLevelModules(level, ModuleType.DeadEnd, levelContent.ModulesDeadEnd3);
+        level.ModulesExtraction3 = RegisterLevelModules(level, ModuleType.Extraction, levelContent.ModulesExtraction3);
 
         if (_initialLevelsRegistered)
         {
@@ -177,6 +179,48 @@ public static class Levels
         {
             _levelsToRegister.Add(level);
         }
+    }
+
+    private static List<PrefabRef> RegisterLevelModules(Level level, ModuleType moduleType, List<GameObject> modules)
+    {
+        List<PrefabRef> prefabRefs = [];
+
+        foreach (var module in modules)
+        {
+            string prefabId = $"Level/{level.name}/{moduleType}/{module.name}";
+
+            PrefabRef? prefabRef = RegisterLevelPrefab(prefabId, module);
+            if (prefabRef == null) continue;
+
+            prefabRefs.Add(prefabRef);
+        }
+
+        return prefabRefs;
+    }
+
+    private static PrefabRef? RegisterLevelPrefab(string prefabId, GameObject prefab)
+    {
+        PrefabRefResponse response = NetworkPrefabs.RegisterNetworkPrefabInternal(prefabId, prefab);
+
+        if (response.Result == PrefabRefResult.Success)
+        {
+            Utilities.FixAudioMixerGroups(prefab);
+            return response.PrefabRef;
+        }
+
+        if (response.Result == PrefabRefResult.PrefabAlreadyRegistered)
+        {
+            return response.PrefabRef;
+        }
+
+        if (response.Result == PrefabRefResult.DifferentPrefabAlreadyRegistered)
+        {
+            Logger.LogError($"Failed to register level network prefab \"{prefabId}\". A prefab is already registered with the same prefab ID.");
+            return null;
+        }
+
+        Logger.LogError($"Failed to register level network prefab \"{prefabId}\". (Reason: {response.Result})");
+        return null;
     }
 
     #region Deprecated

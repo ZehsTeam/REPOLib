@@ -12,7 +12,7 @@ public class ValuableContent : Content
 {
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
-    private ValuableObject _prefab = null!;
+    private ValuableObject? _prefab;
 
     [SerializeField]
     private string[] _valuablePresets = [];
@@ -21,7 +21,7 @@ public class ValuableContent : Content
     /// <summary>
     /// The <see cref="ValuableObject"/> of this content.
     /// </summary>
-    public ValuableObject Prefab => _prefab;
+    public ValuableObject? Prefab => _prefab;
 
     /// <summary>
     /// The list of valuable presets for this content.

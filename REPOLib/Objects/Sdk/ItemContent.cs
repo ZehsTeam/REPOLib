@@ -11,13 +11,13 @@ public class ItemContent : Content
 {
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
-    private ItemAttributes _prefab = null!;
+    private ItemAttributes? _prefab;
     #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     /// <summary>
     /// The <see cref="ItemAttributes"/> of this content.
     /// </summary>
-    public ItemAttributes Prefab => _prefab;
+    public ItemAttributes? Prefab => _prefab;
 
     /// <summary>
     /// The name of the <see cref="Prefab"/>.
