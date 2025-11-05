@@ -1,5 +1,4 @@
-﻿using REPOLib.Extensions;
-using REPOLib.Objects;
+﻿using REPOLib.Objects;
 using REPOLib.Objects.Sdk;
 using System;
 using System.Collections.Generic;
@@ -58,7 +57,7 @@ public static class Levels
         _initialLevelsRegistered = true;
     }
 
-    static void RegisterLevelWithGame(Level level)
+    private static void RegisterLevelWithGame(Level level)
     {
         if (_levelsRegistered.Contains(level))
         {
@@ -73,7 +72,7 @@ public static class Levels
 
         for (int i = 0; i < level.ValuablePresets.Count; i++)
         {
-            var valuablePreset = level.ValuablePresets[i];
+            LevelValuables valuablePreset = level.ValuablePresets[i];
 
             if (ValuablePresets.AllValuablePresets.Values.Contains(valuablePreset))
             {
@@ -81,14 +80,8 @@ public static class Levels
             }
 
             // This allows custom levels to use vanilla presets, by using a proxy preset with the same name
-            if (ValuablePresets.AllValuablePresets.TryGetValue(valuablePreset.name, out var foundPreset))
+            if (ValuablePresets.AllValuablePresets.TryGetValue(valuablePreset.name, out LevelValuables foundPreset))
             {
-                // Check if the mod author accidentally included a vanilla preset (and all of its valuables) in their bundle
-                if (valuablePreset.GetCombinedList().Count > 0)
-                {
-                    Logger.LogWarning($"Proxy preset \"{valuablePreset.name}\" in level \"{level.name}\" contains valuables! This likely caused duplicate valuables to load!");
-                }
-
                 level.ValuablePresets[i] = foundPreset;
                 Logger.LogInfo($"Replaced proxy preset \"{valuablePreset.name}\" in level \"{level.name}\".", extended: true);
             }
@@ -100,6 +93,7 @@ public static class Levels
         }
 
         RunManager.instance.levels.Add(level);
+
         Logger.LogInfo($"Added level \"{level.name}\"", extended: true);
 
         _levelsRegistered.Add(level);
@@ -169,8 +163,6 @@ public static class Levels
         level.ModulesPassage3 = RegisterLevelModules(level, ModuleType.Passage, levelContent.ModulesPassage3);
         level.ModulesDeadEnd3 = RegisterLevelModules(level, ModuleType.DeadEnd, levelContent.ModulesDeadEnd3);
         level.ModulesExtraction3 = RegisterLevelModules(level, ModuleType.Extraction, levelContent.ModulesExtraction3);
-
-        // TODO: Register valuable presets.
 
         _levelsToRegister.Add(level);
 

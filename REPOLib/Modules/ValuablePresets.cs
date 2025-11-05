@@ -48,6 +48,31 @@ public static class ValuablePresets
 
     internal static void RegisterValuablePreset(LevelValuables valuablePreset)
     {
+        RemoveMissingValuables(valuablePreset, valuablePreset.tiny);
+        RemoveMissingValuables(valuablePreset, valuablePreset.small);
+        RemoveMissingValuables(valuablePreset, valuablePreset.medium);
+        RemoveMissingValuables(valuablePreset, valuablePreset.big);
+        RemoveMissingValuables(valuablePreset, valuablePreset.wide);
+        RemoveMissingValuables(valuablePreset, valuablePreset.tall);
+        RemoveMissingValuables(valuablePreset, valuablePreset.veryTall);
+
         _valuablePresets.Add(valuablePreset.name, valuablePreset);
+    }
+
+    private static void RemoveMissingValuables(LevelValuables valuablePreset, List<PrefabRef> prefabRefs)
+    {
+        int count = prefabRefs.Count;
+
+        for (int i = count - 1; i >= 0; i--)
+        {
+            PrefabRef prefabRef = prefabRefs[i];
+
+            if (!prefabRef.IsValid() || prefabRef.Prefab == null)
+            {
+                Logger.LogWarning($"Valuable preset \"{valuablePreset.name}\" has an invalid valuable PrefabRef at index {i}");
+                prefabRefs.RemoveAt(i);
+                continue;
+            }
+        }
     }
 }
