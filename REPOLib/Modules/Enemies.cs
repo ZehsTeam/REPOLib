@@ -23,50 +23,34 @@ public static class Enemies
     /// <summary>
     /// Gets all enemies registered with REPOLib.
     /// </summary>
-    public static IReadOnlyList<EnemySetup> RegisteredEnemies => _enemiesRegistered;
+    public static IReadOnlyList<EnemySetup> RegisteredEnemies => _enemiesToRegister;
 
     internal static int SpawnNextEnemiesNotDespawned = 0;
 
     private static readonly List<EnemySetup> _enemiesToRegister = [];
-    private static readonly List<EnemySetup> _enemiesRegistered = [];
 
-    private static bool _initialEnemiesRegistered;
-
+    // This will run multiple times because of how the vanilla game registers enemies.
     internal static void RegisterEnemies()
     {
-        if (_initialEnemiesRegistered)
-        {
-            return;
-        }
+        Logger.LogInfo($"Adding enemies.");
 
         foreach (var enemy in _enemiesToRegister)
         {
             RegisterEnemyWithGame(enemy);
         }
-
-        _initialEnemiesRegistered = true;
     }
 
     private static void RegisterEnemyWithGame(EnemySetup enemySetup)
     {
-        if (_enemiesRegistered.Contains(enemySetup))
-        {
-            return;
-        }
-
         if (!enemySetup.TryGetEnemyParent(out EnemyParent? enemyParent))
         {
+            Logger.LogError($"Failed to register enemy \"{enemySetup.name}\" to game. Could not find EnemyParent component.");
             return;
         }
 
         if (EnemyDirector.instance.AddEnemy(enemySetup))
         {
-            _enemiesRegistered.Add(enemySetup);
             Logger.LogInfo($"Added enemy \"{enemyParent.enemyName}\" to difficulty {enemyParent.difficulty}", extended: true);
-        }
-        else
-        {
-            Logger.LogWarning($"Failed to add enemy \"{enemyParent.enemyName}\" to difficulty {enemyParent.difficulty}", extended: true);
         }
     }
 
@@ -161,13 +145,9 @@ public static class Enemies
         enemySetup.spawnObjects = spawnObjectPrefabRefs;
 
         _enemiesToRegister.Add(enemySetup);
-
-        if (_initialEnemiesRegistered)
-        {
-            RegisterEnemyWithGame(enemySetup);
-        }
     }
 
+    // TODO: Test this and make sure it works as intended.
     /// <summary>
     /// Spawns an enemy or enemies from a <see cref="EnemySetup"/>.
     /// </summary>

@@ -32,12 +32,6 @@ public static class Items
     // This will run multiple times because of how the vanilla game registers items.
     internal static void RegisterItems()
     {
-        if (StatsManager.instance == null)
-        {
-            Logger.LogError("Failed to register items. StatsManager instance is null.");
-            return;
-        }
-
         Logger.LogInfo($"Adding items.");
 
         foreach (var item in _itemsToRegister)
