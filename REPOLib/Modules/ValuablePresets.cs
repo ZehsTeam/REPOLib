@@ -9,7 +9,7 @@ namespace REPOLib.Modules;
 public static class ValuablePresets
 {
     /// <summary>
-    /// Gets all cached valuable presets. See <see cref="Initialize"/>.
+    /// Gets all valuable presets.
     /// </summary>
     public static IReadOnlyDictionary<string, LevelValuables> AllValuablePresets => _valuablePresets;
 

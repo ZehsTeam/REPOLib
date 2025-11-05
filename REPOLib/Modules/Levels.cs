@@ -45,8 +45,6 @@ public static class Levels
             return;
         }
 
-        ValuablePresets.Initialize();
-
         Logger.LogInfo($"Adding levels.");
 
         foreach (var level in _levelsToRegister)
