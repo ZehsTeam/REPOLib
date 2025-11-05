@@ -199,26 +199,26 @@ public static class Levels
 
     private static PrefabRef? RegisterLevelPrefab(string prefabId, GameObject prefab)
     {
-        PrefabRefResponse response = NetworkPrefabs.RegisterNetworkPrefabInternal(prefabId, prefab);
+        PrefabRefResponse prefabRefResponse = NetworkPrefabs.RegisterNetworkPrefabInternal(prefabId, prefab);
 
-        if (response.Result == PrefabRefResult.Success)
+        if (prefabRefResponse.Result == PrefabRefResult.Success)
         {
             Utilities.FixAudioMixerGroups(prefab);
-            return response.PrefabRef;
+            return prefabRefResponse.PrefabRef;
         }
 
-        if (response.Result == PrefabRefResult.PrefabAlreadyRegistered)
+        if (prefabRefResponse.Result == PrefabRefResult.PrefabAlreadyRegistered)
         {
-            return response.PrefabRef;
+            return prefabRefResponse.PrefabRef;
         }
 
-        if (response.Result == PrefabRefResult.DifferentPrefabAlreadyRegistered)
+        if (prefabRefResponse.Result == PrefabRefResult.DifferentPrefabAlreadyRegistered)
         {
             Logger.LogError($"Failed to register level network prefab \"{prefabId}\". A prefab is already registered with the same prefab ID.");
             return null;
         }
 
-        Logger.LogError($"Failed to register level network prefab \"{prefabId}\". (Reason: {response.Result})");
+        Logger.LogError($"Failed to register level network prefab \"{prefabId}\". (Reason: {prefabRefResponse.Result})");
         return null;
     }
 
