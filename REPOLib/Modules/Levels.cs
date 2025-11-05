@@ -170,6 +170,8 @@ public static class Levels
         level.ModulesDeadEnd3 = RegisterLevelModules(level, ModuleType.DeadEnd, levelContent.ModulesDeadEnd3);
         level.ModulesExtraction3 = RegisterLevelModules(level, ModuleType.Extraction, levelContent.ModulesExtraction3);
 
+        // TODO: Register valuable presets.
+
         _levelsToRegister.Add(level);
 
         if (_initialLevelsRegistered)

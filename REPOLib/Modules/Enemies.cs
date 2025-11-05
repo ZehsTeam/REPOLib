@@ -83,8 +83,8 @@ public static class Enemies
         }
 
         EnemySetup? enemySetup = enemyContent.Setup;
-        List<GameObject> spawnObjects = enemyContent.SpawnObjects.Where(x => x != null).ToList();
-
+        List<GameObject> spawnObjects = enemyContent.SpawnObjects;
+        
         if (enemySetup == null)
         {
             Logger.LogError($"Failed to register enemy. EnemySetup is null.");
@@ -109,58 +109,56 @@ public static class Enemies
             return;
         }
 
-        Dictionary<GameObject, PrefabRef> spawnObjectRefs = [];
-
-        List<GameObject> DistinctSpawnObjects = spawnObjects.Distinct(new UnityObjectNameComparer<GameObject>()).ToList();
+        List<PrefabRef> spawnObjectPrefabRefs = [];
 
         foreach (var spawnObject in spawnObjects)
         {
-            if (spawnObject == null) continue;
-
-            string prefabId = $"Enemies/{spawnObject.name}";
-
-            PrefabRef? prefabRef = null;
-            PrefabRef? existingPrefabRef = NetworkPrefabs.GetNetworkPrefabRef(prefabId);
-
-            if (existingPrefabRef == null)
+            if (spawnObject == null)
             {
-                prefabRef = NetworkPrefabs.RegisterNetworkPrefab(prefabId, spawnObject);
-
-                if (prefabRef == null)
-                {
-                    Logger.LogError($"Failed to register enemy \"{enemyContent.Name}\". Could not register spawn object \"{spawnObject.name}\".");
-                    return;
-                }
-
-                Utilities.FixAudioMixerGroups(spawnObject);
-            }
-            else
-            {
-                GameObject existingSpawnObject = existingPrefabRef.Prefab;
-
-                if (spawnObject != existingSpawnObject)
-                {
-                    Logger.LogError($"Failed to register enemy \"{enemyContent.Name}\". Spawn object already exists with the name \"{existingSpawnObject.name}\"");
-                    return;
-                }
-
-                prefabRef = existingPrefabRef;
-            }
-
-            spawnObjectRefs[spawnObject] = prefabRef;
-        }
-
-        enemySetup.spawnObjects.Clear();
-
-        foreach (var spawnObject in spawnObjects)
-        {
-            if (!spawnObjectRefs.TryGetValue(spawnObject, out PrefabRef prefabRef))
-            {
+                Logger.LogWarning($"Enemy \"{enemyContent.Name}\" has a null spawn object.");
                 continue;
             }
 
-            enemySetup.spawnObjects.Add(prefabRef);
+            string prefabId = $"Enemies/{spawnObject.name}";
+
+            PrefabRefResponse prefabRefResponse = NetworkPrefabs.RegisterNetworkPrefabInternal(prefabId, spawnObject);
+            PrefabRef? prefabRef = prefabRefResponse.PrefabRef;
+
+            if (prefabRefResponse.Result == PrefabRefResult.DifferentPrefabAlreadyRegistered)
+            {
+                Logger.LogError($"Failed to register enemy \"{enemyContent.Name}\" spawn object. A prefab is already registered with the same name.");
+                continue;
+            }
+
+            bool success = prefabRefResponse.Result == PrefabRefResult.Success || prefabRefResponse.Result == PrefabRefResult.PrefabAlreadyRegistered;
+
+            if (!success)
+            {
+                Logger.LogError($"Failed to register enemy \"{enemyContent.Name}\" spawn object. (Reason: {prefabRefResponse.Result})");
+                continue;
+            }
+
+            if (prefabRef == null)
+            {
+                Logger.LogError($"Failed to register enemy \"{enemyContent.Name}\" spawn object. PrefabRef is null.");
+                continue;
+            }
+
+            if (prefabRefResponse.Result == PrefabRefResult.Success)
+            {
+                Utilities.FixAudioMixerGroups(spawnObject);
+            }
+
+            spawnObjectPrefabRefs.Add(prefabRef);
         }
+
+        if (spawnObjectPrefabRefs.Count == 0)
+        {
+            Logger.LogError($"Failed to register enemy \"{enemyContent.Name}\". No valid spawn objects found.");
+            return;
+        }
+
+        enemySetup.spawnObjects = spawnObjectPrefabRefs;
 
         _enemiesToRegister.Add(enemySetup);
 
