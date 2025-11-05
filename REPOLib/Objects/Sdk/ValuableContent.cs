@@ -15,7 +15,7 @@ public class ValuableContent : Content
     private ValuableObject? _prefab;
 
     [SerializeField]
-    private string[] _valuablePresets = [];
+    private string[] _valuablePresets = [Modules.ValuablePresets.GenericValuablePresetName];
     #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     /// <summary>

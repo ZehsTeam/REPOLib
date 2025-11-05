@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace REPOLib.Modules;
 
@@ -12,15 +12,18 @@ public static class ValuablePresets
     /// Gets all cached valuable presets. See <see cref="Initialize"/>.
     /// </summary>
     public static IReadOnlyDictionary<string, LevelValuables> AllValuablePresets => _valuablePresets;
+
     private static readonly Dictionary<string, LevelValuables> _valuablePresets = [];
 
     /// <summary>
-    /// All of the valuable preset names. Register your valuables to this list if you want them to spawn in all levels.
+    /// The generic valuables preset name.
     /// </summary>
-    public static List<string> AllValuablePresetNames => AllValuablePresets.Keys.ToList();
+    public const string GenericValuablePresetName = "Valuables - Generic";
 
-    internal static string GenericValuablePresetName => "Valuables - Generic";
-    internal static LevelValuables? GenericValuablePreset => AllValuablePresets.GetValueOrDefault(GenericValuablePresetName);
+    /// <summary>
+    /// Gets the generic valuables preset.
+    /// </summary>
+    public static LevelValuables GenericValuablePreset => AllValuablePresets.GetValueOrDefault(GenericValuablePresetName);
 
     internal static void Initialize()
     {
@@ -35,6 +38,40 @@ public static class ValuablePresets
         foreach (var level in RunManager.instance.levels)
         {
             AddValuablePresets(level.ValuablePresets);
+        }
+
+        AddGenericValuablePresetToVanillaLevels();
+    }
+
+    private static void AddGenericValuablePresetToVanillaLevels()
+    {
+        LevelValuables valuablePreset = GenericValuablePreset;
+
+        if (valuablePreset == null)
+        {
+            Logger.LogError($"Failed to add \"{GenericValuablePresetName}\" valuable preset to vanilla levels. Valuable preset is null.");
+            return;
+        }
+
+        valuablePreset.tiny.Clear();
+        valuablePreset.small.Clear();
+        valuablePreset.medium.Clear();
+        valuablePreset.big.Clear();
+        valuablePreset.wide.Clear();
+        valuablePreset.tall.Clear();
+        valuablePreset.veryTall.Clear();
+
+        foreach (var level in RunManager.instance.levels)
+        {
+            if (level.ValuablePresets.Contains(valuablePreset))
+            {
+                Logger.LogInfo($"Level \"{level.name}\" already has the valuable preset \"{valuablePreset.name}\"", extended: true);
+                continue;
+            }
+
+            level.ValuablePresets.Add(valuablePreset);
+
+            Logger.LogInfo($"Added valuable preset \"{valuablePreset.name}\" to level \"{level.name}\"", extended: true);
         }
     }
 
@@ -75,4 +112,11 @@ public static class ValuablePresets
             }
         }
     }
+
+    #region Deprecated
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    [Obsolete("Use GenericValuablePreset instead.", error: true)]
+    public static LevelValuables GenericPreset => GenericValuablePreset;
+    #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+    #endregion
 }

@@ -75,7 +75,7 @@ public static class Valuables
         if (!presetNames.Any(x => ValuablePresets.AllValuablePresets.Keys.Any(y => x == y)))
         {
             Logger.LogWarning($"Valuable \"{prefabRef.PrefabName}\" does not have any valid valuable preset names set. Adding generic valuable preset name.");
-            presetNames = ValuablePresets.AllValuablePresetNames;
+            presetNames = [ValuablePresets.GenericValuablePresetName];
         }
 
         foreach (var presetName in presetNames)
@@ -178,14 +178,8 @@ public static class Valuables
 
         if (presetNames == null || presetNames.Count == 0)
         {
-            Logger.LogWarning($"Valuable \"{prefab.name}\" does not have any valid valuable preset names set. Overriding with all valuable presets.", extended: true);
-            presetNames = ValuablePresets.AllValuablePresetNames;
-        }
-
-        if (presetNames.Count == 1 || presetNames[0] == ValuablePresets.GenericValuablePresetName)
-        {
-            Logger.LogWarning($"Valuable \"{prefab.name}\" only targets the \"{ValuablePresets.GenericValuablePresetName}\" valuable preset which is no longer used by vanilla levels. Overriding with all valuable presets.", extended: true);
-            presetNames = ValuablePresets.AllValuablePresetNames;
+            Logger.LogWarning($"Valuable \"{prefab.name}\" does not have any valid valuable preset names set. Adding generic valuable preset name.", extended: true);
+            presetNames = [ValuablePresets.GenericValuablePresetName];
         }
 
         PrefabRefResponse prefabRefResponse = NetworkPrefabs.RegisterNetworkPrefabInternal(prefabId, prefab);
