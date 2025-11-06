@@ -58,7 +58,15 @@ public static class BundleLoader
 
         IEnumerator OnLoaded(AssetBundle bundle)
         {
-            onLoaded(bundle);
+            try
+            {
+                onLoaded(bundle);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"BundleLoader failed to invoke onLoaded method for AssetBundle at \"{path}\" {ex}");
+            }
+            
             yield break;
         }
     }
