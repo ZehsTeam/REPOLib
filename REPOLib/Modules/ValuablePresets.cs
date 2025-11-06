@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace REPOLib.Modules;
 
@@ -104,9 +105,9 @@ public static class ValuablePresets
         {
             PrefabRef prefabRef = prefabRefs[i];
 
-            if (!prefabRef.IsValid() || prefabRef.Prefab == null)
+            if (!prefabRef.IsValid() || Resources.Load<GameObject>(prefabRef.ResourcePath) == null)
             {
-                Logger.LogWarning($"Valuable preset \"{valuablePreset.name}\" has an invalid valuable PrefabRef at index {i}");
+                Logger.LogWarning($"Valuable preset \"{valuablePreset.name}\" has an invalid vanilla valuable PrefabRef at index {i} (PrefabName: \"{prefabRef.PrefabName}\", ResourcePath: \"{prefabRef.ResourcePath}\")");
                 prefabRefs.RemoveAt(i);
                 continue;
             }
