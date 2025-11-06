@@ -98,67 +98,6 @@ public static class Valuables
         }
     }
 
-    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
-    /// <param name="valuableContent">The <see cref="ValuableContent"/> to register.</param>
-    public static PrefabRef? RegisterValuable(ValuableContent? valuableContent)
-    {
-        if (valuableContent == null)
-        {
-            Logger.LogError($"Failed to register valuable. ValuableContent is null.");
-            return null;
-        }
-
-        return RegisterValuable(valuableContent.Prefab, valuableContent.ValuablePresets.ToList());
-    }
-
-    /// <inheritdoc cref="RegisterValuable(GameObject, List{string})"/>
-    public static PrefabRef? RegisterValuable(GameObject? prefab)
-    {
-        return RegisterValuable(prefab, new List<string>());
-    }
-
-    /// <inheritdoc cref="RegisterValuable(GameObject, List{string})"/>
-    /// <param name="presets">The list of presets for this <see cref="ValuableObject"/>.</param>
-    /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
-    public static PrefabRef? RegisterValuable(GameObject? prefab, List<LevelValuables> presets)
-    {
-        return RegisterValuable(prefab, (from preset in presets select preset.name).ToList());
-    }
-
-    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
-    /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
-    /// <param name="presetNames"></param>
-    public static PrefabRef? RegisterValuable(GameObject? prefab, List<string> presetNames)
-    {
-        if (prefab == null)
-        {
-            Logger.LogError($"Failed to register valuable. Prefab is null.");
-            return null;
-        }
-
-        if (!prefab.TryGetComponent(out ValuableObject valuableObject))
-        {
-            Logger.LogError($"Failed to register valuable \"{prefab.name}\". Prefab does not have a ValuableObject component.");
-            return null;
-        }
-
-        return RegisterValuable(valuableObject, presetNames);
-    }
-
-    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
-    public static PrefabRef? RegisterValuable(ValuableObject? valuableObject)
-    {
-        return RegisterValuable(valuableObject, new List<string>());
-    }
-
-    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
-    /// <param name="presets">The list of presets for this <see cref="ValuableObject"/>.</param>
-    /// <param name="valuableObject">The <see cref="ValuableObject"/> to register.</param>
-    public static PrefabRef? RegisterValuable(ValuableObject? valuableObject, List<LevelValuables> presets)
-    {
-        return RegisterValuable(valuableObject, (from preset in presets select preset.name).ToList());
-    }
-
     /// <summary>
     /// Registers a <see cref="ValuableObject"/>.
     /// </summary>
@@ -220,6 +159,69 @@ public static class Valuables
 
         return prefabRef;
     }
+
+    #region RegisterValuable overloads
+    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
+    public static PrefabRef? RegisterValuable(ValuableObject? valuableObject)
+    {
+        return RegisterValuable(valuableObject, new List<string>());
+    }
+
+    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
+    /// <param name="presets">The list of presets for this <see cref="ValuableObject"/>.</param>
+    /// <param name="valuableObject">The <see cref="ValuableObject"/> to register.</param>
+    public static PrefabRef? RegisterValuable(ValuableObject? valuableObject, List<LevelValuables> presets)
+    {
+        return RegisterValuable(valuableObject, (from preset in presets select preset.name).ToList());
+    }
+
+    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
+    /// <param name="valuableContent">The <see cref="ValuableContent"/> to register.</param>
+    public static PrefabRef? RegisterValuable(ValuableContent? valuableContent)
+    {
+        if (valuableContent == null)
+        {
+            Logger.LogError($"Failed to register valuable. ValuableContent is null.");
+            return null;
+        }
+
+        return RegisterValuable(valuableContent.Prefab, valuableContent.ValuablePresets.ToList());
+    }
+
+    /// <inheritdoc cref="RegisterValuable(ValuableObject, List{string})"/>
+    /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
+    /// <param name="presetNames"></param>
+    public static PrefabRef? RegisterValuable(GameObject? prefab, List<string> presetNames)
+    {
+        if (prefab == null)
+        {
+            Logger.LogError($"Failed to register valuable. Prefab is null.");
+            return null;
+        }
+
+        if (!prefab.TryGetComponent(out ValuableObject valuableObject))
+        {
+            Logger.LogError($"Failed to register valuable \"{prefab.name}\". Prefab does not have a ValuableObject component.");
+            return null;
+        }
+
+        return RegisterValuable(valuableObject, presetNames);
+    }
+
+    /// <inheritdoc cref="RegisterValuable(GameObject, List{string})"/>
+    /// <param name="presets">The list of presets for this <see cref="ValuableObject"/>.</param>
+    /// <param name="prefab">The <see cref="GameObject"/> whose <see cref="ValuableObject"/> to register.</param>
+    public static PrefabRef? RegisterValuable(GameObject? prefab, List<LevelValuables> presets)
+    {
+        return RegisterValuable(prefab, (from preset in presets select preset.name).ToList());
+    }
+
+    /// <inheritdoc cref="RegisterValuable(GameObject, List{string})"/>
+    public static PrefabRef? RegisterValuable(GameObject? prefab)
+    {
+        return RegisterValuable(prefab, new List<string>());
+    }
+    #endregion
 
     /// <summary>
     /// Spawns a <see cref="ValuableObject"/>.

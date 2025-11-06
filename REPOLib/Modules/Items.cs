@@ -61,19 +61,6 @@ public static class Items
         }
     }
 
-    /// <inheritdoc cref="RegisterItem(ItemAttributes)"/>
-    /// <param name="itemContent">The <see cref="ItemContent"/> to register.</param>
-    public static PrefabRef? RegisterItem(ItemContent? itemContent)
-    {
-        if (itemContent == null)
-        {
-            Logger.LogError($"Failed to register item. ItemContent is null.");
-            return null;
-        }
-
-        return RegisterItem(itemContent.Prefab);
-    }
-
     /// <summary>
     /// Registers an <see cref="Item"/>.
     /// </summary>
@@ -138,6 +125,21 @@ public static class Items
 
         return prefabRef;
     }
+
+    #region RegisterItem overloads
+    /// <inheritdoc cref="RegisterItem(ItemAttributes)"/>
+    /// <param name="itemContent">The <see cref="ItemContent"/> to register.</param>
+    public static PrefabRef? RegisterItem(ItemContent? itemContent)
+    {
+        if (itemContent == null)
+        {
+            Logger.LogError($"Failed to register item. ItemContent is null.");
+            return null;
+        }
+
+        return RegisterItem(itemContent.Prefab);
+    }
+    #endregion
 
     /// <summary>
     /// Spawns an <see cref="Item"/>.
