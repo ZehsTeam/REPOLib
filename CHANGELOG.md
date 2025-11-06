@@ -1,3 +1,19 @@
+# v3.0.0
+
+> [!IMPORTANT] Almost every mod will need to update to support this version of REPOLib.
+
+- Updated for R.E.P.O. v0.3.0
+- REPOLib-Sdk valuable and item mods *should* work without needing to update.
+- All content register method signatures have changed due to `PrefabRef` being introduced.
+  - You will need to recompile your mods for them to work with this version.
+- Deprecated some getter methods in `Valuables`, `Items`, `Enemies`, and `Levels` modules.
+- Added support for registering debug chat commands using the `Commands` module.
+- Removed REPOLib command attributes. Use the `Commands` module instead.
+- Removed REPOLib spawn commands since they now exist in vanilla.
+- You can now add vanilla valuables to your level valuable presets using `PrefabRef`s.
+- Registering enemies requires you to put your spawn objects in the `EnemyContent` ScriptableObject.
+- Registering levels requires you to put your modules in the `LevelContent` ScriptableObject.
+
 # v2.1.0
 
 - Added Upgrades module. (#29)

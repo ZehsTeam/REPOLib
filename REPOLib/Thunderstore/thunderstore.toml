@@ -11,7 +11,7 @@ description = "Library for adding content to R.E.P.O."
 websiteUrl = "https://github.com/ZehsTeam/REPOLib"
 containsNsfwContent = false
 [package.dependencies]
-BepInEx-BepInExPack = "5.4.2100"
+BepInEx-BepInExPack = "5.4.2304"
 
 [build]
 icon = "../../icon.png"
