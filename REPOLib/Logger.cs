@@ -21,6 +21,11 @@ internal static class Logger
         Log(LogLevel.Info, data, extended);
     }
 
+    public static void LogMessage(object data, bool extended = false)
+    {
+        Log(LogLevel.Message, data, extended);
+    }
+
     public static void LogWarning(object data, bool extended = false)
     {
         Log(LogLevel.Warning, data, extended);

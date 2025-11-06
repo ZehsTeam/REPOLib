@@ -98,7 +98,6 @@ public static class Items
         GameObject prefab = itemAttributes.gameObject;
         string prefabId = $"Items/{prefab.name}";
 
-
         PrefabRefResponse prefabRefResponse = NetworkPrefabs.RegisterNetworkPrefabInternal(prefabId, prefab);
         PrefabRef? prefabRef = prefabRefResponse.PrefabRef;
 
