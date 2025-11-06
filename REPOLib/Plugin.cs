@@ -33,8 +33,6 @@ public class Plugin : BaseUnityPlugin
         _harmony.PatchAll(typeof(SemiFuncPatch));
         _harmony.PatchAll(typeof(AudioManagerPatch));
         _harmony.PatchAll(typeof(SteamManagerPatch));
-        //_harmony.PatchAll(typeof(EnemyGnomeDirectorPatch));
-        //_harmony.PatchAll(typeof(EnemyBangDirectorPatch));
         _harmony.PatchAll(typeof(PlayerControllerPatch));
         _harmony.PatchAll(typeof(DebugCommandHandlerPatch));
         _harmony.PatchAll(typeof(DefaultPoolPatch));

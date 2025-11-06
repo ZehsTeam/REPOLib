@@ -147,7 +147,6 @@ public static class Enemies
         _enemiesToRegister.Add(enemySetup);
     }
 
-    // TODO: Test this and make sure it works as intended.
     /// <summary>
     /// Spawns an enemy or enemies from a <see cref="EnemySetup"/>.
     /// </summary>
@@ -156,7 +155,7 @@ public static class Enemies
     /// <param name="rotation">The rotation of the enemy.</param>
     /// <param name="spawnDespawned">Whether or not this enemy will spawn despawned.</param>
     /// <returns>The <see cref="EnemyParent"/> objects from spawned enemies.</returns>
-    public static List<EnemyParent>? SpawnEnemy(EnemySetup? enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = true)
+    public static List<EnemyParent>? SpawnEnemy(EnemySetup? enemySetup, Vector3 position, Quaternion rotation, bool spawnDespawned = false)
     {
         if (enemySetup == null)
         {
@@ -187,6 +186,8 @@ public static class Enemies
             Logger.LogError($"Failed to spawn enemy \"{prefabEnemyParent.enemyName}\". EnemyDirector instance is null.");
             return null;
         }
+
+        RunManager.instance.EnemiesSpawnedRemoveStart();
 
         List<EnemyParent> enemyParents = [];
 
@@ -233,9 +234,13 @@ public static class Enemies
                 Logger.LogError($"Enemy \"{prefabEnemyParent.enemyName}\" spawn object \"{spawnObject.name}\" does not have an enemy component.");
             }
 
+            enemyParent.firstSpawnPointUsed = true;
+
             LevelGenerator.Instance.EnemiesSpawnTarget++;
             EnemyDirector.instance.FirstSpawnPointAdd(enemyParent);
         }
+
+        RunManager.instance.EnemiesSpawnedRemoveEnd();
 
         if (enemyParents.Count == 0)
         {
@@ -244,8 +249,6 @@ public static class Enemies
         }
 
         Logger.LogInfo($"Spawned enemy \"{prefabEnemyParent.enemyName}\" at position {position}", extended: true);
-
-        RunManager.instance.EnemiesSpawnedRemoveEnd();
 
         return enemyParents;
     }
