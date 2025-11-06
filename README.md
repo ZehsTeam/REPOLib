@@ -1,4 +1,5 @@
 # REPOLib
+
 [![GitHub](https://img.shields.io/badge/GitHub-REPOLib-brightgreen?style=for-the-badge&logo=GitHub)](https://github.com/ZehsTeam/REPOLib)
 [![Thunderstore Version](https://img.shields.io/thunderstore/v/Zehs/REPOLib?style=for-the-badge&logo=thunderstore&logoColor=white)](https://thunderstore.io/c/repo/p/Zehs/REPOLib/)
 [![Thunderstore Downloads](https://img.shields.io/thunderstore/dt/Zehs/REPOLib?style=for-the-badge&logo=thunderstore&logoColor=white)](https://thunderstore.io/c/repo/p/Zehs/REPOLib/)
@@ -7,27 +8,28 @@
 **Library for adding content to R.E.P.O.**
 
 ## Features
+
 - **Registering network prefabs.**
 - **Registering valuables.**
 - **Registering items.**
 - **Registering upgrades.**
 - **Registering enemies.**
 - **Registering levels.**
-- ResourcesHelper to help get network prefab IDs.
 - Method to spawn network prefabs. (Which works in both multiplayer and singleplayer)
 - Methods to get valuables and spawn valuables.
 - Methods to get items and spawn items.
 - Methods to get enemies and spawn enemies.
-- Registering custom chat /commands
-    - Built-in dev mode commands: `Spawn Valuable`, `Spawn Item`, `Spawn Enemy`
+- Registering debug chat commands.
 - **Fixing audio mixer groups.**
 - Making networked events.
 - **Registering features without code using the [REPOLib-Sdk](https://github.com/ZehsTeam/REPOLib-Sdk).**
 
 ## Documentation
+
 Documentation is available on the [R.E.P.O. Modding Wiki](https://repomods.com/repolib/overview.html).
 
 ## Developer Contact
+
 **Report bugs, suggest features, or provide feedback:**
 
 | **Discord Server** | **Forum** | **Post** |  
@@ -37,4 +39,6 @@ Documentation is available on the [R.E.P.O. Modding Wiki](https://repomods.com/r
 - **GitHub Issues Page:** [REPOLib](https://github.com/ZehsTeam/REPOLib/issues)
 - **My Links:** https://solo.to/crithaxxog
 
-[![kofi](https://i.imgur.com/jzwECeF.png)](https://ko-fi.com/zehsteam)
+<a href="https://ko-fi.com/zehsteam" target="_blank">
+<img src="https://storage.ko-fi.com/cdn/brandasset/v2/support_me_on_kofi_dark.png" alt="Ko-Fi" width="200px"/>
+</a>
