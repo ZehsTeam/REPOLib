@@ -23,6 +23,8 @@ public static class BundleLoader
 
     private static readonly List<LoadOperation> _operations = [];
 
+    internal static bool AllBundlesLoaded { get; private set; }
+
     internal static void LoadAllBundles(string root, string withExtension)
     {
         Logger.LogInfo($"Loading all bundles with extension {withExtension} from root {root}", extended: true);
@@ -82,12 +84,14 @@ public static class BundleLoader
     {
         yield return null;
 
+        AllBundlesLoaded = false;
+
         foreach (var loadOperation in _operations.ToArray()) // collection might change
         {
             behaviour.StartCoroutine(FinishLoadOperation(loadOperation));
         }
 
-        var (text, disableLoadingUI) = SetupLoadingUI();
+        BundleLoaderLoadingText.Create();
 
         float lastUpdate = Time.time;
         while (_operations.Count > 0)
@@ -97,7 +101,8 @@ public static class BundleLoader
                 lastUpdate = Time.time;
 
                 string bundlesWord = _operations.Count == 1 ? "bundle" : "bundles";
-                text.text = $"REPOLib: Waiting for {_operations.Count} {bundlesWord} to load...";
+
+                BundleLoaderLoadingText.SetText($"REPOLib: Waiting for {_operations.Count} {bundlesWord} to load...");
 
                 if (!ConfigManager.ExtendedLogging.Value) continue;
 
@@ -121,35 +126,11 @@ public static class BundleLoader
 
         Logger.LogInfo("Finished loading bundles.");
 
-        disableLoadingUI();
+        BundleLoaderLoadingText.Hide();
+
+        AllBundlesLoaded = true;
+
         Utilities.SafeInvokeEvent(OnAllBundlesLoaded);
-    }
-
-    private static (TMP_Text, Action) SetupLoadingUI()
-    {
-        var hudCanvas = GameObject.Find("HUD Canvas");
-        var hud = hudCanvas.transform.Find("HUD");
-        hud.gameObject.SetActive(false);
-
-        var buttonText = Object.FindObjectOfType<TMP_Text>();
-        var text = Object.Instantiate(buttonText, hudCanvas.transform);
-        text.gameObject.name = "REPOLibText";
-        text.gameObject.SetActive(true);
-        text.text = "REPOLib is loading bundles... Hang tight!";
-        text.color = Color.white;
-        text.alignment = TextAlignmentOptions.Center;
-
-        var rectTransform = text.GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = Vector2.zero;
-        rectTransform.anchorMin = Vector2.zero;
-        rectTransform.anchorMax = Vector2.one;
-        rectTransform.sizeDelta = Vector2.zero;
-
-        return (text, () =>
-        {
-            text.gameObject.SetActive(false);
-            hud.gameObject.SetActive(true);
-        });
     }
 
     private static IEnumerator FinishLoadOperation(LoadOperation operation)
@@ -252,4 +233,51 @@ public static class BundleLoader
     }
 
     #endregion
+}
+
+internal static class BundleLoaderLoadingText
+{
+    private static TMP_Text? _text;
+
+    public static void Create()
+    {
+        var hudCanvas = GameObject.Find("HUD Canvas");
+
+        var buttonText = Object.FindObjectOfType<TMP_Text>();
+        _text = Object.Instantiate(buttonText, hudCanvas.transform);
+        _text.gameObject.name = "REPOLibText";
+        _text.color = Color.white;
+        _text.fontStyle = FontStyles.Bold;
+        _text.alignment = TextAlignmentOptions.Center;
+
+        var rectTransform = _text.GetComponent<RectTransform>();
+        rectTransform.anchoredPosition = Vector2.zero;
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.sizeDelta = Vector2.zero;
+
+        // Hide the text now so we can show it later after the vanilla splash screens
+        _text.gameObject.SetActive(false);
+
+        SetText("REPOLib is loading bundles... Hang tight!");
+    }
+    
+    public static void Show()
+    {
+        VideoOverlay.Instance.Override(999f, 0.02f, 2f);
+        _text?.gameObject.SetActive(true);
+    }
+
+    public static void Hide()
+    {
+        VideoOverlay.Instance.Override(0f, 0.02f, 2f);
+        _text?.gameObject.SetActive(false);
+    }
+
+    public static void SetText(string value)
+    {
+        if (_text == null) return;
+
+        _text.text = value;
+    }
 }
