@@ -1,4 +1,8 @@
-# v3.0.0
+# v3.0.1
+
+- Fixed getting stuck on the REPOLib loading bundles screen.
+
+## v3.0.0
 
 > [!IMPORTANT] Almost every mod will need to update to support this version of REPOLib.
 
