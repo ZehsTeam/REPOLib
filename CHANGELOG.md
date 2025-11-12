@@ -1,4 +1,8 @@
-# v3.0.1
+# v3.0.2
+
+- Fixed custom level ambiences not working.
+
+## v3.0.1
 
 - Fixed getting stuck on the REPOLib loading bundles screen.
 
@@ -17,6 +21,8 @@
 - You can now add vanilla valuables to your level valuable presets using `PrefabRef`s.
 - Registering enemies requires you to put your spawn objects in the `EnemyContent` ScriptableObject.
 - Registering levels requires you to put your modules in the `LevelContent` ScriptableObject.
+
+<details><summary>Older Versions</summary>
 
 # v2.1.0
 
@@ -44,8 +50,6 @@
 - **Breaking changes:**
   - Changed the signature of `BundleLoader.LoadBundle` (due to async loading).
   - Moved `GenericValuablePresetName` and `ValuablePresets` from `Modules.Valuables` to `Modules.ValuablePresets`.
-
-<details><summary>Older Versions</summary>
 
 ## v1.5.0
 
