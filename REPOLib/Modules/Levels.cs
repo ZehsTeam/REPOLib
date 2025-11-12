@@ -62,10 +62,23 @@ public static class Levels
             return;
         }
 
+        RegisterLevelValuablePresets(level);
+        LevelAmbiences.RegisterLevelAmbience(level);
+
+        RunManager.instance.levels.Add(level);
+
+        Logger.LogInfo($"Added level \"{level.name}\"", extended: true);
+
+        _levelsRegistered.Add(level);
+    }
+
+    private static void RegisterLevelValuablePresets(Level level)
+    {
         if (level.ValuablePresets.Count == 0)
         {
             Logger.LogWarning($"Level \"{level.name}\" does not have any valuable presets! Adding generic preset.");
             level.ValuablePresets.Add(ValuablePresets.GenericValuablePreset);
+            return;
         }
 
         for (int i = 0; i < level.ValuablePresets.Count; i++)
@@ -81,20 +94,14 @@ public static class Levels
             if (ValuablePresets.AllValuablePresets.TryGetValue(valuablePreset.name, out LevelValuables foundPreset))
             {
                 level.ValuablePresets[i] = foundPreset;
-                Logger.LogInfo($"Replaced proxy preset \"{valuablePreset.name}\" in level \"{level.name}\".", extended: true);
+                Logger.LogInfo($"Replaced proxy valuable preset \"{valuablePreset.name}\" in level \"{level.name}\"", extended: true);
             }
             else
             {
                 ValuablePresets.RegisterValuablePreset(valuablePreset);
-                Logger.LogInfo($"Registered valuable preset \"{valuablePreset.name}\" from \"{level.name}\".", extended: true);
+                Logger.LogInfo($"Registered valuable preset \"{valuablePreset.name}\" from level \"{level.name}\"", extended: true);
             }
         }
-
-        RunManager.instance.levels.Add(level);
-
-        Logger.LogInfo($"Added level \"{level.name}\"", extended: true);
-
-        _levelsRegistered.Add(level);
     }
 
     /// <summary>

@@ -11,5 +11,6 @@ internal static class AudioManagerPatch
     private static void StartPatch()
     {
         Utilities.FixAudioMixerGroupsOnPrefabs();
+        LevelAmbiences.RegisterLevelAmbiences();
     }
 }
