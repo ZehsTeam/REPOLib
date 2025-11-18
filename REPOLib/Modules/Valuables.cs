@@ -268,32 +268,37 @@ public static class Valuables
     [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
     public static IReadOnlyList<GameObject> GetValuables()
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return [];
     }
 
     [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
-    public static bool TryGetValuableByName(string name, [NotNullWhen(true)] out PrefabRef? prefabRef)
+    public static bool TryGetValuableByName(string name, [NotNullWhen(true)] out ValuableObject? prefabRef)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         prefabRef = null;
         return false;
     }
 
-    [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
-    public static PrefabRef? GetValuableByName(string name)
+    [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: false)]
+    public static ValuableObject? GetValuableByName(string name)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return null;
     }
 
     [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
-    public static bool TryGetValuableThatContainsName(string name, [NotNullWhen(true)] out PrefabRef? prefabRef)
+    public static bool TryGetValuableThatContainsName(string name, [NotNullWhen(true)] out ValuableObject? prefabRef)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         prefabRef = null;
         return false;
     }
 
     [Obsolete("This is no longer supported. Use AllValuables or RegisteredValuables instead.", error: true)]
-    public static PrefabRef? GetValuableThatContainsName(string name)
+    public static ValuableObject? GetValuableThatContainsName(string name)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return null;
     }
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

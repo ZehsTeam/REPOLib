@@ -224,12 +224,14 @@ public static class Levels
     [Obsolete("This is no longer supported. Use AllLevels or RegisteredLevels instead.", error: true)]
     public static IReadOnlyList<Level> GetLevels()
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return AllLevels;
     }
 
     [Obsolete("This is no longer supported. Use AllLevels or RegisteredLevels instead.", error: true)]
     public static bool TryGetLevelByName(string name, [NotNullWhen(true)] out Level? level)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         level = null;
         return false;
     }
@@ -237,12 +239,14 @@ public static class Levels
     [Obsolete("This is no longer supported. Use AllLevels or RegisteredLevels instead.", error: true)]
     public static Level? GetLevelByName(string name)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return null;
     }
 
     [Obsolete("This is no longer supported. Use AllLevels or RegisteredLevels instead.", error: true)]
     public static bool TryGetLevelThatContainsName(string name, [NotNullWhen(true)] out Level? level)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         level = null;
         return false;
     }
@@ -250,6 +254,7 @@ public static class Levels
     [Obsolete("This is no longer supported. Use AllLevels or RegisteredLevels instead.", error: true)]
     public static Level? GetLevelThatContainsName(string name)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return null;
     }
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

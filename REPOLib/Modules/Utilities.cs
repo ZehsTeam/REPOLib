@@ -1,6 +1,7 @@
 using REPOLib.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace REPOLib.Modules;
@@ -61,5 +62,12 @@ public static class Utilities
         {
             Logger.LogError($"Exception occured while invoking event: {e}");
         }
+    }
+
+    internal static string GetStackTrace()
+    {
+        // Skip 1 frame so the stack trace starts at the *caller* of GetStackTrace()
+        var trace = new StackTrace(skipFrames: 1, fNeedFileInfo: true);
+        return trace.ToString();
     }
 }

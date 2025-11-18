@@ -258,12 +258,14 @@ public static class Enemies
     [Obsolete("This is no longer supported. Use AllEnemies or RegisteredEnemies instead.", error: true)]
     public static IReadOnlyList<EnemySetup> GetEnemies()
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return AllEnemies;
     }
 
     [Obsolete("This is no longer supported. Use AllEnemies or RegisteredEnemies instead.", error: true)]
     public static bool TryGetEnemyByName(string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         enemySetup = null;
         return false;
     }
@@ -271,12 +273,14 @@ public static class Enemies
     [Obsolete("This is no longer supported. Use AllEnemies or RegisteredEnemies instead.", error: true)]
     public static EnemySetup? GetEnemyByName(string name)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return null;
     }
 
     [Obsolete("This is no longer supported. Use AllEnemies or RegisteredEnemies instead.", error: true)]
     public static bool TryGetEnemyThatContainsName(string name, [NotNullWhen(true)] out EnemySetup? enemySetup)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         enemySetup = null;
         return false;
     }
@@ -284,6 +288,7 @@ public static class Enemies
     [Obsolete("This is no longer supported. Use AllEnemies or RegisteredEnemies instead.", error: true)]
     public static EnemySetup? GetEnemyThatContainsName(string name)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return null;
     }
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

@@ -186,12 +186,14 @@ public static class Items
     [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static IReadOnlyList<Item> GetItems()
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return AllItems;
     }
 
     [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static bool TryGetItemByName(string name, [NotNullWhen(true)] out Item? item)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         item = null;
         return false;
     }
@@ -199,12 +201,14 @@ public static class Items
     [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static Item? GetItemByName(string name)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return null;
     }
 
     [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static bool TryGetItemThatContainsName(string name, [NotNullWhen(true)] out Item? item)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         item = null;
         return false;
     }
@@ -212,6 +216,7 @@ public static class Items
     [Obsolete("This is no longer supported. Use AllItems or RegisteredItems instead.", error: true)]
     public static Item? GetItemThatContainsName(string name)
     {
+        Logger.LogError($"This method is deprecated! {Utilities.GetStackTrace()}");
         return null;
     }
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
