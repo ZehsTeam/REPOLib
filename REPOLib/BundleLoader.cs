@@ -1,4 +1,5 @@
-﻿using REPOLib.Modules;
+﻿using REPOLib.Extensions;
+using REPOLib.Modules;
 using REPOLib.Objects.Sdk;
 using System;
 using System.Collections;
@@ -198,15 +199,15 @@ public static class BundleLoader
 
         var mod = mods[0];
 
-        foreach (var content in assets.OfType<Content>())
+        foreach (var content in assets.OfType<Content>().OrderByTypeFirst<Content, LevelContent>())
         {
             try
             {
                 content.Initialize(mod);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.LogError($"Failed to load {content.Name} ({content.GetType().Name}) from bundle {operation.FileName} ({mod.Identifier}): {e}");
+                Logger.LogError($"Failed to load {content.Name} ({content.GetType().Name}) from bundle {operation.FileName} ({mod.Identifier}): {ex}");
             }
         }
     }
