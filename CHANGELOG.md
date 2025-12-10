@@ -1,4 +1,8 @@
-# v3.0.2
+# v3.0.3
+
+- Forced BundleLoader to register LevelContent assets first.
+
+## v3.0.2
 
 - Fixed custom level ambiences not working.
 
