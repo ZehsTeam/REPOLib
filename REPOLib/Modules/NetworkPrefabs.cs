@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using REPOLib.Objects;
+using REPOLib.Objects.Sdk;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
@@ -24,9 +25,10 @@ public static class NetworkPrefabs
     private static readonly Dictionary<string, PrefabRef> _prefabRefs = [];
 
     /// <inheritdoc cref="RegisterNetworkPrefab(string, GameObject)"/>
-    public static PrefabRef? RegisterNetworkPrefab(GameObject prefab)
+    public static PrefabRef? RegisterNetworkPrefab(GameObject? prefab)
     {
-        return RegisterNetworkPrefab(prefab.name, prefab);
+        string prefabId = prefab?.name ?? string.Empty;
+        return RegisterNetworkPrefab(prefabId, prefab);
     }
 
     /// <summary>
@@ -35,7 +37,7 @@ public static class NetworkPrefabs
     /// <param name="prefabId">The ID for this <see cref="GameObject"/>.</param>
     /// <param name="prefab">The <see cref="GameObject"/> to register.</param>
     /// <returns>The registered network <see cref="PrefabRef"/> or null.</returns>
-    public static PrefabRef? RegisterNetworkPrefab(string prefabId, GameObject prefab)
+    public static PrefabRef? RegisterNetworkPrefab(string prefabId, GameObject? prefab)
     {
         PrefabRefResponse PrefabRefResponse = RegisterNetworkPrefabInternal(prefabId, prefab);
 
@@ -60,16 +62,29 @@ public static class NetworkPrefabs
         }
     }
 
-    internal static PrefabRefResponse RegisterNetworkPrefabInternal(string prefabId, GameObject prefab)
+    /// <inheritdoc cref="RegisterNetworkPrefab(string, GameObject)"/>
+    /// <param name="networkPrefabContent">The <see cref="NetworkPrefabContent"/> to register.</param>
+    public static PrefabRef? RegisterNetworkPrefab(NetworkPrefabContent? networkPrefabContent)
     {
-        if (string.IsNullOrEmpty(prefabId))
+        if (networkPrefabContent == null)
         {
-            return new PrefabRefResponse(PrefabRefResult.PrefabIdNullOrEmpty, null);
+            Logger.LogError("Failed to register network prefab. NetworkPrefabContent is null.");
+            return null;
         }
 
+        return RegisterNetworkPrefab(networkPrefabContent.Prefab);
+    }
+
+    internal static PrefabRefResponse RegisterNetworkPrefabInternal(string prefabId, GameObject? prefab)
+    {
         if (prefab == null)
         {
             return new PrefabRefResponse(PrefabRefResult.PrefabNull, null);
+        }
+
+        if (string.IsNullOrEmpty(prefabId))
+        {
+            return new PrefabRefResponse(PrefabRefResult.PrefabIdNullOrEmpty, null);
         }
 
         PrefabRef? existingPrefabRef = GetNetworkPrefabRef(prefabId);
@@ -147,8 +162,14 @@ public static class NetworkPrefabs
     /// <param name="group">The interest group. See: https://doc.photonengine.com/pun/current/gameplay/interestgroups</param>
     /// <param name="data">Custom instantiation data. See: https://doc.photonengine.com/pun/current/gameplay/instantiation#custom-instantiation-data</param>
     /// <returns>The spawned <see cref="GameObject"/> or null.</returns>
-    public static GameObject? SpawnNetworkPrefab(PrefabRef prefabRef, Vector3 position, Quaternion rotation, byte group = 0, object[]? data = null)
+    public static GameObject? SpawnNetworkPrefab(PrefabRef? prefabRef, Vector3 position, Quaternion rotation, byte group = 0, object[]? data = null)
     {
+        if (prefabRef == null)
+        {
+            Logger.LogError("Failed to spawn network prefab. PrefabRef is null.");
+            return null;
+        }
+
         if (!prefabRef.IsValid())
         {
             Logger.LogError("Failed to spawn network prefab. PrefabRef is not valid.");
@@ -169,5 +190,55 @@ public static class NetworkPrefabs
         {
             return Object.Instantiate(prefabRef.Prefab, position, rotation);
         }
+    }
+}
+
+/// <summary>
+/// A component for easily spawning a network prefab.
+/// </summary>
+public class REPOLibSpawnNetworkPrefab : MonoBehaviour
+{
+    #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
+    [SerializeField]
+    private PrefabRef? _prefabRef;
+
+    [SerializeField]
+    private Transform? _positionTransform;
+    #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
+
+    /// <summary>
+    /// The <see cref="global::PrefabRef"/> of your network prefab.
+    /// </summary>
+    public PrefabRef? PrefabRef => _prefabRef;
+
+    /// <summary>
+    /// The <see cref="Transform"/> to spawn the network prefab at.
+    /// </summary>
+    public Transform? PositionTransform => _positionTransform;
+
+    private void Start()
+    {
+        if (!SemiFunc.IsMasterClientOrSingleplayer())
+            return;
+
+        if (PrefabRef == null)
+        {
+            Logger.LogError("REPOLibSpawnNetworkPrefab: Failed to spawn network prefab. PrefabRef is null.");
+            return;
+        }
+
+        if (PositionTransform == null)
+        {
+            Logger.LogError("REPOLibSpawnNetworkPrefab: Failed to spawn network prefab. PositionTransform is null.");
+            return;
+        }
+
+        if (PrefabRef.Prefab == null)
+        {
+            Logger.LogError($"REPOLibSpawnNetworkPrefab: Failed to spawn network prefab. Could not find prefab \"{PrefabRef.PrefabName}\" with prefabId \"{PrefabRef.ResourcePath}\"");
+            return;
+        }
+
+        NetworkPrefabs.SpawnNetworkPrefab(_prefabRef, PositionTransform.position, PositionTransform.rotation);
     }
 }
