@@ -4,6 +4,7 @@
 [![Thunderstore Version](https://img.shields.io/thunderstore/v/Zehs/REPOLib?style=for-the-badge&logo=thunderstore&logoColor=white)](https://thunderstore.io/c/repo/p/Zehs/REPOLib/)
 [![Thunderstore Downloads](https://img.shields.io/thunderstore/dt/Zehs/REPOLib?style=for-the-badge&logo=thunderstore&logoColor=white)](https://thunderstore.io/c/repo/p/Zehs/REPOLib/)
 [![NuGet Version](https://img.shields.io/nuget/v/zehs.repolib?style=for-the-badge&logo=nuget)](https://www.nuget.org/packages/Zehs.REPOLib)
+[![Ko-fi](https://img.shields.io/badge/Donate-F16061.svg?style=for-the-badge&logo=ko-fi&logoColor=white&label=Ko-fi)](https://ko-fi.com/zehsteam)
 
 **Library for adding content to R.E.P.O.**
 
@@ -26,7 +27,7 @@
 
 ## Documentation
 
-Documentation is available on the [R.E.P.O. Modding Wiki](https://repomods.com/repolib/overview.html).
+Documentation is available on the [R.E.P.O. Modding Wiki](https://repomods.com/apis/repolib/overview.html).
 
 ## Developer Contact
 

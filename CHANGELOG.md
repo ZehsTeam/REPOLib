@@ -1,4 +1,9 @@
-# v3.0.3
+# v3.0.4
+
+- Updated the documentation URL in the README.
+- Updated the BepInExPack dependency target version in the manifest.
+
+## v3.0.3
 
 - Forced BundleLoader to register LevelContent assets first.
 
