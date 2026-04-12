@@ -9,6 +9,9 @@ internal static class SteamManagerPatch
     [HarmonyPostfix]
     public static void AwakePatch(SteamManager __instance)
     {
+        if(__instance != SteamManager.instance) return;
+        if(ConfigManager.VanillaDeveloperMode == null || !ConfigManager.VanillaDeveloperMode.Value) return;
+
         UpdateDeveloperMode();
     }
 
