@@ -27,19 +27,26 @@ public class Plugin : BaseUnityPlugin
         REPOLib.Logger.Initialize(BepInEx.Logging.Logger.CreateLogSource(MyPluginInfo.PLUGIN_GUID));
         REPOLib.Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} has awoken!");
 
-        _harmony.PatchAll(typeof(RunManagerPatch));
-        _harmony.PatchAll(typeof(EnemyDirectorPatch));
-        _harmony.PatchAll(typeof(StatsManagerPatch));
-        _harmony.PatchAll(typeof(SemiFuncPatch));
-        _harmony.PatchAll(typeof(AudioManagerPatch));
-        _harmony.PatchAll(typeof(SteamManagerPatch));
-        _harmony.PatchAll(typeof(PlayerControllerPatch));
-        _harmony.PatchAll(typeof(DebugCommandHandlerPatch));
-        _harmony.PatchAll(typeof(MultiplayerPoolPatch));
-        _harmony.PatchAll(typeof(PrefabRefPatch));
-        _harmony.PatchAll(typeof(SplashScreenPatch));
-        _harmony.PatchAll(typeof(MetaManagerPatch));
-        _harmony.PatchAll(typeof(PlayerCosmeticsPatch));
+        try
+        {
+            _harmony.PatchAll(typeof(RunManagerPatch));
+            _harmony.PatchAll(typeof(EnemyDirectorPatch));
+            _harmony.PatchAll(typeof(StatsManagerPatch));
+            _harmony.PatchAll(typeof(SemiFuncPatch));
+            _harmony.PatchAll(typeof(AudioManagerPatch));
+            _harmony.PatchAll(typeof(SteamManagerPatch));
+            _harmony.PatchAll(typeof(PlayerControllerPatch));
+            _harmony.PatchAll(typeof(DebugCommandHandlerPatch));
+            _harmony.PatchAll(typeof(MultiplayerPoolPatch));
+            _harmony.PatchAll(typeof(PrefabRefPatch));
+            _harmony.PatchAll(typeof(SplashScreenPatch));
+            _harmony.PatchAll(typeof(MetaManagerPatch));
+            _harmony.PatchAll(typeof(PlayerCosmeticsPatch));
+        }
+        catch (System.Exception e)
+        {
+            Logger.LogError(e);
+        }
 
         ConfigManager.Initialize(Config);
 
