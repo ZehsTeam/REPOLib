@@ -169,6 +169,10 @@ public static class Levels
         level.ModulesDeadEnd3 = RegisterLevelModules(level, ModuleType.DeadEnd, levelContent.ModulesDeadEnd3);
         level.ModulesExtraction3 = RegisterLevelModules(level, ModuleType.Extraction, levelContent.ModulesExtraction3);
 
+        if(level.LoadingGraphic01.IsValid()) level.LoadingGraphic01.bundle = levelContent.Bundle;
+        if(level.LoadingGraphic02.IsValid()) level.LoadingGraphic02.bundle = levelContent.Bundle;
+        if(level.LoadingGraphic03.IsValid()) level.LoadingGraphic03.bundle = levelContent.Bundle;
+
         _levelsToRegister.Add(level);
 
         if (_initialLevelsRegistered)
