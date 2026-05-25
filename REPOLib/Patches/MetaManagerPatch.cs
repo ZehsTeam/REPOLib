@@ -86,196 +86,205 @@ internal static class MetaManagerPatch
         missingCosmeticPresets[_index].Clear();
     }
 
-    private static void CreateSaveBackup(string _savePath){
-        try{
-            string _savePathOriginal = $"{Application.persistentDataPath}/{_savePath}.es3";
-            string _savePathBackup = $"{Application.persistentDataPath}/{_savePath}_BACKUP.es3";
-            if(File.Exists(_savePathOriginal)){
-                File.Copy(_savePathOriginal, _savePathBackup, true);
-            }
-        }catch(System.Exception e){
-            Logger.LogError(e);
-        }
-    }
-
     [HarmonyPatch(nameof(MetaManager.Save))]
     [HarmonyPrefix]
-    private static bool SavePatch(MetaManager __instance, bool createBackup)
+    private static bool SavePatch(MetaManager __instance)
     {
-        if(createBackup) CreateSaveBackup(__instance.savePath);
-        SaveModded();
-        return false;
-    }
-
-    public static void SaveModded(bool createBackup = true)
-    {
-        if(!MetaManager.instance) return;
-
         bool IsValidCosmetic(int x) => x >= 0 && x < MetaManager.instance.cosmeticAssets.Count && MetaManager.instance.cosmeticAssets[x] != null;
 
         #region Vanilla
         try{
             bool IsValidVanillaCosmetic(int x) => IsValidCosmetic(x) && !Cosmetics.RegisteredCosmetics.Contains(MetaManager.instance.cosmeticAssets[x]);
 
-            var _saveSettings = new ES3Settings(ES3.Location.File);
-            _saveSettings.encryptionType = ES3.EncryptionType.AES;
-            _saveSettings.encryptionPassword = StatsManager.instance.totallyNormalString;
-            _saveSettings.path = $"{MetaManager.instance.savePath}.es3";
+            string SavePathTemp = Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}.tmp"); 
+            string SavePathFull = Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}.es3");
+            string SavePathBackup = Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}.bak");
 
+            if(File.Exists(SavePathFull)){
+                File.Copy(SavePathFull, SavePathTemp, overwrite: true);
+            }
+            var _settings = MetaManager.instance.MakeSettings(SavePathTemp);
+ 
             // Values that are in-sync with vanilla save file
-            ES3.Save("cosmeticTokens", MetaManager.instance.cosmeticTokens, _saveSettings);
-            ES3.Save("cosmeticUnlocks", MetaManager.instance.cosmeticUnlocks.Where(IsValidVanillaCosmetic).ToList(), _saveSettings);
-            ES3.Save("cosmeticHistory", MetaManager.instance.cosmeticHistory.Where(IsValidVanillaCosmetic).ToList(), _saveSettings);
+            ES3.Save("cosmeticTokens", MetaManager.instance.cosmeticTokens, _settings);
+            ES3.Save("cosmeticUnlocks", MetaManager.instance.cosmeticUnlocks.Where(IsValidVanillaCosmetic).ToList(), _settings);
+            ES3.Save("cosmeticHistory", MetaManager.instance.cosmeticHistory.Where(IsValidVanillaCosmetic).ToList(), _settings);
+ 
+            if(!MetaManager.instance.VerifySaveFile(SavePathTemp)){
+                Logger.LogError($"[MetaSaveModded] Failed to verify {Path.GetFileName(SavePathTemp)}");
+                MetaManager.instance.DeleteSaveFile(SavePathTemp);
+            }else{
+                MetaManager.instance.DeleteSaveFile(SavePathBackup);
+                if(File.Exists(SavePathFull)){
+                    File.Move(SavePathFull, SavePathBackup);
+                }
+
+                File.Move(SavePathTemp, SavePathFull);
+            }
+ 
         }catch(System.Exception e){
-            Logger.LogError(e);
+            Logger.LogError($"[MetaSaveModded] Save failed: {e}");
         }
         #endregion
 
         #region Modded
-        if(createBackup) CreateSaveBackup($"{MetaManager.instance.savePath}Modded");
-
         try{
             bool IsValidModdedCosmetic(int x) => IsValidCosmetic(x) && Cosmetics.RegisteredCosmetics.Contains(MetaManager.instance.cosmeticAssets[x]);
 
-            var _saveSettingsModded = new ES3Settings(ES3.Location.Cache);
-            _saveSettingsModded.encryptionType = ES3.EncryptionType.AES;
-            _saveSettingsModded.encryptionPassword = StatsManager.instance.totallyNormalString;
-            _saveSettingsModded.path = $"{MetaManager.instance.savePath}Modded.es3";
+            string SavePathTemp = Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}Modded.tmp"); 
+            string SavePathFull = Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}Modded.es3");
+            string SavePathBackup = Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}Modded.bak");
 
+            var _settings = MetaManager.instance.MakeSettings(SavePathTemp);
+ 
             ES3.Save("cosmeticUnlocks", MetaManager.instance.cosmeticUnlocks.Where(IsValidModdedCosmetic).Select(x => MetaManager.instance.cosmeticAssets[x].assetId)
-                .Concat(missingCosmeticUnlocks).ToList(), _saveSettingsModded);
+                .Concat(missingCosmeticUnlocks).ToList(), _settings);
             ES3.Save("cosmeticHistory", MetaManager.instance.cosmeticHistory.Where(IsValidModdedCosmetic).Select(x => MetaManager.instance.cosmeticAssets[x].assetId)
-                .Concat(missingCosmeticHistory).ToList(), _saveSettingsModded);
+                .Concat(missingCosmeticHistory).ToList(), _settings);
 
             ES3.Save("cosmeticEquipped", MetaManager.instance.cosmeticEquipped.Where(IsValidCosmetic).Select(x => MetaManager.instance.cosmeticAssets[x].assetId)
-                .Concat(missingCosmeticEquipped).ToList(), _saveSettingsModded);
+                .Concat(missingCosmeticEquipped).ToList(), _settings);
 
             ES3.Save("cosmeticPresets", MetaManager.instance.cosmeticPresets.Select((preset, i) => preset.Where(IsValidCosmetic).Select(x => MetaManager.instance.cosmeticAssets[x].assetId)
                 .Concat(missingCosmeticPresets[i]).ToList()
-            ).ToList(), _saveSettingsModded);
+            ).ToList(), _settings);
 
-            ES3.Save("colorPresets", MetaManager.instance.colorPresets, _saveSettingsModded);
-            ES3.Save("colorsEquipped", MetaManager.instance.colorsEquipped, _saveSettingsModded);
+            ES3.Save("colorPresets", MetaManager.instance.colorPresets, _settings);
+            ES3.Save("colorsEquipped", MetaManager.instance.colorsEquipped, _settings);
+ 
+            if(!VerifySaveFile(SavePathTemp)){
+                Logger.LogError($"[MetaSaveModded] Failed to verify {Path.GetFileName(SavePathTemp)}");
+                MetaManager.instance.DeleteSaveFile(SavePathTemp);
+            }else{
+                MetaManager.instance.DeleteSaveFile(SavePathBackup);
+                if(File.Exists(SavePathFull)){
+                    File.Move(SavePathFull, SavePathBackup);
+                }
 
-            ES3.StoreCachedFile(_saveSettingsModded);
+                File.Move(SavePathTemp, SavePathFull);
+            }
+ 
         }catch(System.Exception e){
-            Logger.LogError(e);
+            Logger.LogError($"[MetaSaveModded] Save failed: {e}");
         }
         #endregion
+
+        return false;
+    }
+
+    private static bool VerifySaveFile(string _path){
+        try{
+            var _settings = MetaManager.instance.MakeSettings(_path);
+            return ES3.FileExists(_settings) && ES3.KeyExists("cosmeticPresets", _settings) && ES3.KeyExists("cosmeticUnlocks", _settings);
+        }catch{
+            return false;
+        }
     }
 
     [HarmonyPatch(nameof(MetaManager.Load))]
     [HarmonyPostfix]
-    private static void LoadPatch(MetaManager __instance, bool useBackup)
+    private static void LoadPatch(MetaManager __instance)
     {
-        if(useBackup) return;
-
-        __instance.saveReady = false;
         LoadModded();
-        __instance.saveReady = true;
     }
 
-    public static void LoadModded(bool useBackup = false)
+    private static bool TryLoadModded(string _path){
+
+        if(!File.Exists(_path)) return false;
+
+        try{
+            bool IsValidCosmetic(string x) => MetaManager.instance.cosmeticAssets.FirstOrDefault(a => a.assetId == x);
+
+            var _saveFile = MetaManager.instance.MakeSettings(_path);
+
+            if(!ES3.FileExists(_saveFile)) return false;
+
+            #region Combine
+            if(ES3.KeyExists("cosmeticUnlocks", _saveFile)){
+                List<string> _cosmeticUnlocks = ES3.Load<List<string>>("cosmeticUnlocks", _saveFile);
+                MetaManager.instance.cosmeticUnlocks = MetaManager.instance.cosmeticUnlocks
+                    .Concat(_cosmeticUnlocks.Where(IsValidCosmetic).Select(e => MetaManager.instance.cosmeticAssets.FindIndex(a => a.assetId == e)))
+                    .Distinct().ToList();
+                missingCosmeticUnlocks = _cosmeticUnlocks.Where(x => !IsValidCosmetic(x)).ToList();
+            }
+            if(ES3.KeyExists("cosmeticHistory", _saveFile)){
+                List<string> _cosmeticHistory = ES3.Load<List<string>>("cosmeticHistory", _saveFile);
+                MetaManager.instance.cosmeticHistory = MetaManager.instance.cosmeticHistory
+                    .Concat(_cosmeticHistory.Where(IsValidCosmetic).Select(e => MetaManager.instance.cosmeticAssets.FindIndex(a => a.assetId == e)))
+                    .Distinct().ToList();
+                missingCosmeticHistory = _cosmeticHistory.Where(x => !IsValidCosmetic(x)).ToList();
+            }
+            #endregion
+
+            #region Overwrite
+            if(ES3.KeyExists("cosmeticEquipped", _saveFile)){
+                List<string> _cosmeticEquipped = ES3.Load<List<string>>("cosmeticEquipped", _saveFile);
+                MetaManager.instance.cosmeticEquipped = _cosmeticEquipped.Where(IsValidCosmetic).Select(e => MetaManager.instance.cosmeticAssets.FindIndex(a => a.assetId == e)).ToList();
+                missingCosmeticEquipped = _cosmeticEquipped.Where(x => !IsValidCosmetic(x)).ToList();
+            }
+
+            if(ES3.KeyExists("cosmeticPresets", _saveFile)){
+                var _cosmeticPresets = ES3.Load<List<List<string>>>("cosmeticPresets", _saveFile);
+                if(_cosmeticPresets != null){
+                    int _minLength = Mathf.Min(MetaManager.instance.cosmeticPresets.Count, _cosmeticPresets.Count);
+                    for(int i = 0; i < _minLength; i++){
+                        MetaManager.instance.cosmeticPresets[i] = _cosmeticPresets[i].Where(IsValidCosmetic).Select(e => MetaManager.instance.cosmeticAssets.FindIndex(a => a.assetId == e)).ToList();
+                        missingCosmeticPresets[i] = _cosmeticPresets[i].Where(x => !IsValidCosmetic(x)).ToList();
+                    }
+                }
+            }
+
+            if(ES3.KeyExists("colorPresets", _saveFile)){
+                var _colorPresets = ES3.Load<List<List<int>>>("colorPresets", _saveFile);
+                if(_colorPresets != null){
+                    int _minLength = Mathf.Min(MetaManager.instance.colorPresets.Count, _colorPresets.Count);
+                    for(int i = 0; i < _minLength; i++){
+                        MetaManager.instance.colorPresets[i] = _colorPresets[i];
+                    }
+                }
+            }
+
+            if(ES3.KeyExists("colorsEquipped", _saveFile)){
+                var _colorsEquipped = ES3.Load<int[]>("colorsEquipped", _saveFile);
+                if(_colorsEquipped != null){
+                    int _minLength = Mathf.Min(MetaManager.instance.colorsEquipped.Length, _colorsEquipped.Length);
+                    for(int i = 0; i < _minLength; i++){
+                        MetaManager.instance.colorsEquipped[i] = _colorsEquipped[i];
+                    }
+                }
+            }
+            #endregion
+
+            return true;
+        }catch(System.Exception e){
+            Logger.LogError($"[MetaSave] Failed to load {Path.GetFileName(_path)}: {e}");
+            return false;
+        }
+    }
+    
+    public static void LoadModded()
     {
         if(!MetaManager.instance) return;
 
-        bool IsValidCosmetic(string x) => MetaManager.instance.cosmeticAssets.FirstOrDefault(a => a.assetId == x);
+        string SavePathTemp = Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}Modded.tmp"); 
+        string SavePathFull = Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}Modded.es3");
+        string SavePathBackup = Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}Modded.bak");
 
-        string _savePathBackup = $"{Application.persistentDataPath}/{MetaManager.instance.savePath}Modded_BACKUP.es3";
-        bool backupExists = File.Exists(_savePathBackup);
+        MetaManager.instance.DeleteSaveFile(SavePathTemp);
 
-        if(useBackup){
-            try{
-                string _savePathOriginal = $"{Application.persistentDataPath}/{MetaManager.instance.savePath}Modded.es3";
-                if(backupExists){
-                    File.Copy(_savePathBackup, _savePathOriginal, true);
-                    Logger.LogWarning($"[MetaSave] Restored {Path.GetFileName(_savePathOriginal)} from {Path.GetFileName(_savePathBackup)}");
-                }else{
-                    Logger.LogWarning("[MetaSave] Failed to locate backup!");
-                    SaveModded(false);
-                    return;
-                }
-            }catch(System.Exception e){
-                Logger.LogWarning("[MetaSave] Failed to restore backup!");
-                Logger.LogError(e);
-                SaveModded(false);
-                return;
-            }
+        if(TryLoadModded(SavePathFull)){
+            Logger.LogInfo($"[MetaSaveModded] {Path.GetFileName(SavePathFull)} found");
+            return;
         }
-
-        var _savePathModded = $"{MetaManager.instance.savePath}Modded.es3";
-        try{
-            ES3Settings _saveFileModded = new ES3Settings(_savePathModded, ES3.EncryptionType.AES, StatsManager.instance.totallyNormalString);
-            if(ES3.FileExists(_saveFileModded)){
-                Logger.LogInfo("Loading modded meta save");
-
-                #region Combine
-                if(ES3.KeyExists("cosmeticUnlocks", _saveFileModded)){
-                    List<string> _cosmeticUnlocks = ES3.Load<List<string>>("cosmeticUnlocks", _saveFileModded);
-                    MetaManager.instance.cosmeticUnlocks = MetaManager.instance.cosmeticUnlocks
-                        .Concat(_cosmeticUnlocks.Where(IsValidCosmetic).Select(e => MetaManager.instance.cosmeticAssets.FindIndex(a => a.assetId == e)))
-                        .Distinct().ToList();
-                    missingCosmeticUnlocks = _cosmeticUnlocks.Where(x => !IsValidCosmetic(x)).ToList();
-                }
-                if(ES3.KeyExists("cosmeticHistory", _saveFileModded)){
-                    List<string> _cosmeticHistory = ES3.Load<List<string>>("cosmeticHistory", _saveFileModded);
-                    MetaManager.instance.cosmeticHistory = MetaManager.instance.cosmeticHistory
-                        .Concat(_cosmeticHistory.Where(IsValidCosmetic).Select(e => MetaManager.instance.cosmeticAssets.FindIndex(a => a.assetId == e)))
-                        .Distinct().ToList();
-                    missingCosmeticHistory = _cosmeticHistory.Where(x => !IsValidCosmetic(x)).ToList();
-                }
-                #endregion
-
-                #region Overwrite
-                if(ES3.KeyExists("cosmeticEquipped", _saveFileModded)){
-                    List<string> _cosmeticEquipped = ES3.Load<List<string>>("cosmeticEquipped", _saveFileModded);
-                    MetaManager.instance.cosmeticEquipped = _cosmeticEquipped.Where(IsValidCosmetic).Select(e => MetaManager.instance.cosmeticAssets.FindIndex(a => a.assetId == e)).ToList();
-                    missingCosmeticEquipped = _cosmeticEquipped.Where(x => !IsValidCosmetic(x)).ToList();
-                }
-
-                if(ES3.KeyExists("cosmeticPresets", _saveFileModded)){
-                    var _cosmeticPresets = ES3.Load<List<List<string>>>("cosmeticPresets", _saveFileModded);
-                    if(_cosmeticPresets != null){
-                        int _minLength = Mathf.Min(MetaManager.instance.cosmeticPresets.Count, _cosmeticPresets.Count);
-                        for(int i = 0; i < _minLength; i++){
-                            MetaManager.instance.cosmeticPresets[i] = _cosmeticPresets[i].Where(IsValidCosmetic).Select(e => MetaManager.instance.cosmeticAssets.FindIndex(a => a.assetId == e)).ToList();
-                            missingCosmeticPresets[i] = _cosmeticPresets[i].Where(x => !IsValidCosmetic(x)).ToList();
-                        }
-                    }
-                }
-
-                if(ES3.KeyExists("colorPresets", _saveFileModded)){
-                    var _colorPresets = ES3.Load<List<List<int>>>("colorPresets", _saveFileModded);
-                    if(_colorPresets != null){
-                        int _minLength = Mathf.Min(MetaManager.instance.colorPresets.Count, _colorPresets.Count);
-                        for(int i = 0; i < _minLength; i++){
-                            MetaManager.instance.colorPresets[i] = _colorPresets[i];
-                        }
-                    }
-                }
-
-                if(ES3.KeyExists("colorsEquipped", _saveFileModded)){
-                    var _colorsEquipped = ES3.Load<int[]>("colorsEquipped", _saveFileModded);
-                    if(_colorsEquipped != null){
-                        int _minLength = Mathf.Min(MetaManager.instance.colorsEquipped.Length, _colorsEquipped.Length);
-                        for(int i = 0; i < _minLength; i++){
-                            MetaManager.instance.colorsEquipped[i] = _colorsEquipped[i];
-                        }
-                    }
-                }
-                #endregion
-
-                if(!backupExists) CreateSaveBackup($"{MetaManager.instance.savePath}Modded");
-            }else{
-                SaveModded(false);
-            }
-        }catch(System.Exception ex){
-            Logger.LogError($"Failed to load modded meta save: {ex}");
-
-            ES3.DeleteFile(_savePathModded);
-
-            if(!useBackup) LoadModded(true);
-            else SaveModded(false);
+ 
+        if(TryLoadModded(SavePathBackup)){
+            Logger.LogWarning($"[MetaSaveModded] {Path.GetFileName(SavePathFull)} restored from {Path.GetFileName(SavePathBackup)}");
+            MetaManager.instance.DeleteSaveFile(SavePathFull);
+            MetaManager.instance.Save();
+            return;
         }
+ 
+        Logger.LogWarning($"[MetaSaveModded] {Path.GetFileName(SavePathFull)} not found - creating new");
+        MetaManager.instance.Save();
     }
 }

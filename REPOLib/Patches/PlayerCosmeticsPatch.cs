@@ -11,10 +11,13 @@ namespace REPOLib.Patches;
 internal static class PlayerCosmeticsPatch
 {
     [HarmonyPatch(nameof(PlayerCosmetics.Awake))]
-    [HarmonyPostfix]
+    [HarmonyPrefix]
     private static void AwakePatch(PlayerCosmetics __instance)
     {
-        __instance.gameObject.AddComponent<PlayerCosmeticsModded>();
+        if (!__instance.gameObject.GetComponent<PlayerCosmeticsModded>())
+        {
+            __instance.gameObject.AddComponent<PlayerCosmeticsModded>();
+        }
     }
 
     // Sync the list of cosmetics as a list of names
@@ -39,16 +42,6 @@ internal static class PlayerCosmeticsPatch
         __instance.SetupCosmeticsLogic(_cosmeticEquipped.ToArray(), _forced);
         #endregion
 
-        #region Vanilla
-        bool IsValidVanillaCosmetic(int x) =>
-            x >= 0 && x < MetaManager.instance.cosmeticAssets.Count &&
-            MetaManager.instance.cosmeticAssets[x] != null &&
-            !Cosmetics.RegisteredCosmetics.Contains(MetaManager.instance.cosmeticAssets[x]);
-
-        PhotonNetwork.RemoveBufferedRPCs(__instance.photonView.ViewID, nameof(__instance.SetupCosmeticsRPC));
-        __instance.photonView.RPC(nameof(__instance.SetupCosmeticsRPC), RpcTarget.OthersBuffered, _cosmeticEquipped.Where(IsValidVanillaCosmetic).ToArray(), _forced);
-        #endregion
-
         #region Modded
         List<string> _cosmeticEquippedModded = new();
         foreach(var _cosmetic in _cosmeticEquipped){
@@ -62,6 +55,16 @@ internal static class PlayerCosmeticsPatch
 
         PhotonNetwork.RemoveBufferedRPCs(playerCosmeticsModded.photonView.ViewID, nameof(playerCosmeticsModded.SetupCosmeticsModdedRPC));
         playerCosmeticsModded.photonView.RPC(nameof(playerCosmeticsModded.SetupCosmeticsModdedRPC), RpcTarget.OthersBuffered, string.Join("\x1F", _cosmeticEquippedModded));
+        #endregion
+
+        #region Vanilla
+        bool IsValidVanillaCosmetic(int x) =>
+            x >= 0 && x < MetaManager.instance.cosmeticAssets.Count &&
+            MetaManager.instance.cosmeticAssets[x] != null &&
+            !Cosmetics.RegisteredCosmetics.Contains(MetaManager.instance.cosmeticAssets[x]);
+
+        PhotonNetwork.RemoveBufferedRPCs(__instance.photonView.ViewID, nameof(__instance.SetupCosmeticsRPC));
+        __instance.photonView.RPC(nameof(__instance.SetupCosmeticsRPC), RpcTarget.OthersBuffered, _cosmeticEquipped.Where(IsValidVanillaCosmetic).ToArray(), _forced);
         #endregion
 
         return false;

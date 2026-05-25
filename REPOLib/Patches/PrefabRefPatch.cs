@@ -1,17 +1,18 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using REPOLib.Modules;
 using UnityEngine;
 
 namespace REPOLib.Patches;
 
-[HarmonyPatch(typeof(PrefabRef))]
+[HarmonyPatch(typeof(Resources))]
 internal static class PrefabRefPatch
 {
-    [HarmonyPatch(nameof(PrefabRef.Prefab), MethodType.Getter)]
+    [HarmonyPatch(nameof(Resources.Load), typeof(string), typeof(Type))]
     [HarmonyPrefix]
-    private static bool PrefabPatch(PrefabRef __instance, ref GameObject __result)
+    private static bool PrefabPatch(string path, Type systemTypeInstance, ref UnityEngine.Object __result)
     {
-        if (NetworkPrefabs.TryGetNetworkPrefab(__instance.resourcePath, out GameObject? prefab))
+        if (systemTypeInstance == typeof(GameObject) && NetworkPrefabs.TryGetNetworkPrefab(path, out GameObject? prefab))
         {
             __result = prefab;
             return false;
