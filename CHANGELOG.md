@@ -1,4 +1,18 @@
-# v4.0.4
+# v4.1.0
+
+- Updated for R.E.P.O. v0.4.4 (#84)
+
+### Changes ported from vanilla
+
+- Improved cosmetic save file backup logic. (#84)
+- Switched level loading images to use PrefabRef. (#84)
+
+### Additional Changes
+
+- Fixed config failing to initialize if a patch fails to load. (#84)
+- Fixed modded cosmetics not initially showing in multiplayer. (#84)
+
+## v4.0.4
 
 - Fixed gaining infinite tokens if an exception occurs whilst attempting to save the meta files. (#82)
 
