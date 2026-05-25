@@ -15,7 +15,7 @@ public abstract class Content : ScriptableObject
     /// <summary>
     /// The asset bundle of this content.
     /// </summary>
-    public abstract AssetBundle? Bundle { get; internal set; }
+    public abstract AssetBundle? Bundle { get; set; }
 
     /// <summary>
     /// Initializes this content.

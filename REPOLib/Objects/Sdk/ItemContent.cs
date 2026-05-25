@@ -25,7 +25,7 @@ public class ItemContent : Content
     public override string Name => Prefab?.name ?? string.Empty;
 
     /// <inheritdoc/>
-    public override AssetBundle? Bundle { get; internal set; }
+    public override AssetBundle? Bundle { get; set; }
 
     /// <inheritdoc/>
     public override void Initialize(Mod mod)
