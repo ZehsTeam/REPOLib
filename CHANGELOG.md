@@ -1,4 +1,10 @@
-# v4.1.0
+# v4.2.0
+
+- Fixed registering network prefabs that were already registered with the same prefab ID and GameObject throwing an error instead of returning the already registered PrefabRef.
+  - This *should* fix some mods that previously weren't working with REPOLib v4.1.0
+- Made bundle setter in SDK Content ScriptableObjects public. (#85)
+
+## v4.1.0
 
 - Updated for R.E.P.O. v0.4.4 (#84)
 

@@ -37,7 +37,7 @@ public class Plugin : BaseUnityPlugin
             _harmony.PatchAll(typeof(SteamManagerPatch));
             _harmony.PatchAll(typeof(PlayerControllerPatch));
             _harmony.PatchAll(typeof(DebugCommandHandlerPatch));
-            _harmony.PatchAll(typeof(PrefabRefPatch));
+            _harmony.PatchAll(typeof(ResourcesPatch));
             _harmony.PatchAll(typeof(SplashScreenPatch));
             _harmony.PatchAll(typeof(MetaManagerPatch));
             _harmony.PatchAll(typeof(PlayerCosmeticsPatch));

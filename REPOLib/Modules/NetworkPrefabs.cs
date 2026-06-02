@@ -76,7 +76,10 @@ public static class NetworkPrefabs
 
         if (existingPrefabRef != null)
         {
-            GameObject existingPrefab = existingPrefabRef.Prefab;
+            // This doesn't work anymore because PrefabRef`1[T].get_Prefab () uses a reference to RunManager.instance that is null during registration of network prefabs.
+            //GameObject existingPrefab = existingPrefabRef.Prefab;
+
+            GameObject existingPrefab = _prefabs[prefabId];
 
             if (prefab == existingPrefab)
             {

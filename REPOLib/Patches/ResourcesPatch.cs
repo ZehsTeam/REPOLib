@@ -6,7 +6,7 @@ using UnityEngine;
 namespace REPOLib.Patches;
 
 [HarmonyPatch(typeof(Resources))]
-internal static class PrefabRefPatch
+internal static class ResourcesPatch
 {
     [HarmonyPatch(nameof(Resources.Load), typeof(string), typeof(Type))]
     [HarmonyPrefix]
