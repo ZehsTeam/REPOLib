@@ -1,15 +1,16 @@
 ﻿using HarmonyLib;
+using Platforms;
 
 namespace REPOLib.Patches;
 
-[HarmonyPatch(typeof(SteamManager))]
-internal static class SteamManagerPatch
+[HarmonyPatch(typeof(PlatformManager))]
+internal static class PlatformManagerPatch
 {
-    [HarmonyPatch(nameof(SteamManager.Awake))]
+    [HarmonyPatch(nameof(PlatformManager.Awake))]
     [HarmonyPostfix]
-    public static void AwakePatch(SteamManager __instance)
+    public static void AwakePatch(PlatformManager __instance)
     {
-        if(__instance != SteamManager.instance) return;
+        if(__instance != PlatformManager.instance) return;
         if(ConfigManager.VanillaDeveloperMode == null || !ConfigManager.VanillaDeveloperMode.Value) return;
 
         UpdateDeveloperMode();
@@ -22,14 +23,14 @@ internal static class SteamManagerPatch
             return;
         }
 
-        if (SteamManager.instance == null)
+        if (PlatformManager.instance == null)
         {
             return;
         }
 
         bool value = ConfigManager.VanillaDeveloperMode.Value;
 
-        if (SteamManager.instance.developerMode != value)
+        if (PlatformManager.instance.developerFlags.debug_console != value)
         {
             if (value)
             {
@@ -41,6 +42,6 @@ internal static class SteamManagerPatch
             }
         }
 
-        SteamManager.instance.developerMode = value;
+        PlatformManager.instance.developerFlags.debug_console = value;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using REPOLib.Extensions;
 using REPOLib.Modules;
 using REPOLib.Objects.Sdk;
+using REPOLib.Patches;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -154,6 +155,8 @@ public static class BundleLoader
             yield break;
         }
 
+        var legacyTextAssetSnapshot = FontAssetMaterialPatch.BeginLegacyBundle(operation.Path, bundle);
+
         if (operation.LoadContents)
         {
             yield return LoadBundleContent(operation, bundle);
@@ -162,6 +165,11 @@ public static class BundleLoader
         if (operation.OnBundleLoaded != null)
         {
             yield return operation.OnBundleLoaded(bundle);
+        }
+
+        if (legacyTextAssetSnapshot != null)
+        {
+            FontAssetMaterialPatch.EndLegacyBundle(operation.Path, bundle, legacyTextAssetSnapshot);
         }
 
         if (ConfigManager.ExtendedLogging.Value)

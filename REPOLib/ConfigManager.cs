@@ -23,6 +23,6 @@ internal static class ConfigManager
         DeveloperMode =        ConfigFile.Bind("General", "DeveloperMode",        defaultValue: false, "Enable developer mode chat commands for testing.");
         VanillaDeveloperMode = ConfigFile.Bind("General", "VanillaDeveloperMode", defaultValue: false, "Enable vanilla developer mode cheats and chat commands for testing.");
 
-        VanillaDeveloperMode.SettingChanged += (object sender, System.EventArgs e) => SteamManagerPatch.UpdateDeveloperMode();
+        VanillaDeveloperMode.SettingChanged += (object sender, System.EventArgs e) => PlatformManagerPatch.UpdateDeveloperMode();
     }
 }
