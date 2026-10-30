@@ -73,10 +73,26 @@
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="UnityEngine.Modules" Version="2022.3.62" IncludeAssets="compile" PrivateAssets="all" />
-    <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.4.4-ngd.0" PrivateAssets="all" />
+    <PackageReference Include="UnityEngine.Modules" Version="6000.3.17" IncludeAssets="compile" PrivateAssets="all" />
+    <!--<PackageReference Include="R.E.P.O.GameLibs.Steam" Version="0.4.4-ngd.0" PrivateAssets="all" />-->
     <PackageReference Include="Linkoid.Repo.Plugin.Build" Version="0.2.2" PrivateAssets="all" />
   </ItemGroup>
+  
+  <!-- Game References (START) - R.E.P.O.GameLibs.Steam package is not updated yet -->
+  <PropertyGroup>
+    <GameManagedFolder>D:\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed</GameManagedFolder>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp"           HintPath="$(GameManagedFolder)\Assembly-CSharp.dll"           PrivateAssets="all" Publicize="true" />
+    <Reference Include="Assembly-CSharp-firstpass" HintPath="$(GameManagedFolder)\Assembly-CSharp-firstpass.dll" PrivateAssets="all" Publicize="true" />
+    <Reference Include="Photon3Unity3D"            HintPath="$(GameManagedFolder)\Photon3Unity3D.dll"            PrivateAssets="all" />
+    <Reference Include="PhotonRealtime"            HintPath="$(GameManagedFolder)\PhotonRealtime.dll"            PrivateAssets="all" />
+    <Reference Include="PhotonUnityNetworking"     HintPath="$(GameManagedFolder)\PhotonUnityNetworking.dll"     PrivateAssets="all" />
+    <Reference Include="Unity.TextMeshPro"         HintPath="$(GameManagedFolder)\Unity.TextMeshPro.dll"         PrivateAssets="all" />
+    <Reference Include="UnityEngine.UI"            HintPath="$(GameManagedFolder)\UnityEngine.UI.dll"            PrivateAssets="all" />
+  </ItemGroup>
+  <!-- Game References (END) -->
   
   <!-- Default values in case the Directory.Repo.props file doesn't exist -->
   <PropertyGroup>
