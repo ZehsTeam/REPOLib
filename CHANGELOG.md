@@ -1,4 +1,8 @@
-# v4.2.0
+# v4.3.0
+
+- Updated for R.E.P.O. v0.5.0 (#88)
+
+## v4.2.0
 
 - Fixed registering network prefabs that were already registered with the same prefab ID and GameObject throwing an error instead of returning the already registered PrefabRef.
   - This *should* fix some mods that previously weren't working with REPOLib v4.1.0
