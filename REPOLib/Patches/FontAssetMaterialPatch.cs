@@ -50,7 +50,7 @@ internal static class FontAssetMaterialPatch
 
         _legacyAssets.UnionWith(bundleAssets);
 
-        Logger.LogInfo($"Bundle \"{Path.GetFileName(path)}\" was built with Unity {ReadBundleUnityVersion(path)}, replacing its TMP assets with the game's: {(bundleAssets.Count > 0 ? string.Join(", ", bundleAssets.Select(asset => $"\"{asset.name}\"").Distinct()) : "none found")}");
+        Logger.LogDebug($"Replacing TMP assets in bundle \"{Path.GetFileName(path)}\" with the game's: {(bundleAssets.Count > 0 ? string.Join(", ", bundleAssets.Select(asset => $"\"{asset.name}\"").Distinct()) : "none found")}", extended: true);
     }
 
     private static IEnumerable<Object> GetLoadedTextAssets()
