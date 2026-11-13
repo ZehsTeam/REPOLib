@@ -37,7 +37,7 @@ public static class Localization
 
     private static ResourceLocationMap? _locator;
     private static bool _rebuildQueued;
-    private static Dictionary<string, (Guid TableGuid, long KeyId)>? _gameKeys;
+    private static Dictionary<string, (Guid TableGuid, string TableName, long KeyId)>? _gameKeys;
 
     /// <summary>
     /// Registers a <see cref="StringTable"/> (one locale of a table collection).
@@ -80,7 +80,7 @@ public static class Localization
         _stringTables.Add(stringTable);
         QueueRebuild();
 
-        Logger.LogInfo($"Registered string table \"{stringTable.name}\"", extended: true);
+        Logger.LogDebug($"Registered string table \"{stringTable.name}\"", extended: true);
     }
 
     internal static IEnumerator RegisterBundleStringTables(AssetBundle bundle)
@@ -114,10 +114,11 @@ public static class Localization
 
         foreach (var localizedAsset in invalid)
         {
-            if (_gameKeys != null && _gameKeys.TryGetValue(GetEntryKey(localizedAsset.name), out var entry))
+            string key = GetEntryKey(localizedAsset.name);
+            if (_gameKeys != null && _gameKeys.TryGetValue(key, out var entry))
             {
                 localizedAsset.stringReference.SetReference(entry.TableGuid, entry.KeyId);
-                Logger.LogDebug($"Fixed LocalizedAsset \"{localizedAsset.name}\"");
+                Logger.LogDebug($"LocalizedAsset \"{localizedAsset.name}\" uses base-game entry \"{key}\" in table \"{entry.TableName}\"", extended: true);
             }
             else
             {
@@ -159,9 +160,10 @@ public static class Localization
             if (table == null || table.SharedData == null || _stringTables.Contains(table)) continue;
 
             var tableGuid = table.SharedData.TableCollectionNameGuid;
+            string tableName = table.SharedData.TableCollectionName;
             foreach (var entry in table.SharedData.Entries)
             {
-                _gameKeys.TryAdd(entry.Key, (tableGuid, entry.Id));
+                _gameKeys.TryAdd(entry.Key, (tableGuid, tableName, entry.Id));
             }
         }
     }

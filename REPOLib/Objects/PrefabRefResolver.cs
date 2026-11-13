@@ -48,7 +48,7 @@ internal static class PrefabRefResolver
 
         if (resolved > 0)
         {
-            Logger.LogInfo($"Resolved {resolved} PrefabRef(s) in bundle \"{bundle.name}\"", extended: true);
+            Logger.LogDebug($"Resolved {resolved} PrefabRef(s) in bundle \"{bundle.name}\"", extended: true);
         }
     }
 
@@ -72,16 +72,16 @@ internal static class PrefabRefResolver
             relativePath = extension < 0 ? relativePath : relativePath.Substring(0, extension);
             resourcePathField.SetValue(prefabRef, relativePath);
             bundleField.SetValue(prefabRef, null);
-            // Logger.LogInfo($"PrefabRef uses base-game asset \"{relativePath}\" (converted from old path \"{resourcePath}\"){FromBundle(bundle)}", extended: true);
+            Logger.LogDebug($"PrefabRef uses base-game asset \"{relativePath}\" (converted from old path \"{resourcePath}\"){FromBundle(bundle)}", extended: true);
             return true;
         }
 
         if (!resourcePath.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase))
         {
-            // if (bundle != null && !NetworkPrefabs.HasNetworkPrefab(resourcePath))
-            // {
-            //     Logger.LogInfo($"PrefabRef uses base-game asset \"{resourcePath}\"{FromBundle(bundle)}", extended: true);
-            // }
+            if (bundle != null && !NetworkPrefabs.HasNetworkPrefab(resourcePath))
+            {
+                Logger.LogDebug($"PrefabRef uses base-game asset \"{resourcePath}\"{FromBundle(bundle)}", extended: true);
+            }
             return false;
         }
 
