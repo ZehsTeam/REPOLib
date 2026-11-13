@@ -1,5 +1,6 @@
 ﻿using REPOLib.Extensions;
 using REPOLib.Modules;
+using REPOLib.Objects;
 using REPOLib.Objects.Sdk;
 using REPOLib.Patches;
 using System;
@@ -157,6 +158,9 @@ public static class BundleLoader
 
         var legacyTextAssetSnapshot = FontAssetMaterialPatch.BeginLegacyBundle(operation.Path, bundle);
 
+        yield return Localization.RegisterBundleStringTables(bundle);
+        yield return PrefabRefResolver.ResolveBundle(bundle);
+
         if (operation.LoadContents)
         {
             yield return LoadBundleContent(operation, bundle);
@@ -166,6 +170,8 @@ public static class BundleLoader
         {
             yield return operation.OnBundleLoaded(bundle);
         }
+
+        yield return Localization.FixLocalizedAssets();
 
         if (legacyTextAssetSnapshot != null)
         {
