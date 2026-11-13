@@ -114,7 +114,7 @@ public static class Localization
 
         foreach (var localizedAsset in invalid)
         {
-            if (_gameKeys != null && _gameKeys.TryGetValue(localizedAsset.name, out var entry))
+            if (_gameKeys != null && _gameKeys.TryGetValue(GetEntryKey(localizedAsset.name), out var entry))
             {
                 localizedAsset.stringReference.SetReference(entry.TableGuid, entry.KeyId);
                 Logger.LogDebug($"Fixed LocalizedAsset \"{localizedAsset.name}\"");
@@ -124,6 +124,15 @@ public static class Localization
                 Logger.LogWarning($"LocalizedAsset \"{localizedAsset.name}\" has no string reference and doesn't match any vanilla entry.");
             }
         }
+    }
+
+    private static string GetEntryKey(string localizedAssetName)
+    {
+        const string LegacyPrefix = "LocalizedAsset - ";
+
+        return localizedAssetName.StartsWith(LegacyPrefix, StringComparison.Ordinal)
+            ? localizedAssetName.Substring(LegacyPrefix.Length)
+            : localizedAssetName;
     }
 
     private static IEnumerator LoadGameKeys()

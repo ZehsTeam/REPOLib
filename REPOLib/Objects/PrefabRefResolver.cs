@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using REPOLib.Modules;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -68,12 +69,23 @@ internal static class PrefabRefResolver
         {
             string relativePath = resourcePath.Substring(GameResourcesFolder.Length);
             int extension = relativePath.LastIndexOf('.');
-            resourcePathField.SetValue(prefabRef, extension < 0 ? relativePath : relativePath.Substring(0, extension));
+            relativePath = extension < 0 ? relativePath : relativePath.Substring(0, extension);
+            resourcePathField.SetValue(prefabRef, relativePath);
             bundleField.SetValue(prefabRef, null);
+            // Logger.LogInfo($"PrefabRef uses base-game asset \"{relativePath}\" (converted from old path \"{resourcePath}\"){FromBundle(bundle)}", extended: true);
             return true;
         }
 
-        if (bundle == null || !resourcePath.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase)) return false;
+        if (!resourcePath.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase))
+        {
+            // if (bundle != null && !NetworkPrefabs.HasNetworkPrefab(resourcePath))
+            // {
+            //     Logger.LogInfo($"PrefabRef uses base-game asset \"{resourcePath}\"{FromBundle(bundle)}", extended: true);
+            // }
+            return false;
+        }
+
+        if (bundle == null) return false;
         if (bundleField.GetValue(prefabRef) as AssetBundle == bundle) return false;
 
         if (!bundle.Contains(resourcePath.ToLowerInvariant()))
@@ -84,6 +96,11 @@ internal static class PrefabRefResolver
 
         bundleField.SetValue(prefabRef, bundle);
         return true;
+    }
+
+    private static string FromBundle(AssetBundle? bundle)
+    {
+        return bundle != null ? $" in bundle \"{bundle.name}\"" : string.Empty;
     }
 
     private static int Walk(object obj, AssetBundle bundle, int depth)
@@ -127,7 +144,6 @@ internal static class PrefabRefResolver
         return resolved;
     }
 
-    // Fields that can contain a PrefabRef: serializable classes and lists/arrays of them
     private static FieldInfo[] GetSerializedFields(Type type)
     {
         if (_serializedFields.TryGetValue(type, out var cached)) return cached;
