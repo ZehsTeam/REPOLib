@@ -90,6 +90,9 @@
     <Reference Include="PhotonRealtime"            HintPath="$(GameManagedFolder)\PhotonRealtime.dll"            PrivateAssets="all" />
     <Reference Include="PhotonUnityNetworking"     HintPath="$(GameManagedFolder)\PhotonUnityNetworking.dll"     PrivateAssets="all" />
     <Reference Include="Unity.TextMeshPro"         HintPath="$(GameManagedFolder)\Unity.TextMeshPro.dll"         PrivateAssets="all" />
+    <Reference Include="Unity.Localization"        HintPath="$(GameManagedFolder)\Unity.Localization.dll"        PrivateAssets="all" />
+    <Reference Include="Unity.Addressables"        HintPath="$(GameManagedFolder)\Unity.Addressables.dll"        PrivateAssets="all" />
+    <Reference Include="Unity.ResourceManager"     HintPath="$(GameManagedFolder)\Unity.ResourceManager.dll"     PrivateAssets="all" />
     <Reference Include="UnityEngine.UI"            HintPath="$(GameManagedFolder)\UnityEngine.UI.dll"            PrivateAssets="all" />
   </ItemGroup>
   <!-- Game References (END) -->
