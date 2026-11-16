@@ -1,4 +1,9 @@
-# v4.4.0
+# v4.5.0
+
+- Added support for mega & special level modules (#91)
+- Added LevelType field to LevelContent which allows setting the level as an arena/shop (#91)
+
+## v4.4.0
 
 - Localization now works in modded projects (#90)
 - Mods can add their own localization and LocalizedAssets that use base-game entries now point to the game's own tables (#90)
