@@ -1,4 +1,5 @@
 using REPOLib.Modules;
+using REPOLib.Objects;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,6 +14,9 @@ public class LevelContent : Content
     #pragma warning disable CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
     [SerializeField]
     private Level? _level;
+
+    [SerializeField]
+    private LevelType _levelType = LevelType.Normal;
 
     [SerializeField]
     private GameObject? _connectObject;
@@ -37,6 +41,9 @@ public class LevelContent : Content
     [SerializeField]
     private List<GameObject> _modulesExtraction1 = [];
 
+    [SerializeField]
+    private List<GameObject> _modulesMega1 = [];
+
     [Space]
     [Header("Difficulty 2")]
     [SerializeField]
@@ -51,6 +58,9 @@ public class LevelContent : Content
     [SerializeField]
     private List<GameObject> _modulesExtraction2 = [];
 
+    [SerializeField]
+    private List<GameObject> _modulesMega2 = [];
+
     [Space]
     [Header("Difficulty 3")]
     [SerializeField]
@@ -64,6 +74,16 @@ public class LevelContent : Content
 
     [SerializeField]
     private List<GameObject> _modulesExtraction3 = [];
+
+    [SerializeField]
+    private List<GameObject> _modulesMega3 = [];
+
+    [Space]
+    [Header("Special")]
+    [SerializeField]
+    private int _modulesSpecialAmount;
+    [SerializeField]
+    private List<GameObject> _modulesSpecial = [];
     #pragma warning restore CS0649 // Field 'field' is never assigned to, and will always have its default value 'value'
 
     /// <summary>
@@ -75,6 +95,11 @@ public class LevelContent : Content
     /// The name of the <see cref="Level"/>
     /// </summary>
     public override string Name => Level?.name ?? string.Empty;
+
+    /// <summary>
+    /// The <see cref="Objects.LevelType"/> of the <see cref="Level"/>.
+    /// </summary>
+    public LevelType LevelType => _levelType;
 
     // TODO: Document this.
     #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -88,16 +113,22 @@ public class LevelContent : Content
     public List<GameObject> ModulesPassage1 => _modulesPassage1;
     public List<GameObject> ModulesDeadEnd1 => _modulesDeadEnd1;
     public List<GameObject> ModulesExtraction1 => _modulesExtraction1;
+    public List<GameObject> ModulesMega1 => _modulesMega1;
 
     public List<GameObject> ModulesNormal2 => _modulesNormal2;
     public List<GameObject> ModulesPassage2 => _modulesPassage2;
     public List<GameObject> ModulesDeadEnd2 => _modulesDeadEnd2;
     public List<GameObject> ModulesExtraction2 => _modulesExtraction2;
+    public List<GameObject> ModulesMega2 => _modulesMega2;
 
     public List<GameObject> ModulesNormal3 => _modulesNormal3;
     public List<GameObject> ModulesPassage3 => _modulesPassage3;
     public List<GameObject> ModulesDeadEnd3 => _modulesDeadEnd3;
     public List<GameObject> ModulesExtraction3 => _modulesExtraction3;
+    public List<GameObject> ModulesMega3 => _modulesMega3;
+
+    public int ModulesSpecialAmount => _modulesSpecialAmount;
+    public List<GameObject> ModulesSpecial => _modulesSpecial;
     #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
     /// <inheritdoc/>
