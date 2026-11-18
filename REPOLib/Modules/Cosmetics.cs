@@ -133,7 +133,7 @@ public static class Cosmetics
             prefabRef = cosmeticContent.PrefabRef;
             if (prefabRef != null)
             {
-                prefabRef.bundle = cosmeticContent.Bundle;
+                PrefabRefResolver.Resolve(prefabRef, cosmeticContent.Bundle);
             }
         }
         else if (cosmeticContent.Prefab != null)

@@ -19,7 +19,9 @@ public static class Levels
         Normal,
         Passage,
         DeadEnd,
-        Extraction
+        Extraction,
+        Special,
+        Mega
     }
 
     /// <summary>
@@ -29,12 +31,25 @@ public static class Levels
     public static IReadOnlyList<Level> AllLevels => RunManager.instance?.levels ?? [];
 
     /// <summary>
+    /// Get the shop <see cref="Level"/> list from <see cref="RunManager"/>.
+    /// </summary>
+    /// <returns>A <see cref="Level"/> list from <see cref="RunManager"/>.</returns>
+    public static IReadOnlyList<Level> AllShopLevels => RunManager.instance?.levelShop ?? [];
+
+    /// <summary>
+    /// Get the arena <see cref="Level"/> list from <see cref="RunManager"/>.
+    /// </summary>
+    /// <returns>A <see cref="Level"/> list from <see cref="RunManager"/>.</returns>
+    public static IReadOnlyList<Level> AllArenaLevels => RunManager.instance?.levelArena ?? [];
+
+    /// <summary>
     /// Get all levels registered with REPOLib.
     /// </summary>
     public static IReadOnlyList<Level> RegisteredLevels => _levelsRegistered;
 
     private static readonly List<Level> _levelsToRegister = [];
     private static readonly List<Level> _levelsRegistered = [];
+    private static readonly Dictionary<Level, LevelType> _levelTypes = [];
 
     private static bool _initialLevelsRegistered;
 
@@ -62,20 +77,48 @@ public static class Levels
             return;
         }
 
-        RegisterLevelValuablePresets(level);
+        LevelType levelType = GetLevelType(level);
+        List<Level> levelList = GetGameLevelList(levelType);
+
+        if (levelList.Any(x => x != null && x.name.Equals(level.name, StringComparison.OrdinalIgnoreCase)))
+        {
+            Logger.LogError($"Failed to add {levelType} level \"{level.name}\". A level already exists with the same name.");
+            return;
+        }
+
+        RegisterLevelValuablePresets(level, levelType);
         LevelAmbiences.RegisterLevelAmbience(level);
 
-        RunManager.instance.levels.Add(level);
+        levelList.Add(level);
 
-        Logger.LogInfo($"Added level \"{level.name}\"", extended: true);
+        Logger.LogInfo($"Added {levelType} level \"{level.name}\"", extended: true);
 
         _levelsRegistered.Add(level);
     }
 
-    private static void RegisterLevelValuablePresets(Level level)
+    private static LevelType GetLevelType(Level level)
+    {
+        return _levelTypes.TryGetValue(level, out LevelType levelType) ? levelType : LevelType.Normal;
+    }
+
+    private static List<Level> GetGameLevelList(LevelType levelType)
+    {
+        RunManager runManager = RunManager.instance;
+
+        return levelType switch
+        {
+            LevelType.Shop => runManager.levelShop,
+            LevelType.Arena => runManager.levelArena,
+            _ => runManager.levels,
+        };
+    }
+
+    private static void RegisterLevelValuablePresets(Level level, LevelType levelType)
     {
         if (level.ValuablePresets.Count == 0)
         {
+            if (levelType == LevelType.Shop) return;
+
             Logger.LogWarning($"Level \"{level.name}\" does not have any valuable presets! Adding generic preset.");
             level.ValuablePresets.Add(ValuablePresets.GenericValuablePreset);
             return;
@@ -158,21 +201,28 @@ public static class Levels
         level.ModulesPassage1 = RegisterLevelModules(level, ModuleType.Passage, levelContent.ModulesPassage1);
         level.ModulesDeadEnd1 = RegisterLevelModules(level, ModuleType.DeadEnd, levelContent.ModulesDeadEnd1);
         level.ModulesExtraction1 = RegisterLevelModules(level, ModuleType.Extraction, levelContent.ModulesExtraction1);
+        level.ModulesMega1 = RegisterLevelModules(level, ModuleType.Mega, levelContent.ModulesMega1);
 
         level.ModulesNormal2 = RegisterLevelModules(level, ModuleType.Normal, levelContent.ModulesNormal2);
         level.ModulesPassage2 = RegisterLevelModules(level, ModuleType.Passage, levelContent.ModulesPassage2);
         level.ModulesDeadEnd2 = RegisterLevelModules(level, ModuleType.DeadEnd, levelContent.ModulesDeadEnd2);
         level.ModulesExtraction2 = RegisterLevelModules(level, ModuleType.Extraction, levelContent.ModulesExtraction2);
+        level.ModulesMega2 = RegisterLevelModules(level, ModuleType.Mega, levelContent.ModulesMega2);
 
         level.ModulesNormal3 = RegisterLevelModules(level, ModuleType.Normal, levelContent.ModulesNormal3);
         level.ModulesPassage3 = RegisterLevelModules(level, ModuleType.Passage, levelContent.ModulesPassage3);
         level.ModulesDeadEnd3 = RegisterLevelModules(level, ModuleType.DeadEnd, levelContent.ModulesDeadEnd3);
         level.ModulesExtraction3 = RegisterLevelModules(level, ModuleType.Extraction, levelContent.ModulesExtraction3);
+        level.ModulesMega3 = RegisterLevelModules(level, ModuleType.Mega, levelContent.ModulesMega3);
 
-        if(level.LoadingGraphic01.IsValid()) level.LoadingGraphic01.bundle = levelContent.Bundle;
-        if(level.LoadingGraphic02.IsValid()) level.LoadingGraphic02.bundle = levelContent.Bundle;
-        if(level.LoadingGraphic03.IsValid()) level.LoadingGraphic03.bundle = levelContent.Bundle;
+        level.ModulesSpecialAmount = levelContent.ModulesSpecialAmount;
+        level.ModulesSpecial = RegisterLevelModules(level, ModuleType.Special, levelContent.ModulesSpecial);
 
+        if(level.LoadingGraphic01.IsValid()) PrefabRefResolver.Resolve(level.LoadingGraphic01, levelContent.Bundle);
+        if(level.LoadingGraphic02.IsValid()) PrefabRefResolver.Resolve(level.LoadingGraphic02, levelContent.Bundle);
+        if(level.LoadingGraphic03.IsValid()) PrefabRefResolver.Resolve(level.LoadingGraphic03, levelContent.Bundle);
+
+        _levelTypes[level] = levelContent.LevelType;
         _levelsToRegister.Add(level);
 
         if (_initialLevelsRegistered)

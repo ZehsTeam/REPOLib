@@ -1,4 +1,15 @@
-# v4.3.0
+# v4.5.0
+
+- Added support for mega & special level modules (#91)
+- Added LevelType field to LevelContent which allows setting the level as an arena/shop (#91)
+
+## v4.4.0
+
+- Localization now works in modded projects (#90)
+- Mods can add their own localization and LocalizedAssets that use base-game entries now point to the game's own tables (#90)
+- PrefabRefs to base-game assets in Resources now load the game's own copy instead of bundling one (#90)
+
+## v4.3.0
 
 - Updated for R.E.P.O. v0.5.0 (#88)
 
