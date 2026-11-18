@@ -18,9 +18,15 @@ internal static class MetaManagerPatch
     // Mirrors MetaManager.saveAllowed for the modded save file
     private static bool moddedSaveAllowed;
 
-    private static string SavePathTemp(string _suffix = "") => Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}{_suffix}.tmp");
-    private static string SavePathFull(string _suffix = "") => Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}{_suffix}.es3");
-    private static string SavePathBackup(string _suffix = "") => Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}{_suffix}.bak");
+    private const int FileRetryAttempts = 5;
+    private const int FileRetryDelay = 200;
+    private const int BackupsKept = 3;
+
+    private static string ModdedSavePath => $"{MetaManager.instance.savePath}Modded";
+    private static string SavePathVanilla => Path.Combine(Application.persistentDataPath, $"{MetaManager.instance.savePath}.es3");
+    private static string SavePathFull => Path.Combine(Application.persistentDataPath, $"{ModdedSavePath}.es3");
+    private static string SavePathLegacyBackup => Path.Combine(Application.persistentDataPath, $"{ModdedSavePath}.bak");
+    private static string SavePathLegacyTemp => Path.Combine(Application.persistentDataPath, $"{ModdedSavePath}.tmp");
 
     [HarmonyPatch(nameof(MetaManager.Awake))]
     [HarmonyPrefix]
@@ -85,10 +91,10 @@ internal static class MetaManagerPatch
         missingCosmeticEquipped.Clear();
         missingCosmeticPresets.ForEach(x => x.Clear());
 
-        // Vanilla deletes its save files before saving, do the same for the modded save
-        SemiFunc.DeleteFileSafe(SavePathTemp("Modded"));
-        SemiFunc.DeleteFileSafe(SavePathFull("Modded"));
-        SemiFunc.DeleteFileSafe(SavePathBackup("Modded"));
+        SemiFunc.DeleteFileSafe(SavePathFull);
+        SemiFunc.DeleteFileSafe(SavePathLegacyBackup);
+        SemiFunc.DeleteFileSafe(SavePathLegacyTemp);
+        foreach(var _backup in GetModdedBackups()) SemiFunc.DeleteFileSafe(_backup);
     }
 
     [HarmonyPatch(nameof(MetaManager.CosmeticPresetSet))]
@@ -111,27 +117,25 @@ internal static class MetaManagerPatch
         try{
             bool IsValidVanillaCosmetic(int x) => IsValidCosmetic(x) && !Cosmetics.RegisteredCosmetics.Contains(__instance.cosmeticAssets[x]);
 
-            string _pathTemp = SavePathTemp();
-            string _pathFull = SavePathFull();
-            string _pathBackup = SavePathBackup();
+            var _settings = __instance.MakeSettings(SavePathVanilla);
+            _settings.location = ES3.Location.Cache;
 
-            // Start from the existing vanilla save so values we don't write here are preserved
-            if(File.Exists(_pathFull)){
-                File.Copy(_pathFull, _pathTemp, overwrite: true);
+            if(File.Exists(SavePathVanilla)){
+                ES3.CacheFile(_settings);
+            }else{
+                ES3File.RemoveCachedFile(_settings);
+                ES3.Save("cosmeticEquipped", __instance.cosmeticEquipped.Where(IsValidVanillaCosmetic).ToList(), _settings);
+                ES3.Save("cosmeticPresets", __instance.cosmeticPresets.Select(x => x.Where(IsValidVanillaCosmetic).ToList()).ToList(), _settings);
+                ES3.Save("colorPresets", __instance.colorPresets, _settings);
+                ES3.Save("colorsEquipped", __instance.colorsEquipped, _settings);
             }
-            var _settings = __instance.MakeSettings(_pathTemp);
 
             // Values that are in-sync with vanilla save file
             ES3.Save("cosmeticTokens", __instance.cosmeticTokens, _settings);
             ES3.Save("cosmeticUnlocks", __instance.cosmeticUnlocks.Where(IsValidVanillaCosmetic).ToList(), _settings);
             ES3.Save("cosmeticHistory", __instance.cosmeticHistory.Where(IsValidVanillaCosmetic).ToList(), _settings);
 
-            if(!__instance.VerifySaveFile(_pathTemp)){
-                Logger.LogError($"[MetaSave] Failed to verify {Path.GetFileName(_pathTemp)}");
-                SemiFunc.DeleteFileSafe(_pathTemp);
-            }else{
-                CommitSaveFile(_pathTemp, _pathFull, _pathBackup, "MetaSave");
-            }
+            ES3.StoreCachedFile(_settings);
 
         }catch(System.Exception e){
             Logger.LogError($"[MetaSave] Save failed: {e}");
@@ -144,11 +148,8 @@ internal static class MetaManagerPatch
         try{
             bool IsValidModdedCosmetic(int x) => IsValidCosmetic(x) && Cosmetics.RegisteredCosmetics.Contains(__instance.cosmeticAssets[x]);
 
-            string _pathTemp = SavePathTemp("Modded");
-            string _pathFull = SavePathFull("Modded");
-            string _pathBackup = SavePathBackup("Modded");
-
-            var _settings = __instance.MakeSettings(_pathTemp);
+            var _settings = __instance.MakeSettings(SavePathFull);
+            _settings.location = ES3.Location.Cache;
 
             ES3.Save("cosmeticUnlocks", __instance.cosmeticUnlocks.Where(IsValidModdedCosmetic).Select(x => __instance.cosmeticAssets[x].assetId)
                 .Concat(missingCosmeticUnlocks).ToList(), _settings);
@@ -165,12 +166,7 @@ internal static class MetaManagerPatch
             ES3.Save("colorPresets", __instance.colorPresets, _settings);
             ES3.Save("colorsEquipped", __instance.colorsEquipped, _settings);
 
-            if(!VerifyModdedSaveFile(_pathTemp)){
-                Logger.LogError($"[MetaSaveModded] Failed to verify {Path.GetFileName(_pathTemp)}");
-                SemiFunc.DeleteFileSafe(_pathTemp);
-            }else{
-                CommitSaveFile(_pathTemp, _pathFull, _pathBackup, "MetaSaveModded");
-            }
+            ES3.StoreCachedFile(_settings);
 
         }catch(System.Exception e){
             Logger.LogError($"[MetaSaveModded] Save failed: {e}");
@@ -180,27 +176,23 @@ internal static class MetaManagerPatch
         return false;
     }
 
-    private static void CommitSaveFile(string _pathTemp, string _pathFull, string _pathBackup, string _logTag){
-        SemiFunc.DeleteFileSafe(_pathBackup);
-        try{
-            if(File.Exists(_pathFull)) File.Move(_pathFull, _pathBackup);
-        }catch(System.Exception e){
-            Logger.LogWarning($"[{_logTag}] Could not back up {Path.GetFileName(_pathFull)} - saving without backup: {e.Message}");
-        }
-
-        if(File.Exists(_pathFull)){
-            File.Copy(_pathTemp, _pathFull, true);
-            SemiFunc.DeleteFileSafe(_pathTemp);
-        }else{
-            File.Move(_pathTemp, _pathFull);
-        }
+    private static List<string> GetModdedBackups(){
+        return Directory.GetFiles(Application.persistentDataPath, $"{ModdedSavePath}_BACKUP*.es3").OrderByDescending(SemiFunc.GetBackupNumber).ToList();
     }
 
-    private static bool VerifyModdedSaveFile(string _path){
+    private static bool CreateModdedBackup(string _path){
+
+        if(!SemiFunc.IsMainEditor() || !File.Exists(_path)) return false;
+
         try{
-            var _settings = MetaManager.instance.MakeSettings(_path);
-            return ES3.FileExists(_settings) && ES3.KeyExists("cosmeticPresets", _settings) && ES3.KeyExists("cosmeticUnlocks", _settings);
-        }catch{
+            var _backups = GetModdedBackups();
+            var _index = _backups.Count > 0 ? SemiFunc.GetBackupNumber(_backups[0]) + 1 : 1;
+            File.Copy(_path, Path.Combine(Application.persistentDataPath, $"{ModdedSavePath}_BACKUP{_index}.es3"), true);
+
+            foreach(var _old in GetModdedBackups().Skip(BackupsKept)) SemiFunc.DeleteFileSafe(_old);
+            return true;
+        }catch(System.Exception e){
+            Logger.LogWarning($"[MetaSaveModded] Could not back up {Path.GetFileName(_path)}: {e.Message}");
             return false;
         }
     }
@@ -294,39 +286,52 @@ internal static class MetaManagerPatch
         }
     }
 
+    private static bool TryLoadModdedRetry(string _path){
+
+        if(!File.Exists(_path)) return false;
+
+        for(int _attempt = 1; _attempt < FileRetryAttempts; _attempt++){
+            if(TryLoadModded(_path)) return true;
+            System.Threading.Thread.Sleep(FileRetryDelay);
+        }
+
+        return TryLoadModded(_path);
+    }
+
     public static void LoadModded()
     {
         if(!MetaManager.instance) return;
 
-        string _pathTemp = SavePathTemp("Modded");
-        string _pathFull = SavePathFull("Modded");
-        string _pathBackup = SavePathBackup("Modded");
+        SemiFunc.DeleteFileSafe(SavePathLegacyTemp);
+        if(File.Exists(SavePathLegacyBackup)){
+            CreateModdedBackup(SavePathLegacyBackup);
+            SemiFunc.DeleteFileSafe(SavePathLegacyBackup);
+        }
 
-        SemiFunc.DeleteFileSafe(_pathTemp);
-
-        if(TryLoadModded(_pathFull)){
-            Logger.LogInfo($"[MetaSaveModded] {Path.GetFileName(_pathFull)} found");
+        if(TryLoadModdedRetry(SavePathFull)){
+            Logger.LogInfo($"[MetaSaveModded] {ModdedSavePath}.es3 found");
+            CreateModdedBackup(SavePathFull);
             moddedSaveAllowed = true;
             return;
         }
 
-        if(TryLoadModded(_pathBackup)){
-            Logger.LogWarning($"[MetaSaveModded] {Path.GetFileName(_pathFull)} restored from {Path.GetFileName(_pathBackup)}");
-            MetaManager.instance.PreserveSaveFile(_pathFull);
-            SemiFunc.DeleteFileSafe(_pathFull);
+        var _backups = GetModdedBackups();
+        foreach(var _backup in _backups){
+            if(!TryLoadModdedRetry(_backup)) continue;
+            Logger.LogWarning($"[MetaSaveModded] {ModdedSavePath}.es3 restored from {Path.GetFileName(_backup)}");
+            SemiFunc.DeleteFileSafe(SavePathFull);
             moddedSaveAllowed = true;
             MetaManager.instance.Save();
             return;
         }
 
-        if(File.Exists(_pathFull) || File.Exists(_pathBackup)){
-            MetaManager.instance.PreserveSaveFile(_pathFull);
-            Logger.LogError($"[MetaSaveModded] {Path.GetFileName(_pathFull)} exists but could not be loaded - modded saving disabled this session");
+        if(File.Exists(SavePathFull) || _backups.Count > 0){
+            Logger.LogError($"[MetaSaveModded] {ModdedSavePath} exists but could not be loaded - modded saving disabled this session");
             moddedSaveAllowed = false;
             return;
         }
 
-        Logger.LogWarning($"[MetaSaveModded] {Path.GetFileName(_pathFull)} not found - creating new");
+        Logger.LogWarning($"[MetaSaveModded] {ModdedSavePath}.es3 not found - creating new");
         moddedSaveAllowed = true;
         MetaManager.instance.Save();
     }
