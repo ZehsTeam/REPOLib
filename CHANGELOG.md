@@ -1,4 +1,8 @@
-# v4.5.0
+# v4.5.1
+
+- Fixes for R.E.P.O. v0.5.2 (#92 + #93)
+
+## v4.5.0
 
 - Added support for mega & special level modules (#91)
 - Added LevelType field to LevelContent which allows setting the level as an arena/shop (#91)
